@@ -53,15 +53,38 @@ api.interceptors.request.use(
  * If the backend says 401 (token expired / invalid), we clear the stale credentials.
  * We do NOT hard-redirect to /login here — that is handled by ProtectedRoute and Redux.
  */
+import toast from "react-hot-toast";
+
 api.interceptors.response.use(
   (response: any) => {
     return response;
   },
   (error: unknown) => {
-    if ((error as import('axios').AxiosError<{message?: string}>)?.response && (error as import('axios').AxiosError<{message?: string}>)?.response?.status === 401) {
-      /* Clear stale credentials so the app knows the user is no longer authenticated */
-      localStorage.removeItem("token");
-      localStorage.removeItem("user");
+    const axiosError = error as import('axios').AxiosError<{message?: string, errors?: Array<{message: string}>}>;
+    const response = axiosError.response;
+
+    if (response) {
+      if (response.status === 401) {
+        /* Clear stale credentials so the app knows the user is no longer authenticated */
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+      }
+
+      // Extract the valid error reason from the backend response
+      let errorMessage = response.data?.message || "An unexpected error occurred";
+      
+      // Handle validation error arrays
+      if (response.data?.errors && Array.isArray(response.data.errors) && response.data.errors.length > 0) {
+        errorMessage = response.data.errors.map((e: any) => e.message).join(", ");
+      }
+
+      // Display the toast for every API failure so the user knows the valid reason
+      toast.error(errorMessage);
+    } else if (axiosError.request) {
+      // Network error or no response
+      toast.error("Network error: Unable to reach the server");
+    } else {
+      toast.error(axiosError.message || "An unexpected error occurred");
     }
 
     return Promise.reject(error);
