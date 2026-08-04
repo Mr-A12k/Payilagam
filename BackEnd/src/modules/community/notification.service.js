@@ -1,0 +1,114 @@
+const prisma = require('../../config/prisma');
+
+const createNotification = async (userId, data) => {
+    const { type, title, message, link } = data;
+
+    return prisma.notification.create({
+        data: {
+            userId,
+            type,
+            title,
+            message,
+            link: link || null,
+        },
+    });
+};
+
+const createBulkNotifications = async (userIds, data) => {
+    const { type, title, message, link } = data;
+
+    const notifications = userIds.map((userId) => ({
+        userId,
+        type,
+        title,
+        message,
+        link: link || null,
+    }));
+
+    return prisma.notification.createMany({
+        data: notifications,
+    });
+};
+
+const getUserNotifications = async (userId, pagination) => {
+    const { skip, take } = pagination;
+
+    const [notifications, total, unreadCount] = await Promise.all([
+        prisma.notification.findMany({
+            where: { userId },
+            skip,
+            take,
+            orderBy: { createdAt: 'desc' },
+        }),
+        prisma.notification.count({ where: { userId } }),
+        prisma.notification.count({ where: { userId, isRead: false } }),
+    ]);
+
+    return { notifications, total, unreadCount };
+};
+
+const markAsRead = async (notificationId, userId) => {
+    const notification = await prisma.notification.findUnique({
+        where: { notificationId: parseInt(notificationId) },
+    });
+
+    if (!notification) {
+        throw new Error('Notification not found');
+    }
+
+    if (notification.userId !== userId) {
+        throw new Error('Access denied');
+    }
+
+    return prisma.notification.update({
+        where: { notificationId: parseInt(notificationId) },
+        data: { isRead: true },
+    });
+};
+
+const markAllAsRead = async (userId) => {
+    await prisma.notification.updateMany({
+        where: { userId, isRead: false },
+        data: { isRead: true },
+    });
+
+    return { message: 'All notifications marked as read' };
+};
+
+const deleteNotification = async (notificationId, userId) => {
+    const notification = await prisma.notification.findUnique({
+        where: { notificationId: parseInt(notificationId) },
+    });
+
+    if (!notification) {
+        throw new Error('Notification not found');
+    }
+
+    if (notification.userId !== userId) {
+        throw new Error('Access denied');
+    }
+
+    await prisma.notification.delete({
+        where: { notificationId: parseInt(notificationId) },
+    });
+
+    return { message: 'Notification deleted' };
+};
+
+const getUnreadCount = async (userId) => {
+    const count = await prisma.notification.count({
+        where: { userId, isRead: false },
+    });
+
+    return { unreadCount: count };
+};
+
+module.exports = {
+    createNotification,
+    createBulkNotifications,
+    getUserNotifications,
+    markAsRead,
+    markAllAsRead,
+    deleteNotification,
+    getUnreadCount,
+};

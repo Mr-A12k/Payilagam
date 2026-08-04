@@ -1,0 +1,712 @@
+/**
+ * @file index.css
+ * @description Global stylesheet for the TaskPro application.
+ *
+ * Structure:
+ *   1. Font imports (Google Fonts: Geist + Inter)
+ *   2. Tailwind CSS v4 import
+ *   3. shadcn/ui CSS variables (light + dark themes)
+ *   4. Theme system — dark/light CSS custom properties via data-theme attribute
+ *   5. Custom brand tokens
+ *   6. Base typography styles
+ *   7. Custom component classes
+ *   8. Scrollbar styling
+ */
+
+@import url("https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap");
+@import "tailwindcss";
+
+/* ══════════════════════════════════════════════════
+   shadcn/ui Theme Variables
+   These CSS custom properties power all shadcn components.
+   They use the OKLCH color space for perceptually uniform colors.
+   ══════════════════════════════════════════════════ */
+
+@theme inline {
+  /* ── shadcn semantic color tokens ────────────────── */
+  --color-background: oklch(1 0 0);
+  --color-foreground: oklch(0.145 0 0);
+  --color-card: oklch(1 0 0);
+  --color-card-foreground: oklch(0.145 0 0);
+  --color-popover: oklch(1 0 0);
+  --color-popover-foreground: oklch(0.145 0 0);
+  --color-primary: oklch(0.205 0 0);
+  --color-primary-foreground: oklch(0.985 0 0);
+  --color-secondary: oklch(0.97 0 0);
+  --color-secondary-foreground: oklch(0.205 0 0);
+  --color-muted: oklch(0.97 0 0);
+  --color-muted-foreground: oklch(0.556 0 0);
+  --color-accent: oklch(0.97 0 0);
+  --color-accent-foreground: oklch(0.205 0 0);
+  --color-destructive: oklch(0.577 0.245 27.325);
+  --color-destructive-foreground: oklch(0.577 0.245 27.325);
+  --color-border: oklch(0.922 0 0);
+  --color-input: oklch(0.922 0 0);
+  --color-ring: oklch(0.708 0 0);
+  --color-chart-1: oklch(0.646 0.222 41.116);
+  --color-chart-2: oklch(0.6 0.118 184.714);
+  --color-chart-3: oklch(0.398 0.07 227.392);
+  --color-chart-4: oklch(0.828 0.189 84.429);
+  --color-chart-5: oklch(0.769 0.188 70.08);
+  --color-sidebar: oklch(0.985 0 0);
+  --color-sidebar-foreground: oklch(0.145 0 0);
+  --color-sidebar-primary: oklch(0.205 0 0);
+  --color-sidebar-primary-foreground: oklch(0.985 0 0);
+  --color-sidebar-accent: oklch(0.97 0 0);
+  --color-sidebar-accent-foreground: oklch(0.205 0 0);
+  --color-sidebar-border: oklch(0.922 0 0);
+  --color-sidebar-ring: oklch(0.708 0 0);
+
+  /* ── Radius tokens ──────────────────────────────── */
+  --radius-sm: 0.5rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.5rem;
+  --radius-xl: 0.5rem;
+  --radius-2xl: 0.5rem;
+  --radius-3xl: 0.5rem;
+
+  /* ── Custom brand tokens (Academic Excellence) ─────── */
+  --color-brand-primary: #0f4c81;
+  --color-brand-secondary: #10b981;
+  --color-brand-tertiary: #f59e0b;
+  --color-brand-neutral: #64748b;
+  --color-surface: #ffffff;
+  --color-surface-hover: #fafbfc;
+
+  /* ── Typography ─────────────────────────────────── */
+  --font-headline: "Geist", -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-body: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-label: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-sans: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+/* ══════════════════════════════════════════════════
+   THEME SYSTEM
+   CSS custom properties for dark and light themes.
+   Applied via [data-theme] attribute on <html>.
+   All components should use these variables.
+   ══════════════════════════════════════════════════ */
+
+/* ── DARK THEME (default) ───────────────────────── */
+:root,
+[data-theme="dark"] {
+  /* Backgrounds */
+  --bg-base: #020617;          /* slate-950 */
+  --bg-surface: #0f172a;       /* slate-900 */
+  --bg-surface-2: #1e293b;     /* slate-800 */
+  --bg-surface-3: #334155;     /* slate-700 */
+  --bg-hover: #1e293b;         /* slate-800 */
+  --bg-active: #0f172a;        /* slate-900 */
+  --bg-input: #020617;         /* slate-950 */
+  --bg-card: #0f172a;          /* slate-900 */
+  --bg-card-hover: #1e293b;    /* slate-800 */
+  --bg-overlay: rgba(2, 6, 23, 0.7);
+  --bg-glass: rgba(15, 23, 42, 0.8);
+
+  /* Text */
+  --text-primary: #f1f5f9;     /* slate-100 */
+  --text-secondary: #94a3b8;   /* slate-400 */
+  --text-muted: #64748b;       /* slate-500 */
+  --text-disabled: #475569;    /* slate-600 */
+  --text-inverse: #0f172a;     /* slate-900 */
+  --text-heading: #f8fafc;     /* slate-50 */
+
+  /* Borders */
+  --border-default: #1e293b;   /* slate-800 */
+  --border-subtle: #334155;    /* slate-700 */
+  --border-strong: #475569;    /* slate-600 */
+  --border-input: #1e293b;     /* slate-800 */
+  --border-focus: #60a5fa;     /* blue-400 */
+
+  /* Brand/Accent */
+  --accent-primary: #3b82f6;   /* blue-500 */
+  --accent-primary-hover: #2563eb; /* blue-600 */
+  --accent-primary-subtle: rgba(59, 130, 246, 0.1);
+  --accent-primary-border: rgba(59, 130, 246, 0.2);
+  --accent-success: #10b981;
+  --accent-warning: #f59e0b;
+  --accent-danger: #ef4444;
+  --accent-info: #06b6d4;
+
+  /* Sidebar */
+  --sidebar-bg: #0f172a;
+  --sidebar-bg-hover: #1e293b;
+  --sidebar-bg-active: rgba(59, 130, 246, 0.1);
+  --sidebar-text: #94a3b8;
+  --sidebar-text-active: #60a5fa;
+  --sidebar-border: #1e293b;
+  --sidebar-icon: #64748b;
+
+  /* Header / Navbar */
+  --header-bg: rgba(2, 6, 23, 0.85);
+  --header-border: rgba(30, 41, 59, 0.7);
+  --header-shadow: 0 1px 0 0 rgba(30, 41, 59, 0.6);
+
+  /* Scrollbar */
+  --scrollbar-track: transparent;
+  --scrollbar-thumb: #334155;
+  --scrollbar-thumb-hover: #475569;
+
+  /* Cards */
+  --card-bg: #0f172a;
+  --card-border: #1e293b;
+  --card-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+
+  /* Inputs */
+  --input-bg: #020617;
+  --input-border: #1e293b;
+  --input-text: #f1f5f9;
+  --input-placeholder: #64748b;
+  --input-focus-ring: rgba(96, 165, 250, 0.3);
+
+  /* Code / Practice */
+  --code-bg: #0d1117;
+  --code-border: #1e293b;
+
+  /* Badge */
+  --badge-bg: #1e293b;
+  --badge-text: #94a3b8;
+
+  /* Drawer */
+  --drawer-bg: #0f172a;
+  --drawer-border: #1e293b;
+  --drawer-overlay: rgba(2, 6, 23, 0.7);
+
+  /* Dialog */
+  --dialog-bg: #0f172a;
+  --dialog-border: #1e293b;
+  --dialog-overlay: rgba(2, 6, 23, 0.8);
+
+  /* Filters */
+  --theme-filter-invert: none;
+}
+
+/* ── LIGHT THEME ────────────────────────────────── */
+/* ── LIGHT THEME ────────────────────────────────── */
+[data-theme="light"] {
+  /* Backgrounds */
+  --bg-base: #f1f5f9;          /* slate-100 - cooler deeper base */
+  --bg-surface: #ffffff;       /* white */
+  --bg-surface-2: #f8fafc;     /* slate-50 - headers, sidebar */
+  --bg-surface-3: #e2e8f0;     /* slate-200 */
+  --bg-hover: #f1f5f9;         /* slate-100 */
+  --bg-active: #e2e8f0;        /* slate-200 */
+  --bg-input: #ffffff;         /* white */
+  --bg-card: #ffffff;
+  --bg-card-hover: #f8fafc;
+  --bg-overlay: rgba(255, 255, 255, 0.8);
+  --bg-glass: rgba(255, 255, 255, 0.95);
+
+  /* Text */
+  --text-primary: #0f172a;     /* slate-900 */
+  --text-secondary: #334155;   /* slate-700 */
+  --text-muted: #64748b;       /* slate-500 */
+  --text-disabled: #94a3b8;    /* slate-400 */
+  --text-inverse: #ffffff;     /* white */
+  --text-heading: #020617;     /* slate-950 */
+
+  /* Borders */
+  --border-default: #e2e8f0;   /* slate-200 */
+  --border-subtle: #f1f5f9;    /* slate-100 */
+  --border-strong: #cbd5e1;    /* slate-300 */
+  --border-input: #cbd5e1;     /* slate-300 */
+  --border-focus: #3b82f6;     /* blue-500 */
+
+  /* Brand/Accent */
+  --accent-primary: #2563eb;   /* blue-600 */
+  --accent-primary-hover: #1d4ed8; /* blue-700 */
+  --accent-primary-subtle: rgba(37, 99, 235, 0.08);
+  --accent-primary-border: rgba(37, 99, 235, 0.2);
+  --accent-success: #059669;
+  --accent-warning: #d97706;
+  --accent-danger: #dc2626;
+  --accent-info: #0891b2;
+
+  /* Sidebar */
+  --sidebar-bg: #ffffff;
+  --sidebar-bg-hover: #f1f5f9;
+  --sidebar-bg-active: rgba(37, 99, 235, 0.07);
+  --sidebar-text: #475569;
+  --sidebar-text-active: #2563eb;
+  --sidebar-border: #e2e8f0;
+  --sidebar-icon: #94a3b8;
+
+  /* Header / Navbar */
+  --header-bg: rgba(255, 255, 255, 0.92);
+  --header-border: rgba(226, 232, 240, 0.9);
+  --header-shadow: 0 1px 0 0 rgba(226, 232, 240, 0.8);
+
+  /* Scrollbar */
+  --scrollbar-track: #f1f5f9;
+  --scrollbar-thumb: #cbd5e1;
+  --scrollbar-thumb-hover: #94a3b8;
+
+  /* Cards */
+  --card-bg: #ffffff;
+  --card-border: #e2e8f0;
+  --card-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
+
+  /* Inputs */
+  --input-bg: #f8fafc;
+  --input-border: #cbd5e1;
+  --input-text: #0f172a;
+  --input-placeholder: #94a3b8;
+  --input-focus-ring: rgba(37, 99, 235, 0.2);
+
+  /* Code / Practice */
+  --code-bg: #f8fafc;
+  --code-border: #e2e8f0;
+
+  /* Badge */
+  --badge-bg: #f1f5f9;
+  --badge-text: #475569;
+
+  /* Drawer */
+  --drawer-bg: #ffffff;
+  --drawer-border: #e2e8f0;
+  --drawer-overlay: rgba(15, 23, 42, 0.4);
+
+  /* Dialog */
+  --dialog-bg: #ffffff;
+  --dialog-border: #e2e8f0;
+  --dialog-overlay: rgba(15, 23, 42, 0.5);
+
+  /* Filters */
+  --theme-filter-invert: invert(1) opacity(0.3);
+}
+
+/* ══════════════════════════════════════════════════
+   Base Typography Styles
+   Applied globally to all elements via @layer base.
+   ══════════════════════════════════════════════════ */
+
+@layer base {
+  html {
+    transition: background-color 0.25s ease, color 0.25s ease;
+  }
+
+  body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    background-color: var(--bg-base);
+    color: var(--text-primary);
+    transition: background-color 0.25s ease, color 0.25s ease;
+  }
+
+  /* Heading typography — uses the display font */
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-headline);
+    color: var(--text-heading);
+    transition: color 0.25s ease;
+  }
+
+  /* Form labels */
+  label {
+    font-family: var(--font-label);
+    color: var(--text-secondary);
+    transition: color 0.25s ease;
+  }
+
+  /* Global Cursor Pointer Rules */
+  button,
+  a,
+  [role="button"],
+  input[type="submit"],
+  input[type="reset"],
+  input[type="button"],
+  select {
+    cursor: pointer;
+  }
+
+  /* Ensure disabled elements show not-allowed cursor */
+  *:disabled,
+  button:disabled,
+  [aria-disabled="true"] {
+    cursor: not-allowed;
+  }
+}
+
+/* ══════════════════════════════════════════════════
+   Custom Component Classes
+   Reusable utility classes used across multiple pages.
+   All now use CSS variables for theme awareness.
+   ══════════════════════════════════════════════════ */
+
+@layer components {
+  /* ── ICONS ────────────────────────────────────────── */
+  .icon-base {
+    @apply shrink-0 transition-transform duration-200 w-4 h-4;
+  }
+  .icon-md {
+    @apply shrink-0 transition-transform duration-200 w-5 h-5;
+  }
+  .icon-lg {
+    @apply shrink-0 transition-transform duration-200 w-6 h-6;
+  }
+
+  /* ── LAYOUT & CONTAINERS ───────────────────────────── */
+  .flex-center {
+    @apply flex items-center justify-center;
+  }
+  .flex-between {
+    @apply flex items-center justify-between;
+  }
+
+  /* ── NAV LINK ANIMATIONS ─────────────────────────── */
+
+  /* Premium sticky header - theme aware */
+  .premium-header {
+    background-color: var(--header-bg);
+    border-bottom: 1px solid var(--header-border);
+    box-shadow: var(--header-shadow);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    transition: background-color 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+  }
+
+  /* Mobile drawer overlay */
+  .drawer-overlay {
+    background-color: var(--drawer-overlay);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    @apply fixed inset-0 z-40;
+    transition: opacity 0.3s ease;
+  }
+
+  /* Mobile drawer panel */
+  .drawer-panel {
+    background-color: var(--drawer-bg);
+    border-left: 1px solid var(--drawer-border);
+    @apply fixed top-0 right-0 h-full w-80 max-w-[85vw] shadow-2xl z-50;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.25s ease;
+  }
+
+  /* ── Nav link animated underline ──────────────────── */
+  .nav-link {
+    position: relative;
+    color: var(--text-secondary);
+    transition: color 0.2s ease;
+  }
+
+  .nav-link:hover {
+    color: var(--text-primary);
+  }
+
+  /* Active link — subtle accent background tint */
+  .nav-link-active {
+    background: var(--accent-primary-subtle);
+    color: var(--accent-primary) !important;
+  }
+
+  /* Active link underline */
+  .nav-link-active::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 12px;
+    right: 12px;
+    height: 3px;
+    background: var(--accent-primary);
+    border-radius: 9999px;
+    box-shadow: 0 0 10px rgba(59, 130, 246, 0.4);
+  }
+
+  /* ── Theme-aware card ────────────────────────────── */
+  .theme-card {
+    background-color: var(--card-bg);
+    border: 1px solid var(--card-border);
+    box-shadow: var(--card-shadow);
+    border-radius: 1rem;
+    transition: background-color 0.25s ease, border-color 0.25s ease;
+  }
+
+  /* ── Theme-aware input ───────────────────────────── */
+  .theme-input {
+    background-color: var(--input-bg);
+    border: 1px solid var(--input-border);
+    color: var(--input-text);
+    transition: background-color 0.25s ease, border-color 0.25s ease, color 0.25s ease;
+  }
+
+  .theme-input::placeholder {
+    color: var(--input-placeholder);
+  }
+
+  .theme-input:focus {
+    border-color: var(--border-focus);
+    outline: none;
+    box-shadow: 0 0 0 3px var(--input-focus-ring);
+  }
+
+  /* ── Theme-aware surface ─────────────────────────── */
+  .theme-surface {
+    background-color: var(--bg-surface);
+    color: var(--text-primary);
+    transition: background-color 0.25s ease, color 0.25s ease;
+  }
+
+  .theme-surface-2 {
+    background-color: var(--bg-surface-2);
+    color: var(--text-primary);
+    transition: background-color 0.25s ease, color 0.25s ease;
+  }
+
+  /* ── Sidebar theme styles ────────────────────────── */
+  .sidebar-root {
+    background-color: var(--sidebar-bg);
+    border-right: 1px solid var(--sidebar-border);
+    transition: background-color 0.25s ease, border-color 0.25s ease;
+  }
+
+  .sidebar-nav-item {
+    color: var(--sidebar-text);
+    transition: background-color 0.2s ease, color 0.2s ease;
+  }
+
+  .sidebar-nav-item:hover {
+    background-color: var(--sidebar-bg-hover);
+    color: var(--text-primary);
+  }
+
+  .sidebar-nav-item.active {
+    background-color: var(--sidebar-bg-active);
+    color: var(--sidebar-text-active);
+  }
+}
+
+/* ══════════════════════════════════════════════════
+   Scrollbar Styling — theme aware
+   ══════════════════════════════════════════════════ */
+
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+}
+
+/* WebKit browsers */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--scrollbar-track);
+  border-radius: 100px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, var(--accent-primary), #8b5cf6);
+  border-radius: 100px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, var(--accent-primary-hover), #7c3aed);
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+/* ══════════════════════════════════════════════════
+   Animation tokens
+   ══════════════════════════════════════════════════ */
+
+@theme inline {
+  --animate-blob: blob 7s infinite;
+  @keyframes blob {
+    0% { transform: translate(0px, 0px) scale(1); }
+    33% { transform: translate(30px, -50px) scale(1.1); }
+    66% { transform: translate(-20px, 20px) scale(0.9); }
+    100% { transform: translate(0px, 0px) scale(1); }
+  }
+}
+
+@layer utilities {
+  .payilagam-hero {
+    isolation: isolate;
+  }
+
+  .hero-orbit-image {
+    animation: hero-orbit-drift 12s ease-in-out infinite alternate;
+    transform-origin: 70% 55%;
+  }
+
+  .hero-kicker,
+  .hero-title,
+  .hero-subtitle,
+  .hero-copy,
+  .hero-actions {
+    animation: hero-rise 700ms ease-out both;
+  }
+
+  .hero-title { animation-delay: 90ms; }
+  .hero-subtitle { animation-delay: 170ms; }
+  .hero-copy { animation-delay: 240ms; }
+  .hero-actions { animation-delay: 320ms; }
+
+  @keyframes hero-rise {
+    from { opacity: 0; transform: translateY(18px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes hero-orbit-drift {
+    from { transform: translate3d(0, 0, 0) scale(1); }
+    to   { transform: translate3d(-14px, -18px, 0) scale(1.015); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hero-orbit-image,
+    .hero-kicker,
+    .hero-title,
+    .hero-subtitle,
+    .hero-copy,
+    .hero-actions {
+      animation: none;
+    }
+  }
+
+  .animation-delay-2000 { animation-delay: 2s; }
+  .animation-delay-4000 { animation-delay: 4s; }
+
+  .hide-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* ══════════════════════════════════════════════════
+   LIGHT THEME OVERRIDES
+   Override specific dark-hardcoded Tailwind classes
+   when [data-theme="light"] is set on <html>.
+   ══════════════════════════════════════════════════ */
+
+/* Body + main background */
+[data-theme="light"] body {
+  background-color: #f8fafc;
+  color: #0f172a;
+}
+
+/* Override slate-950 backgrounds */
+[data-theme="light"] .bg-slate-950,
+[data-theme="light"] [class*="bg-slate-950"] {
+  background-color: var(--bg-base) !important;
+}
+
+/* Override slate-900 backgrounds */
+[data-theme="light"] .bg-slate-900,
+[data-theme="light"] [class*="bg-slate-900"] {
+  background-color: var(--bg-surface) !important;
+}
+
+/* Override slate-800 backgrounds */
+[data-theme="light"] .bg-slate-800,
+[data-theme="light"] [class*="bg-slate-800"] {
+  background-color: var(--bg-surface-2) !important;
+}
+
+/* Override slate-700 backgrounds (used in some components) */
+[data-theme="light"] .bg-slate-700 {
+  background-color: var(--bg-surface-3) !important;
+}
+
+/* Override text colors */
+[data-theme="light"] .text-slate-100,
+[data-theme="light"] .text-slate-50,
+[data-theme="light"] .text-white {
+  color: #0f172a !important;
+}
+
+[data-theme="light"] .text-slate-200 {
+  color: #1e293b !important;
+}
+
+[data-theme="light"] .text-slate-300 {
+  color: #334155 !important;
+}
+
+[data-theme="light"] .text-slate-400 {
+  color: #64748b !important;
+}
+
+[data-theme="light"] .text-slate-500 {
+  color: #94a3b8 !important;
+}
+
+/* Override border colors */
+[data-theme="light"] .border-slate-800,
+[data-theme="light"] .border-slate-700 {
+  border-color: #e2e8f0 !important;
+}
+
+[data-theme="light"] .border-slate-600 {
+  border-color: #cbd5e1 !important;
+}
+
+/* Override backdrop/glass effects */
+[data-theme="light"] .bg-slate-950\/80,
+[data-theme="light"] .bg-slate-950\/60,
+[data-theme="light"] .bg-slate-950\/50,
+[data-theme="light"] .bg-slate-950\/30 {
+  background-color: rgba(248, 250, 252, 0.9) !important;
+}
+
+[data-theme="light"] .bg-slate-900\/50,
+[data-theme="light"] .bg-slate-900\/80 {
+  background-color: rgba(255, 255, 255, 0.9) !important;
+}
+
+/* Override ring/glow colors for inputs */
+[data-theme="light"] .ring-slate-800 {
+  --tw-ring-color: #e2e8f0 !important;
+}
+
+/* Override blue text to be slightly darker on light */
+[data-theme="light"] .text-blue-400 {
+  color: #2563eb !important;
+}
+
+[data-theme="light"] .text-blue-300 {
+  color: #3b82f6 !important;
+}
+
+/* Headings in light mode */
+[data-theme="light"] h1,
+[data-theme="light"] h2,
+[data-theme="light"] h3,
+[data-theme="light"] h4,
+[data-theme="light"] h5,
+[data-theme="light"] h6 {
+  color: #0f172a;
+}
+
+/* Dialog/Modal backgrounds in light mode */
+[data-theme="light"] [role="dialog"] {
+  background-color: var(--dialog-bg);
+  border-color: var(--dialog-border);
+  color: var(--text-primary);
+}
+
+/* Dropdown menus in light mode */
+[data-theme="light"] [role="menu"],
+[data-theme="light"] [data-radix-popper-content-wrapper] {
+  background-color: #ffffff !important;
+  border-color: #e2e8f0 !important;
+  color: #0f172a !important;
+}
+
+/* Tooltip in light mode */
+[data-theme="light"] [role="tooltip"] {
+  background-color: #1e293b !important;
+  color: #f1f5f9 !important;
+}

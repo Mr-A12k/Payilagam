@@ -1,0 +1,767 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─────────────────────────────────────────────────────────────
+// AUTH & USER MANAGEMENT
+// ─────────────────────────────────────────────────────────────
+
+model Role {
+  roleId   Int    @id @default(autoincrement()) @map("role_id")
+  roleName String @unique @map("role_name")
+  users    User[]
+
+  @@map("roles")
+}
+
+model User {
+  userId      Int     @id @default(autoincrement()) @map("user_id")
+  userName    String  @unique @map("user_name")
+  fullName    String  @map("full_name")
+  email       String  @unique
+  mobile      String  @unique @map("mobile_number")
+  password    String
+  profileUrl  String? @map("profile_url")
+  bio         String?
+  skills      String? // JSON string of skills array
+  experience  String? @db.Text
+  socialLinks String? @map("social_links") // JSON string of social links
+
+  roleId Int @map("role_id")
+
+  theme String @default("dark")
+
+  isActive           Boolean   @default(true) @map("is_active")
+  mustChangePassword Boolean   @default(false) @map("must_change_password")
+  lastLoginAt        DateTime? @map("last_login_at")
+
+  createdAt  DateTime @default(now()) @map("created_at")
+  modifiedAt DateTime @updatedAt @map("modified_at")
+
+  role Role @relation(fields: [roleId], references: [roleId])
+
+  // Mentor relations
+  coursesTaught      Course[]        @relation("MentorCourses")
+  assignmentsCreated Assignment[]    @relation("MentorAssignments")
+  problemsCreated    CodingProblem[] @relation("ProblemCreator")
+
+  // Student relations
+  enrollments       Enrollment[]
+  submissions       AssignmentSubmission[]
+  codingSubmissions CodingSubmission[]
+  lessonProgress    LessonProgress[]
+  courseReviews     CourseReview[]
+
+  // Discussion relations
+  discussions       Discussion[]
+  discussionReplies DiscussionReply[]
+
+  // Chat relations
+  conversationParticipants ConversationParticipant[]
+  messages                 Message[]
+  ownedWorkspaces          Workspace[]               @relation("WorkspaceOwner")
+  workspaceMemberships     WorkspaceMember[]
+  channelMessages          ChannelMessage[]
+
+  // Network relations
+  followers          Follow[]        @relation("UserFollowers")
+  following          Follow[]        @relation("UserFollowing")
+  followRequestsSent FollowRequest[] @relation("SentFollowRequests")
+  followRequestsRecv FollowRequest[] @relation("ReceivedFollowRequests")
+
+  // Notification relations
+  notifications Notification[]
+
+  // System & Mentor relations
+  liveSessions      LiveSession[]
+  auditLogs         AuditLog[]
+  uploadedResources Resource[]
+  eduDocuments      EduDocument[]
+
+  // Password Reset
+  passwordResetOtp PasswordResetOTP?
+
+  @@map("users")
+}
+
+// ─────────────────────────────────────────────────────────────
+// COURSE MANAGEMENT
+// ─────────────────────────────────────────────────────────────
+
+model Category {
+  categoryId  Int     @id @default(autoincrement()) @map("category_id")
+  name        String  @unique
+  slug        String  @unique
+  description String?
+  icon        String?
+  parentId    Int?    @map("parent_id")
+
+  parent   Category?  @relation("CategoryTree", fields: [parentId], references: [categoryId])
+  children Category[] @relation("CategoryTree")
+  courses  Course[]
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("categories")
+}
+
+model Course {
+  courseId Int     @id @default(autoincrement()) @map("course_id")
+  uniqueId String? @unique @default(cuid()) @map("unique_id")
+
+  courseName   String  @map("course_name")
+  courseCode   String  @unique @map("course_code")
+  description  String?
+  thumbnail    String?
+  price        Float   @default(0)
+  level        String  @default("beginner") // beginner, intermediate, advanced
+  status       String  @default("draft") // draft, published, archived
+  duration     Int? // estimated duration in minutes
+  totalLessons Int     @default(0) @map("total_lessons")
+
+  mentorId   Int  @map("mentor_id")
+  categoryId Int? @map("category_id")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  mentor   User      @relation("MentorCourses", fields: [mentorId], references: [userId])
+  category Category? @relation(fields: [categoryId], references: [categoryId])
+
+  enrollments  Enrollment[]
+  assignments  Assignment[]
+  modules      CourseModule[]
+  reviews      CourseReview[]
+  liveSessions LiveSession[]
+  workspace    Workspace?
+
+  @@map("courses")
+}
+
+model CourseModule {
+  moduleId Int @id @default(autoincrement()) @map("module_id")
+
+  courseId    Int     @map("course_id")
+  title       String
+  description String?
+  orderIndex  Int     @default(0) @map("order_index")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  course  Course   @relation(fields: [courseId], references: [courseId], onDelete: Cascade)
+  lessons Lesson[]
+
+  @@map("course_modules")
+}
+
+model Lesson {
+  lessonId Int @id @default(autoincrement()) @map("lesson_id")
+
+  moduleId   Int     @map("module_id")
+  title      String
+  type       String  @default("video") // video, text, quiz, coding
+  content    String? // text content or video URL
+  videoUrl   String? @map("video_url")
+  duration   Int? // duration in minutes
+  orderIndex Int     @default(0) @map("order_index")
+  isFree     Boolean @default(false) @map("is_free")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  module         CourseModule     @relation(fields: [moduleId], references: [moduleId], onDelete: Cascade)
+  lessonProgress LessonProgress[]
+
+  @@map("lessons")
+}
+
+model LessonProgress {
+  progressId Int @id @default(autoincrement()) @map("progress_id")
+
+  studentId Int @map("student_id")
+  lessonId  Int @map("lesson_id")
+
+  completed   Boolean   @default(false)
+  completedAt DateTime? @map("completed_at")
+  watchTime   Int?      @default(0) @map("watch_time") // seconds watched
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  student User   @relation(fields: [studentId], references: [userId])
+  lesson  Lesson @relation(fields: [lessonId], references: [lessonId], onDelete: Cascade)
+
+  @@unique([studentId, lessonId])
+  @@map("lesson_progress")
+}
+
+// ─────────────────────────────────────────────────────────────
+// ENROLLMENT & PROGRESS
+// ─────────────────────────────────────────────────────────────
+
+model Enrollment {
+  enrollmentId Int @id @default(autoincrement()) @map("enrollment_id")
+
+  studentId Int @map("student_id")
+  courseId  Int @map("course_id")
+
+  status      String    @default("active") // active, completed, dropped
+  progress    Float     @default(0) // 0-100 percentage
+  enrolledAt  DateTime  @default(now()) @map("enrolled_at")
+  completedAt DateTime? @map("completed_at")
+
+  student User   @relation(fields: [studentId], references: [userId])
+  course  Course @relation(fields: [courseId], references: [courseId])
+
+  @@unique([studentId, courseId])
+  @@map("enrollments")
+}
+
+model CourseReview {
+  reviewId Int @id @default(autoincrement()) @map("review_id")
+
+  courseId  Int     @map("course_id")
+  studentId Int     @map("student_id")
+  rating    Int // 1-5
+  comment   String?
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  course  Course @relation(fields: [courseId], references: [courseId], onDelete: Cascade)
+  student User   @relation(fields: [studentId], references: [userId])
+
+  @@unique([courseId, studentId])
+  @@map("course_reviews")
+}
+
+// ─────────────────────────────────────────────────────────────
+// ASSIGNMENTS
+// ─────────────────────────────────────────────────────────────
+
+model Assignment {
+  assignmentId Int @id @default(autoincrement()) @map("assignment_id")
+
+  courseId Int @map("course_id")
+
+  title       String
+  description String?
+  type        String    @default("file_upload") // file_upload, coding_challenge, quiz, text
+  dueDate     DateTime? @map("due_date")
+  totalMarks  Int       @default(100) @map("total_marks")
+
+  // Link to coding problem if type is coding_challenge
+  problemId Int? @map("problem_id")
+
+  createdBy Int @map("created_by")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  course  Course         @relation(fields: [courseId], references: [courseId], onDelete: Cascade)
+  mentor  User           @relation("MentorAssignments", fields: [createdBy], references: [userId])
+  problem CodingProblem? @relation(fields: [problemId], references: [problemId])
+
+  submissions AssignmentSubmission[]
+
+  @@map("assignments")
+}
+
+model AssignmentSubmission {
+  submissionId Int @id @default(autoincrement()) @map("submission_id")
+
+  assignmentId Int @map("assignment_id")
+  studentId    Int @map("student_id")
+
+  // File submission
+  submissionFile String? @map("submission_file")
+  submissionText String? @map("submission_text")
+
+  // Code submission
+  language        String?
+  code            String?
+  executionTime   Float?  @map("execution_time") // milliseconds
+  memoryUsed      Float?  @map("memory_used") // KB
+  testCasesPassed Int?    @map("test_cases_passed")
+  totalTestCases  Int?    @map("total_test_cases")
+
+  submittedAt DateTime @default(now()) @map("submitted_at")
+
+  marks    Int?
+  feedback String?
+  status   String  @default("submitted") // submitted, reviewed, graded, returned
+
+  assignment Assignment @relation(fields: [assignmentId], references: [assignmentId], onDelete: Cascade)
+  student    User       @relation(fields: [studentId], references: [userId])
+
+  @@map("assignment_submissions")
+}
+
+// ─────────────────────────────────────────────────────────────
+// CODING PRACTICE (LeetCode-style)
+// ─────────────────────────────────────────────────────────────
+
+model CodingProblem {
+  problemId Int @id @default(autoincrement()) @map("problem_id")
+
+  title        String
+  slug         String  @unique
+  description  String // markdown
+  difficulty   String // easy, medium, hard
+  constraints  String? // markdown
+  inputFormat  String? @map("input_format")
+  outputFormat String? @map("output_format")
+  sampleInput  String? @map("sample_input")
+  sampleOutput String? @map("sample_output")
+  explanation  String?
+
+  // Supported languages as JSON array string e.g. '["javascript","python","java"]'
+  supportedLanguages String? @default("[\"javascript\",\"python\",\"java\",\"cpp\"]") @map("supported_languages")
+
+  // Starter code templates as JSON string
+  starterCode String? @map("starter_code")
+
+  createdBy Int @map("created_by")
+
+  isActive Boolean @default(true) @map("is_active")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  creator     User               @relation("ProblemCreator", fields: [createdBy], references: [userId])
+  testCases   TestCase[]
+  submissions CodingSubmission[]
+  tags        ProblemTagMap[]
+  assignments Assignment[]
+  discussions Discussion[]
+
+  @@map("coding_problems")
+}
+
+model TestCase {
+  testCaseId Int @id @default(autoincrement()) @map("test_case_id")
+
+  problemId Int @map("problem_id")
+
+  input          String
+  expectedOutput String  @map("expected_output")
+  isHidden       Boolean @default(false) @map("is_hidden") // hidden test cases not shown to student
+  orderIndex     Int     @default(0) @map("order_index")
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  problem CodingProblem @relation(fields: [problemId], references: [problemId], onDelete: Cascade)
+
+  @@map("test_cases")
+}
+
+model CodingSubmission {
+  submissionId Int @id @default(autoincrement()) @map("submission_id")
+
+  problemId Int @map("problem_id")
+  studentId Int @map("student_id")
+
+  language        String
+  code            String
+  status          String  @default("pending") // pending, running, accepted, wrong_answer, time_limit, runtime_error, compilation_error
+  executionTime   Float?  @map("execution_time") // milliseconds
+  memoryUsed      Float?  @map("memory_used") // KB
+  testCasesPassed Int     @default(0) @map("test_cases_passed")
+  totalTestCases  Int     @default(0) @map("total_test_cases")
+  output          String? // actual output for debugging
+  errorMessage    String? @map("error_message")
+
+  submittedAt DateTime @default(now()) @map("submitted_at")
+
+  problem CodingProblem @relation(fields: [problemId], references: [problemId], onDelete: Cascade)
+  student User          @relation(fields: [studentId], references: [userId])
+
+  @@map("coding_submissions")
+}
+
+model ProblemTag {
+  tagId Int    @id @default(autoincrement()) @map("tag_id")
+  name  String @unique
+  slug  String @unique
+
+  problems ProblemTagMap[]
+
+  @@map("problem_tags")
+}
+
+model ProblemTagMap {
+  problemId Int @map("problem_id")
+  tagId     Int @map("tag_id")
+
+  problem CodingProblem @relation(fields: [problemId], references: [problemId], onDelete: Cascade)
+  tag     ProblemTag    @relation(fields: [tagId], references: [tagId], onDelete: Cascade)
+
+  @@id([problemId, tagId])
+  @@map("problem_tag_map")
+}
+
+// ─────────────────────────────────────────────────────────────
+// DISCUSSIONS
+// ─────────────────────────────────────────────────────────────
+
+model Discussion {
+  discussionId Int @id @default(autoincrement()) @map("discussion_id")
+
+  title   String
+  content String
+
+  authorId  Int  @map("author_id")
+  problemId Int? @map("problem_id") // optional link to coding problem
+
+  upvotes    Int     @default(0)
+  isResolved Boolean @default(false) @map("is_resolved")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  author  User              @relation(fields: [authorId], references: [userId])
+  problem CodingProblem?    @relation(fields: [problemId], references: [problemId], onDelete: Cascade)
+  replies DiscussionReply[]
+
+  @@map("discussions")
+}
+
+model DiscussionReply {
+  replyId Int @id @default(autoincrement()) @map("reply_id")
+
+  discussionId Int @map("discussion_id")
+  authorId     Int @map("author_id")
+
+  content String
+  upvotes Int    @default(0)
+
+  parentReplyId Int? @map("parent_reply_id") // for nested replies
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  discussion   Discussion        @relation(fields: [discussionId], references: [discussionId], onDelete: Cascade)
+  author       User              @relation(fields: [authorId], references: [userId])
+  parentReply  DiscussionReply?  @relation("ReplyTree", fields: [parentReplyId], references: [replyId])
+  childReplies DiscussionReply[] @relation("ReplyTree")
+
+  @@map("discussion_replies")
+}
+
+// ─────────────────────────────────────────────────────────────
+// NOTIFICATIONS
+// ─────────────────────────────────────────────────────────────
+
+model Notification {
+  notificationId Int @id @default(autoincrement()) @map("notification_id")
+
+  userId  Int     @map("user_id")
+  type    String // enrollment, assignment, grade, discussion, system
+  title   String
+  message String
+  link    String? // optional link to relevant page
+  isRead  Boolean @default(false) @map("is_read")
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [userId])
+
+  @@map("notifications")
+}
+
+// ─────────────────────────────────────────────────────────────
+// SYSTEM & LIVE SESSIONS
+// ─────────────────────────────────────────────────────────────
+
+model LiveSession {
+  sessionId Int @id @default(autoincrement()) @map("session_id")
+  courseId  Int @map("course_id")
+  mentorId  Int @map("mentor_id")
+
+  title         String
+  streamUrl     String?  @map("stream_url")
+  streamKey     String?  @map("stream_key")
+  scheduledAt   DateTime @map("scheduled_at")
+  isLive        Boolean  @default(false) @map("is_live")
+  enableChat    Boolean  @default(true) @map("enable_chat")
+  autoRecording Boolean  @default(false) @map("auto_recording")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  course Course @relation(fields: [courseId], references: [courseId], onDelete: Cascade)
+  mentor User   @relation(fields: [mentorId], references: [userId], onDelete: Cascade)
+
+  @@map("live_sessions")
+}
+
+model AuditLog {
+  logId     Int      @id @default(autoincrement()) @map("log_id")
+  event     String
+  source    String
+  status    String // Success, Blocked, Error, etc
+  userId    Int?     @map("user_id") // Optional link to the user who triggered it
+  timestamp DateTime @default(now())
+
+  user User? @relation(fields: [userId], references: [userId])
+
+  @@map("audit_logs")
+}
+
+// ─────────────────────────────────────────────────────────────
+// DIRECT MESSAGING (CHAT)
+// ─────────────────────────────────────────────────────────────
+
+model Conversation {
+  conversationId Int     @id @default(autoincrement()) @map("conversation_id")
+  isGroup        Boolean @default(false) @map("is_group")
+  title          String? // Optional for group chats
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  participants ConversationParticipant[]
+  messages     Message[]
+
+  @@map("conversations")
+}
+
+model ConversationParticipant {
+  id Int @id @default(autoincrement())
+
+  conversationId Int @map("conversation_id")
+  userId         Int @map("user_id")
+
+  joinedAt DateTime @default(now()) @map("joined_at")
+
+  conversation Conversation @relation(fields: [conversationId], references: [conversationId], onDelete: Cascade)
+  user         User         @relation(fields: [userId], references: [userId], onDelete: Cascade)
+
+  @@unique([conversationId, userId])
+  @@map("conversation_participants")
+}
+
+model Message {
+  messageId Int @id @default(autoincrement()) @map("message_id")
+
+  conversationId Int @map("conversation_id")
+  senderId       Int @map("sender_id")
+
+  content String
+  isRead  Boolean @default(false) @map("is_read")
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  conversation Conversation @relation(fields: [conversationId], references: [conversationId], onDelete: Cascade)
+  sender       User         @relation(fields: [senderId], references: [userId], onDelete: Cascade)
+
+  @@map("messages")
+}
+
+// ─────────────────────────────────────────────────────────────
+// WORKSPACE CHAT (Discord-Style)
+// ─────────────────────────────────────────────────────────────
+
+model Workspace {
+  workspaceId Int     @id @default(autoincrement()) @map("workspace_id")
+  name        String
+  description String?
+  iconUrl     String? @map("icon_url")
+
+  // Optional link to a course
+  courseId Int?    @unique @map("course_id")
+  course   Course? @relation(fields: [courseId], references: [courseId])
+
+  ownerId Int  @map("owner_id")
+  owner   User @relation("WorkspaceOwner", fields: [ownerId], references: [userId])
+
+  channels Channel[]
+  members  WorkspaceMember[]
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("workspaces")
+}
+
+model WorkspaceMember {
+  id          Int @id @default(autoincrement())
+  workspaceId Int @map("workspace_id")
+  userId      Int @map("user_id")
+
+  joinedAt DateTime @default(now()) @map("joined_at")
+
+  workspace Workspace @relation(fields: [workspaceId], references: [workspaceId], onDelete: Cascade)
+  user      User      @relation(fields: [userId], references: [userId], onDelete: Cascade)
+
+  @@unique([workspaceId, userId])
+  @@map("workspace_members")
+}
+
+model Channel {
+  channelId   Int     @id @default(autoincrement()) @map("channel_id")
+  workspaceId Int     @map("workspace_id")
+  name        String
+  description String?
+  type        String  @default("TEXT") // TEXT, VOICE
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  workspace Workspace        @relation(fields: [workspaceId], references: [workspaceId], onDelete: Cascade)
+  messages  ChannelMessage[]
+
+  @@map("channels")
+}
+
+model ChannelMessage {
+  messageId Int @id @default(autoincrement()) @map("message_id")
+  channelId Int @map("channel_id")
+  senderId  Int @map("sender_id")
+
+  content  String  @db.Text
+  type     String  @default("TEXT") // TEXT, CODE, ATTACHMENT
+  metadata String? // JSON for code language, attachment url etc
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  channel Channel @relation(fields: [channelId], references: [channelId], onDelete: Cascade)
+  sender  User    @relation(fields: [senderId], references: [userId], onDelete: Cascade)
+
+  @@map("channel_messages")
+}
+
+// ─────────────────────────────────────────────────────────────
+// NETWORK (FOLLOWERS)
+// ─────────────────────────────────────────────────────────────
+
+model Follow {
+  id Int @id @default(autoincrement())
+
+  followerId  Int @map("follower_id")
+  followingId Int @map("following_id")
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  follower  User @relation("UserFollowing", fields: [followerId], references: [userId], onDelete: Cascade)
+  following User @relation("UserFollowers", fields: [followingId], references: [userId], onDelete: Cascade)
+
+  @@unique([followerId, followingId])
+  @@map("follows")
+}
+
+model FollowRequest {
+  id Int @id @default(autoincrement())
+
+  requesterId Int @map("requester_id")
+  targetId    Int @map("target_id")
+
+  status String @default("pending") // pending, approved, rejected
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  requester User @relation("SentFollowRequests", fields: [requesterId], references: [userId], onDelete: Cascade)
+  target    User @relation("ReceivedFollowRequests", fields: [targetId], references: [userId], onDelete: Cascade)
+
+  @@unique([requesterId, targetId])
+  @@map("follow_requests")
+}
+
+// ─────────────────────────────────────────────────────────────
+// FREE RESOURCES
+// ─────────────────────────────────────────────────────────────
+
+model Resource {
+  resourceId  Int     @id @default(autoincrement()) @map("resource_id")
+  title       String
+  description String?
+  category    String // e.g., 'Documents', 'Code', 'Videos'
+  type        String // e.g., 'pdf', 'zip', 'video'
+  sizeBytes   Int     @map("size_bytes")
+  fileUrl     String  @map("file_url") // Local relative path
+  downloads   Int     @default(0)
+
+  uploaderId Int  @map("uploader_id")
+  uploader   User @relation(fields: [uploaderId], references: [userId])
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("resources")
+}
+
+// ─────────────────────────────────────────────────────────────
+// REPORTING
+// ─────────────────────────────────────────────────────────────
+
+model Report {
+  reportId   Int      @id @default(autoincrement()) @map("report_id")
+  resourceId Int      @map("resource_id")
+  reporterId Int      @map("reporter_id")
+  reason     String
+  status     String   @default("pending") // pending, reviewed, dismissed, actioned
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  @@map("reports")
+}
+
+// ─────────────────────────────────────────────────────────────
+// RAG EDUCATIONAL DOCUMENTS
+// ─────────────────────────────────────────────────────────────
+
+model EduDocument {
+  id          Int     @id @default(autoincrement())
+  title       String
+  topic       String?
+  fileUrl     String  @map("file_url")
+  sizeBytes   Int     @map("size_bytes")
+  isProcessed Boolean @default(false) @map("is_processed")
+
+  uploaderId Int  @map("uploader_id")
+  uploader   User @relation(fields: [uploaderId], references: [userId])
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("edu_documents")
+}
+
+// ─────────────────────────────────────────────────────────────
+// PASSWORD RESET OTP
+// ─────────────────────────────────────────────────────────────
+model PasswordResetOTP {
+  id        Int      @id @default(autoincrement())
+  userId    Int      @unique
+  otpHash   String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [userId], onDelete: Cascade)
+
+  @@map("password_reset_otps")
+}
+
+// ─────────────────────────────────────────────────────────────
+// CONTACT FORM SUBMISSIONS
+// ─────────────────────────────────────────────────────────────
+
+model ContactSubmission {
+  id        String   @id @default(cuid())
+  fullName  String   @map("full_name")
+  email     String
+  subject   String
+  message   String   @db.Text
+  isRead    Boolean  @default(false) @map("is_read")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("contact_submissions")
+}
