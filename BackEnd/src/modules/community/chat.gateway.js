@@ -27,14 +27,23 @@ module.exports = (io, socket) => {
       const { conversationId, content } = data;
 
       // Save to database
-      const message = await chatService.sendMessage(
+      const result = await chatService.sendMessage(
         conversationId,
         userId,
         content,
       );
+      const message = result.message;
+      const otherParticipants = result.otherParticipants;
 
-      // Broadcast the message to everyone in the room EXCEPT the sender
+      // Broadcast the message to the specific chat room
       socket.to(`chat_${conversationId}`).emit("new_message", message);
+
+      // Emit to each participant's global room so they get notified anywhere on the site
+      if (otherParticipants && otherParticipants.length > 0) {
+        otherParticipants.forEach((p) => {
+          socket.to(`user_${p.userId}`).emit("new_message", message);
+        });
+      }
 
       // Acknowledge successful receipt to the sender (callback)
       if (typeof callback === "function") {

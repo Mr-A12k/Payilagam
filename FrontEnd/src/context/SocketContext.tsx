@@ -9,6 +9,7 @@ import React, {
 import { io, Socket } from "socket.io-client";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
+import toast from "react-hot-toast";
 
 const SOCKET_URL =
   import.meta.env.VITE_API_URL?.replace("/api", "") || "http://localhost:5000";
@@ -17,12 +18,20 @@ interface SocketContextType {
   socket: Socket | null;
   isConnected: boolean;
   emitEvent: (event: string, data?: any, callback?: Function) => void;
+  notifications: any[];
+  clearNotifications: () => void;
+  isMuted: boolean;
+  toggleMute: () => void;
 }
 
 const SocketContext = createContext<SocketContextType>({
   socket: null,
   isConnected: false,
   emitEvent: () => {},
+  notifications: [],
+  clearNotifications: () => {},
+  isMuted: false,
+  toggleMute: () => {},
 });
 
 export const useSocketContext = () => useContext(SocketContext);
@@ -36,7 +45,29 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({
 }: any) => {
   const [socket, setSocket] = useState<Socket | null>(null);
   const [isConnected, setIsConnected] = useState<boolean>(false);
+  const [notifications, setNotifications] = useState<any[]>([]);
+  const [isMuted, setIsMuted] = useState<boolean>(
+    localStorage.getItem("notificationsMuted") === "true"
+  );
+  
   const token = useSelector((state: RootState) => state.auth.token);
+
+  const toggleMute = useCallback(() => {
+    setIsMuted((prev) => {
+      const next = !prev;
+      localStorage.setItem("notificationsMuted", String(next));
+      if (next) {
+         toast("Notifications muted", { icon: "🔕" });
+      } else {
+         toast.success("Notifications enabled", { icon: "🔔" });
+      }
+      return next;
+    });
+  }, []);
+
+  const clearNotifications = useCallback(() => {
+    setNotifications([]);
+  }, []);
 
   useEffect(() => {
     // We only want to request permission once the component mounts
@@ -80,17 +111,36 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({
       const isChatPage = window.location.pathname.startsWith("/chat");
       const isFocused = document.hasFocus();
 
-      // If user is focused on the chat page, don't send desktop push
+      // Always add to the bell popover list
+      setNotifications((prev) => [messageData, ...prev]);
+
+      // If user is focused on the chat page, don't show toast or desktop push
       if (isChatPage && isFocused) {
         return;
       }
 
-      // Otherwise send a desktop notification if permitted
-      if (Notification.permission === "granted") {
-        const title = messageData.sender?.fullName
+      const title = messageData.sender?.fullName
           ? `New message from ${messageData.sender.fullName}`
           : "New Message";
 
+      // If not muted, show a toast notification in the UI
+      if (!isMuted) {
+         toast(
+           (t) => (
+             <div className="flex flex-col cursor-pointer" onClick={() => {
+                toast.dismiss(t.id);
+                window.location.href = '/chat';
+             }}>
+                <span className="font-bold">{title}</span>
+                <span className="text-sm truncate max-w-[200px]">{messageData.content}</span>
+             </div>
+           ),
+           { icon: '💬', duration: 4000 }
+         );
+      }
+
+      // Send a desktop notification if permitted and not muted
+      if (Notification.permission === "granted" && !isMuted) {
         const notif = new Notification(title, {
           body: messageData.content,
           icon: messageData.sender?.profileUrl || "/logo.png", // Optional icon
@@ -98,8 +148,7 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({
 
         notif.onclick = () => {
           window.focus();
-          // Could also redirect to chat:
-          // window.location.href = '/chat';
+          window.location.href = '/chat';
         };
       }
     };
@@ -115,7 +164,7 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({
       newSocket.off("new_channel_message", handleNotification);
       newSocket.disconnect();
     };
-  }, [token]);
+  }, [token, isMuted]); // Re-bind when isMuted changes
 
   // Wrapper around emit to ensure socket exists
   const emitEvent = useCallback(
@@ -134,8 +183,9 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({
   );
 
   return (
-    <SocketContext.Provider value={{ socket, isConnected, emitEvent }}>
+    <SocketContext.Provider value={{ socket, isConnected, emitEvent, notifications, clearNotifications, isMuted, toggleMute }}>
       {children}
     </SocketContext.Provider>
   );
 };
+

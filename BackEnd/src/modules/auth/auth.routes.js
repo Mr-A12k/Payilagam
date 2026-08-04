@@ -28,6 +28,7 @@ const {
   changePassword,
   requestPasswordReset,
   verifyPasswordReset,
+  requestSignupOtp,
 } = require("./auth.controller");
 
 const { authenticate } = require("../../middlewares/authMiddleware");
@@ -52,11 +53,101 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage: storage });
 
-// Public routes
+/**
+ * @swagger
+ * tags:
+ *   name: Auth
+ *   description: Authentication API
+ */
+
+/**
+ * @swagger
+ * /api/auth/request-signup-otp:
+ *   post:
+ *     summary: Request an OTP for signup
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: OTP requested
+ */
+router.post("/request-signup-otp", authLimiter, requestSignupOtp);
+
+/**
+ * @swagger
+ * /api/auth/register:
+ *   post:
+ *     summary: Register a new user
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *               fullName:
+ *                 type: string
+ *               userName:
+ *                 type: string
+ *               mobile:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: User registered successfully
+ */
 router.post("/register", validate(validationRules.register), register);
+
+/**
+ * @swagger
+ * /api/auth/login:
+ *   post:
+ *     summary: Login user
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Successfully logged in
+ *       401:
+ *         description: Unauthorized
+ */
 router.post("/login", authLimiter, validate(validationRules.login), login);
 
 // Protected routes
+/**
+ * @swagger
+ * /api/auth/profile:
+ *   get:
+ *     summary: Get user profile
+ *     tags: [Auth]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Returns user profile
+ */
 router.get("/profile", authenticate, getProfile);
 router.put("/profile", authenticate, updateProfile);
 router.post(

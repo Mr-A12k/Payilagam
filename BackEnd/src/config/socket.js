@@ -35,6 +35,9 @@ const initializeSocket = (server) => {
   io.on("connection", (socket) => {
     console.log(`Socket connected: ${socket.id} (User: ${socket.user.userId})`);
 
+    // Global room for personal notifications
+    socket.join(`user_${socket.user.userId}`);
+
     // Load chat event listeners
     require("../modules/community/chat.gateway")(io, socket);
 

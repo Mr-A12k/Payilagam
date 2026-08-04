@@ -2,6 +2,8 @@
  * Global error handling middleware
  */
 
+const logger = require("../utils/logger");
+
 const notFound = (request, response, next) => {
   const error = new Error(`Not Found - ${request.originalUrl}`);
   error.statusCode = 404;
@@ -12,13 +14,11 @@ const notFound = (request, response, next) => {
 const errorHandler = (error, request, response, next) => {
   const statusCode = error.statusCode || 500;
 
-  // Log error in development
-  if (process.env.NODE_ENV !== "production") {
-    console.error("Error:", error.message);
-    if (error.stack) {
-      console.error("Stack:", error.stack);
-    }
-  }
+  // Log all errors using Winston
+  logger.error(
+    `${request.method} ${request.originalUrl} - ${error.message}`,
+    { stack: error.stack }
+  );
 
   // Handle Prisma errors
   if (error.code === "P2002") {

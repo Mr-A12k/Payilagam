@@ -152,7 +152,7 @@ const sendMessage = async (conversationId, senderId, content) => {
     });
   }
 
-  return message;
+  return { message, otherParticipants };
 };
 
 // --- Workspace & Channel Chat Services ---

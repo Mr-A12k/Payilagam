@@ -96,7 +96,14 @@ const verifyPasswordReset = catchAsync(async (request, response) => {
   return success(response, result, "Password has been reset successfully");
 });
 
+const requestSignupOtp = catchAsync(async (request, response) => {
+  const { email } = request.body;
+  const result = await authService.requestSignupOtp(email);
+  return success(response, result, "Signup OTP processed");
+});
+
 module.exports = {
+  requestSignupOtp,
   register,
   login,
   getProfile,

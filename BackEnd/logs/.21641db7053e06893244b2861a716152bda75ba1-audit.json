@@ -1,0 +1,15 @@
+{
+    "keep": {
+        "days": true,
+        "amount": 14
+    },
+    "auditLog": "D:\\TaskPro\\BackEnd\\logs\\.21641db7053e06893244b2861a716152bda75ba1-audit.json",
+    "files": [
+        {
+            "date": 1785858384333,
+            "name": "D:\\TaskPro\\BackEnd\\logs\\combined-2026-08-04.log",
+            "hash": "dc58611ca028fefa5c2ea7afddcf2c91bd34759c9c4b46d37e1add3f001c8e64"
+        }
+    ],
+    "hashType": "sha256"
+}

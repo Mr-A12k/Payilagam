@@ -29,6 +29,8 @@ const Signup = () => {
   const [agreed, setAgreed] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [step, setStep] = useState<"details" | "otp">("details");
+  const [otp, setOtp] = useState("");
 
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
@@ -48,6 +50,35 @@ const Signup = () => {
       toast.error("You must agree to the Terms of Service");
       return;
     }
+    
+    if (step === "details") {
+      setIsSubmitting(true);
+      try {
+        const response = await fetch("http://localhost:5000/api/auth/request-signup-otp", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email: formData.email })
+        });
+        if (response.ok) {
+          toast.success("OTP sent to your email");
+          setStep("otp");
+        } else {
+          const errorData = await response.json();
+          toast.error(errorData.message || "Failed to send OTP");
+        }
+      } catch (error) {
+        toast.error("Network error");
+      } finally {
+        setIsSubmitting(false);
+      }
+      return;
+    }
+
+    if (step === "otp" && !otp) {
+      toast.error("Please enter the OTP");
+      return;
+    }
+
     setIsSubmitting(true);
 
     const userName = formData.email.split("@")[0];
@@ -59,6 +90,7 @@ const Signup = () => {
           userName,
           fullName: formData.fullName || userName,
           mobile: "0000000000",
+          otp
         }),
       );
 
@@ -128,113 +160,134 @@ const Signup = () => {
             </div>
 
             <form onSubmit={handleSubmit} className="w-full space-y-3">
-              {/* Custom Animated Input: Name */}
-              <div className="relative group">
-                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-500 group-focus-within:text-blue-400 transition-colors">
-                  <User className="w-5 h-5" />
-                </div>
-                <input
-                  id="fullName"
-                  name="fullName"
-                  type="text"
-                  required
-                  value={formData.fullName}
-                  onChange={handleChange}
-                  className="w-full pl-11 pr-4 py-3.5 bg-slate-950/50 border border-slate-700/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 text-sm font-medium text-white placeholder:text-slate-500 transition-all hover:bg-slate-900/80"
-                  placeholder="Full Name"
-                />
-              </div>
-
-              {/* Custom Animated Input: Email */}
-              <div className="relative group">
-                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-500 group-focus-within:text-blue-400 transition-colors">
-                  <Mail className="w-5 h-5" />
-                </div>
-                <input
-                  id="email"
-                  name="email"
-                  type="email"
-                  required
-                  value={formData.email}
-                  onChange={handleChange}
-                  className="w-full pl-11 pr-4 py-3.5 bg-slate-950/50 border border-slate-700/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 text-sm font-medium text-white placeholder:text-slate-500 transition-all hover:bg-slate-900/80"
-                  placeholder="Email Address"
-                />
-              </div>
-
-              {/* Custom Animated Input: Password */}
-              <div className="relative group">
-                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-500 group-focus-within:text-blue-400 transition-colors">
-                  <Lock className="w-5 h-5" />
-                </div>
-                <input
-                  id="password"
-                  name="password"
-                  type={showPassword ? "text" : "password"}
-                  required
-                  value={formData.password}
-                  onChange={handleChange}
-                  className="w-full pl-11 pr-12 py-3.5 bg-slate-950/50 border border-slate-700/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 text-sm font-medium text-white placeholder:text-slate-500 transition-all hover:bg-slate-900/80"
-                  placeholder="Password"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute inset-y-0 right-0 pr-4 flex items-center text-slate-500 hover:text-blue-400 transition-colors"
-                >
-                  {showPassword ? (
-                    <EyeOff className="w-5 h-5" />
-                  ) : (
-                    <Eye className="w-5 h-5" />
-                  )}
-                </button>
-              </div>
-
-              <div className="flex items-start pt-0.5">
-                <label className="flex items-start gap-3 cursor-pointer group">
-                  <div className="relative flex items-center justify-center w-5 h-5 mt-0.5 shrink-0">
+              {step === "details" ? (
+                <>
+                  {/* Custom Animated Input: Name */}
+                  <div className="relative group">
+                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-500 group-focus-within:text-blue-400 transition-colors">
+                      <User className="w-5 h-5" />
+                    </div>
                     <input
-                      type="checkbox"
+                      id="fullName"
+                      name="fullName"
+                      type="text"
                       required
-                      checked={agreed}
-                      onChange={(event: React.SyntheticEvent<any>) =>
-                        setAgreed((event.target as HTMLInputElement).checked)
-                      }
-                      className="peer appearance-none w-5 h-5 border border-slate-600 rounded bg-slate-950 checked:bg-blue-500 checked:border-blue-500 transition-all cursor-pointer focus:ring-2 focus:ring-blue-500/30 focus:outline-none"
+                      value={formData.fullName}
+                      onChange={handleChange}
+                      className="w-full pl-11 pr-4 py-3.5 bg-slate-950/50 border border-slate-700/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 text-sm font-medium text-white placeholder:text-slate-500 transition-all hover:bg-slate-900/80"
+                      placeholder="Full Name"
                     />
-                    <svg
-                      className="absolute w-3.5 h-3.5 text-white pointer-events-none opacity-0 peer-checked:opacity-100 transition-opacity"
-                      viewBox="0 0 14 14"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        d="M11.6666 3.5L5.24992 9.91667L2.33325 7"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
                   </div>
-                  <span className="text-xs font-medium text-slate-400 group-hover:text-slate-300 transition-colors leading-relaxed">
-                    I agree to the{" "}
-                    <a
-                      href="#"
-                      className="text-blue-400 hover:text-blue-300 underline decoration-blue-500/30 underline-offset-2"
+
+                  {/* Custom Animated Input: Email */}
+                  <div className="relative group">
+                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-500 group-focus-within:text-blue-400 transition-colors">
+                      <Mail className="w-5 h-5" />
+                    </div>
+                    <input
+                      id="email"
+                      name="email"
+                      type="email"
+                      required
+                      value={formData.email}
+                      onChange={handleChange}
+                      className="w-full pl-11 pr-4 py-3.5 bg-slate-950/50 border border-slate-700/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 text-sm font-medium text-white placeholder:text-slate-500 transition-all hover:bg-slate-900/80"
+                      placeholder="Email Address"
+                    />
+                  </div>
+
+                  {/* Custom Animated Input: Password */}
+                  <div className="relative group">
+                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-500 group-focus-within:text-blue-400 transition-colors">
+                      <Lock className="w-5 h-5" />
+                    </div>
+                    <input
+                      id="password"
+                      name="password"
+                      type={showPassword ? "text" : "password"}
+                      required
+                      value={formData.password}
+                      onChange={handleChange}
+                      className="w-full pl-11 pr-12 py-3.5 bg-slate-950/50 border border-slate-700/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 text-sm font-medium text-white placeholder:text-slate-500 transition-all hover:bg-slate-900/80"
+                      placeholder="Password"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute inset-y-0 right-0 pr-4 flex items-center text-slate-500 hover:text-blue-400 transition-colors"
                     >
-                      Terms of Service
-                    </a>{" "}
-                    and{" "}
-                    <a
-                      href="#"
-                      className="text-blue-400 hover:text-blue-300 underline decoration-blue-500/30 underline-offset-2"
-                    >
-                      Privacy Policy
-                    </a>
-                  </span>
-                </label>
-              </div>
+                      {showPassword ? (
+                        <EyeOff className="w-5 h-5" />
+                      ) : (
+                        <Eye className="w-5 h-5" />
+                      )}
+                    </button>
+                  </div>
+
+                  <div className="flex items-start pt-0.5">
+                    <label className="flex items-start gap-3 cursor-pointer group">
+                      <div className="relative flex items-center justify-center w-5 h-5 mt-0.5 shrink-0">
+                        <input
+                          type="checkbox"
+                          required
+                          checked={agreed}
+                          onChange={(event: React.SyntheticEvent<any>) =>
+                            setAgreed((event.target as HTMLInputElement).checked)
+                          }
+                          className="peer appearance-none w-5 h-5 border border-slate-600 rounded bg-slate-950 checked:bg-blue-500 checked:border-blue-500 transition-all cursor-pointer focus:ring-2 focus:ring-blue-500/30 focus:outline-none"
+                        />
+                        <svg
+                          className="absolute w-3.5 h-3.5 text-white pointer-events-none opacity-0 peer-checked:opacity-100 transition-opacity"
+                          viewBox="0 0 14 14"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M11.6666 3.5L5.24992 9.91667L2.33325 7"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          />
+                        </svg>
+                      </div>
+                      <span className="text-xs font-medium text-slate-400 group-hover:text-slate-300 transition-colors leading-relaxed">
+                        I agree to the{" "}
+                        <a
+                          href="#"
+                          className="text-blue-400 hover:text-blue-300 underline decoration-blue-500/30 underline-offset-2"
+                        >
+                          Terms of Service
+                        </a>{" "}
+                        and{" "}
+                        <a
+                          href="#"
+                          className="text-blue-400 hover:text-blue-300 underline decoration-blue-500/30 underline-offset-2"
+                        >
+                          Privacy Policy
+                        </a>
+                      </span>
+                    </label>
+                  </div>
+                </>
+              ) : (
+                <div className="relative group mb-4">
+                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-500 group-focus-within:text-blue-400 transition-colors">
+                    <Lock className="w-5 h-5" />
+                  </div>
+                  <input
+                    id="otp"
+                    name="otp"
+                    type="text"
+                    required
+                    value={otp}
+                    onChange={(e) => setOtp(e.target.value)}
+                    className="w-full pl-11 pr-4 py-3.5 bg-slate-950/50 border border-slate-700/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 text-sm font-medium text-white placeholder:text-slate-500 transition-all hover:bg-slate-900/80"
+                    placeholder="Enter 4-digit OTP (use 0000)"
+                    maxLength={4}
+                  />
+                </div>
+              )}
 
               <Button
                 type="submit"
@@ -244,13 +297,11 @@ const Signup = () => {
                 <div className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:animate-[shimmer_1.5s_infinite]"></div>
                 {isSubmitting ? (
                   <span className="flex items-center justify-center gap-2">
-                    <Loader2 className="w-5 h-5 animate-spin" /> Creating
-                    Account...
+                    <Loader2 className="w-5 h-5 animate-spin" /> {step === "details" ? "Sending OTP..." : "Creating Account..."}
                   </span>
                 ) : (
-                  <span className="flex items-center justify-center gap-2">
-                    Create Account{" "}
-                    <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                  <span className="relative z-10 flex items-center justify-center gap-2">
+                    {step === "details" ? "Sign Up" : "Verify & Create Account"} <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                   </span>
                 )}
               </Button>

@@ -15,6 +15,7 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import { X, ChevronDown, ChevronRight } from "lucide-react";
 import { Button, Avatar } from "@/components/ui";
 import PayilagamLogo from "@/components/ui/PayilagamLogo";
+import NotificationPopover from "./NotificationPopover";
 import { useSelector } from "react-redux";
 
 /* ═══════════════════════════════════════════════════════════
@@ -92,25 +93,28 @@ const Navbar = () => {
   /* ── Auth block (shared between desktop & mobile) ──── */
   const renderAuthDesktop = () =>
     user ? (
-      <Link
-        to={
-          user.pageAccess?.includes("PG_ADM")
-            ? "/admin"
-            : user.pageAccess?.includes("PG_MNT")
-              ? "/mentor"
-              : "/dashboard"
-        }
-        className="flex items-center gap-3 hover:bg-slate-800 p-1.5 rounded-lg transition-all"
-      >
-        <span className="text-sm font-bold hidden sm:block text-slate-200">
-          {user.fullName || "Dashboard"}
-        </span>
-        <Avatar
-          src={user.profileUrl}
-          fallback={user.fullName?.[0] || "U"}
-          size="sm"
-        />
-      </Link>
+      <div className="flex items-center gap-4">
+        <NotificationPopover />
+        <Link
+          to={
+            user.pageAccess?.includes("PG_ADM")
+              ? "/admin"
+              : user.pageAccess?.includes("PG_MNT")
+                ? "/mentor"
+                : "/dashboard"
+          }
+          className="flex items-center gap-3 hover:bg-slate-800 p-1.5 rounded-lg transition-all"
+        >
+          <span className="text-sm font-bold hidden sm:block text-slate-200">
+            {user.fullName || "Dashboard"}
+          </span>
+          <Avatar
+            src={user.profileUrl}
+            fallback={user.fullName?.[0] || "U"}
+            size="sm"
+          />
+        </Link>
+      </div>
     ) : (
       <>
         <Link

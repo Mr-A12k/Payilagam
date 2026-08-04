@@ -15,8 +15,48 @@ const getPageAccess = (roleName) => {
   }
 };
 
+// In-memory OTP store for signups: Map<email, { otp: string, expiresAt: number }>
+const signupOtpCache = new Map();
+
+const requestSignupOtp = async (email) => {
+  // Check if email already registered
+  const existingUser = await prisma.user.findFirst({
+    where: { email },
+  });
+  if (existingUser) {
+    throw new Error("Email already registered");
+  }
+
+  // Generate a hardcoded OTP for now
+  const otp = "0000";
+  // Expire in 30 seconds
+  const expiresAt = Date.now() + 30 * 1000;
+
+  signupOtpCache.set(email, { otp, expiresAt });
+
+  return { success: true, message: "OTP sent successfully. Please check your email." };
+};
+
 const registerUser = async (userData) => {
-  const { userName, fullName, email, mobile, password, roleId } = userData;
+  const { userName, fullName, email, mobile, password, roleId, otp } = userData;
+
+  // Validate OTP
+  const cachedData = signupOtpCache.get(email);
+  if (!cachedData) {
+    throw new Error("OTP not requested or expired");
+  }
+  
+  if (Date.now() > cachedData.expiresAt) {
+    signupOtpCache.delete(email);
+    throw new Error("OTP has expired. Please request a new one.");
+  }
+  
+  if (cachedData.otp !== otp) {
+    throw new Error("Invalid OTP provided");
+  }
+  
+  // Clean up cache on success
+  signupOtpCache.delete(email);
 
   // Check if user already exists
   const existingUser = await prisma.user.findFirst({
@@ -321,6 +361,7 @@ const verifyPasswordReset = async (email, otp, newPassword) => {
 };
 
 module.exports = {
+  requestSignupOtp,
   registerUser,
   loginUser,
   getProfile,

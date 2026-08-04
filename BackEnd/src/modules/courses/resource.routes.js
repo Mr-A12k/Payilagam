@@ -1,3 +1,9 @@
+/**
+ * @swagger
+ * tags:
+ *   name: Resources
+ *   description: Resource management
+ */
 const express = require("express");
 const router = express.Router();
 const multer = require("multer");
@@ -77,14 +83,73 @@ const upload = multer({
 });
 
 // Routes
+/**
+ * @swagger
+ * /:
+ *   get:
+ *     summary: Get all resources
+ *     tags: [Resources]
+ *     responses:
+ *       200:
+ *         description: List of resources
+ */
 router.get("/", resourceController.getAllResources);
+
+/**
+ * @swagger
+ * /:
+ *   post:
+ *     summary: Upload a resource
+ *     tags: [Resources]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       201:
+ *         description: Resource uploaded
+ */
 router.post(
   "/",
   authMiddleware.authenticate,
   upload.single("resourceFile"),
   resourceController.uploadResource,
 );
+
+/**
+ * @swagger
+ * /{id}/download:
+ *   post:
+ *     summary: Download a resource
+ *     tags: [Resources]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Resource file
+ */
 router.post("/:id/download", resourceController.downloadResource);
+
+/**
+ * @swagger
+ * /{id}:
+ *   delete:
+ *     summary: Delete a resource
+ *     tags: [Resources]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Resource deleted
+ */
 router.delete(
   "/:id",
   authMiddleware.authenticate,

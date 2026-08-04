@@ -10,8 +10,12 @@ const { notFound, errorHandler } = require("./middlewares/errorMiddleware");
 
 // Import routes
 const routes = require("./routes");
+const setupSwagger = require("./config/swagger");
 
 const app = express();
+
+// Initialize Swagger Documentation
+setupSwagger(app);
 
 // Global Security Middlewares
 app.use(
