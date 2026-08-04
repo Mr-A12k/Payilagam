@@ -14,7 +14,11 @@ export {
   useMyMentorCourses,
 } from "./queries/useCourses";
 
-export { useDashboardStats, useMyEnrollments, useUserActivity } from "./queries/useDashboard";
+export {
+  useDashboardStats,
+  useMyEnrollments,
+  useUserActivity,
+} from "./queries/useDashboard";
 
 export { useModulesByCourse, useLessonDetail } from "./queries/useModules";
 

@@ -15,7 +15,7 @@ import {
   PlayCircle,
   Calendar,
   Award,
-  MoreHorizontal
+  MoreHorizontal,
 } from "lucide-react";
 import { Avatar, Card, Button } from "@/components/ui";
 
@@ -41,10 +41,10 @@ const Dashboard = () => {
   // Generate heatmap grid for the last 12 weeks (84 days)
   const totalDays = 84;
   const heatmapGrid = [];
-  
+
   // Calculate starting date to align perfectly with today
   const today = new Date();
-  
+
   // We want to generate columns. GitHub goes top-to-bottom (Sun-Sat), then left-to-right.
   // We'll generate an array of columns, each containing 7 days.
   for (let col = 0; col < 12; col++) {
@@ -54,7 +54,7 @@ const Dashboard = () => {
       const date = subDays(today, daysAgo);
       const dateStr = format(date, "yyyy-MM-dd");
       const count = activityData[dateStr] || 0;
-      
+
       let level = 0;
       if (count === 1) level = 1;
       else if (count === 2) level = 2;
@@ -71,7 +71,8 @@ const Dashboard = () => {
       <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-10 gap-4">
         <div>
           <h1 className="text-3xl font-bold text-slate-100 flex items-center gap-3 tracking-tight">
-            Welcome back, {user?.fullName?.split(" ")[0] || user?.userName || "Student"} 
+            Welcome back,{" "}
+            {user?.fullName?.split(" ")[0] || user?.userName || "Student"}
             <span className="text-3xl animate-pulse">👋</span>
           </h1>
           <p className="text-slate-400 mt-2 text-lg">
@@ -111,17 +112,19 @@ const Dashboard = () => {
               {currentCourse?.course?.courseName || "Start Your Journey"}
             </h2>
             <p className="text-slate-400 mb-6 max-w-xl text-sm md:text-base">
-              {currentCourse 
-                ? "You're on a roll! Pick up exactly where you left off and keep the momentum going." 
+              {currentCourse
+                ? "You're on a roll! Pick up exactly where you left off and keep the momentum going."
                 : "Explore our catalog of premium courses and start mastering new skills today."}
             </p>
-            
+
             {currentCourse && (
               <div className="flex items-center gap-4 mb-6">
                 <div className="flex-1 max-w-md bg-slate-950 rounded-full h-2 overflow-hidden border border-slate-800">
                   <div
                     className="bg-gradient-to-r from-blue-500 to-sky-400 h-full rounded-full shadow-[0_0_10px_rgba(56,189,248,0.5)]"
-                    style={{ width: `${currentCourse.progressPercentage || 0}%` }}
+                    style={{
+                      width: `${currentCourse.progressPercentage || 0}%`,
+                    }}
                   ></div>
                 </div>
                 <span className="text-sm font-medium text-sky-300">
@@ -129,7 +132,7 @@ const Dashboard = () => {
                 </span>
               </div>
             )}
-            
+
             <Button
               onClick={handleResumeLesson}
               className="px-6 py-3 rounded-xl font-medium transition-all shadow-lg shadow-blue-900/30 flex items-center gap-2 group/button"
@@ -141,8 +144,8 @@ const Dashboard = () => {
 
           {currentCourse && (
             <div className="hidden md:flex w-48 h-48 rounded-2xl bg-slate-950 border border-slate-800 items-center justify-center shadow-inner relative overflow-hidden">
-               <div className="absolute inset-0 bg-gradient-to-br from-blue-900/20 to-transparent"></div>
-               <Award className="w-20 h-20 text-blue-400/50" strokeWidth={1} />
+              <div className="absolute inset-0 bg-gradient-to-br from-blue-900/20 to-transparent"></div>
+              <Award className="w-20 h-20 text-blue-400/50" strokeWidth={1} />
             </div>
           )}
         </div>
@@ -161,7 +164,7 @@ const Dashboard = () => {
                 <option>This Year</option>
               </select>
             </div>
-            
+
             {/* Heatmap Grid */}
             <div className="overflow-x-auto pb-4">
               <div className="flex gap-1.5 min-w-[600px]">
@@ -171,10 +174,13 @@ const Dashboard = () => {
                       <div
                         key={rowIndex}
                         className={`w-4 h-4 rounded-sm transition-colors cursor-pointer hover:ring-1 hover:ring-slate-400 ${
-                          cell.level === 0 ? "bg-slate-800/50" :
-                          cell.level === 1 ? "bg-blue-900/60" :
-                          cell.level === 2 ? "bg-blue-600/80" :
-                          "bg-sky-400 shadow-[0_0_8px_rgba(56,189,248,0.5)]"
+                          cell.level === 0
+                            ? "bg-slate-800/50"
+                            : cell.level === 1
+                              ? "bg-blue-900/60"
+                              : cell.level === 2
+                                ? "bg-blue-600/80"
+                                : "bg-sky-400 shadow-[0_0_8px_rgba(56,189,248,0.5)]"
                         }`}
                         title={`${cell.count} lessons on ${format(cell.date, "MMM d, yyyy")}`}
                       ></div>
@@ -197,8 +203,13 @@ const Dashboard = () => {
           {myCourses.length > 1 && (
             <div>
               <div className="flex-between mb-6 px-2">
-                <h3 className="text-xl font-bold text-slate-100">Other Courses</h3>
-                <Link to="/courses" className="text-blue-400 text-sm font-semibold hover:text-sky-300 transition-colors">
+                <h3 className="text-xl font-bold text-slate-100">
+                  Other Courses
+                </h3>
+                <Link
+                  to="/courses"
+                  className="text-blue-400 text-sm font-semibold hover:text-sky-300 transition-colors"
+                >
                   View All
                 </Link>
               </div>
@@ -221,16 +232,20 @@ const Dashboard = () => {
                       </h4>
                       <div className="flex justify-between text-xs font-medium text-slate-400 mb-3">
                         <span className="flex items-center gap-1">
-                          <Clock className="w-3.5 h-3.5" /> {course.course?.duration || 0}h
+                          <Clock className="w-3.5 h-3.5" />{" "}
+                          {course.course?.duration || 0}h
                         </span>
                         <span className="flex items-center gap-1 text-slate-300">
-                          <BookOpen className="w-3.5 h-3.5 text-blue-400" /> {course.progressPercentage || 0}%
+                          <BookOpen className="w-3.5 h-3.5 text-blue-400" />{" "}
+                          {course.progressPercentage || 0}%
                         </span>
                       </div>
                       <div className="w-full bg-slate-950 rounded-full h-1.5 mt-2 border border-slate-800">
                         <div
                           className="bg-blue-500 h-1.5 rounded-full"
-                          style={{ width: `${course.progressPercentage || 0}%` }}
+                          style={{
+                            width: `${course.progressPercentage || 0}%`,
+                          }}
                         ></div>
                       </div>
                     </div>
@@ -245,14 +260,21 @@ const Dashboard = () => {
         <div className="space-y-6">
           {/* Quick Stats Card */}
           <Card className="!rounded-3xl !p-6 shadow-lg shadow-blue-900/10">
-            <h3 className="text-lg font-bold text-slate-100 mb-6 border-b border-slate-800 pb-4">Your Stats</h3>
+            <h3 className="text-lg font-bold text-slate-100 mb-6 border-b border-slate-800 pb-4">
+              Your Stats
+            </h3>
             <div className="space-y-6">
               <div className="flex items-center gap-4">
                 <div className="w-12 h-12 rounded-xl bg-blue-900/30 flex-center border border-blue-800/50">
                   <Flame className="icon-lg text-sky-400" />
                 </div>
                 <div>
-                  <div className="text-2xl font-bold text-slate-100">14 <span className="text-sm font-normal text-slate-400">Day Streak</span></div>
+                  <div className="text-2xl font-bold text-slate-100">
+                    14{" "}
+                    <span className="text-sm font-normal text-slate-400">
+                      Day Streak
+                    </span>
+                  </div>
                   <div className="text-xs text-sky-300">Top 5% of learners</div>
                 </div>
               </div>
@@ -261,7 +283,12 @@ const Dashboard = () => {
                   <Award className="icon-lg text-blue-400" />
                 </div>
                 <div>
-                  <div className="text-2xl font-bold text-slate-100">3 <span className="text-sm font-normal text-slate-400">Certificates</span></div>
+                  <div className="text-2xl font-bold text-slate-100">
+                    3{" "}
+                    <span className="text-sm font-normal text-slate-400">
+                      Certificates
+                    </span>
+                  </div>
                   <div className="text-xs text-slate-400">Keep earning!</div>
                 </div>
               </div>
@@ -272,32 +299,41 @@ const Dashboard = () => {
           <Card className="!rounded-3xl !p-6 shadow-lg shadow-blue-900/10">
             <h3 className="text-lg font-bold text-slate-100 mb-4 flex items-center justify-between">
               Upcoming
-              <button className="text-xs text-blue-400 hover:underline">Manage</button>
+              <button className="text-xs text-blue-400 hover:underline">
+                Manage
+              </button>
             </h3>
-            
+
             <div className="bg-slate-950 rounded-xl p-4 border border-slate-800 flex items-start gap-4">
-               <div className="flex-center flex-col min-w-[48px] h-[48px] bg-blue-900/20 text-blue-400 rounded-lg shrink-0 border border-blue-800/50">
-                  <span className="text-[10px] font-bold uppercase">Jul</span>
-                  <span className="text-lg font-bold leading-none">12</span>
-               </div>
-               <div>
-                  <h4 className="font-medium text-slate-100 text-sm">System Design Assessment</h4>
-                  <p className="text-xs text-slate-400 mt-1">Cloud Systems Architecture</p>
-               </div>
+              <div className="flex-center flex-col min-w-[48px] h-[48px] bg-blue-900/20 text-blue-400 rounded-lg shrink-0 border border-blue-800/50">
+                <span className="text-[10px] font-bold uppercase">Jul</span>
+                <span className="text-lg font-bold leading-none">12</span>
+              </div>
+              <div>
+                <h4 className="font-medium text-slate-100 text-sm">
+                  System Design Assessment
+                </h4>
+                <p className="text-xs text-slate-400 mt-1">
+                  Cloud Systems Architecture
+                </p>
+              </div>
             </div>
-            
+
             <div className="bg-slate-950 rounded-xl p-4 border border-slate-800 flex items-start gap-4 mt-3 opacity-60">
-               <div className="flex-center flex-col min-w-[48px] h-[48px] bg-slate-800/50 text-slate-400 rounded-lg shrink-0 border border-slate-700">
-                  <span className="text-[10px] font-bold uppercase">Jul</span>
-                  <span className="text-lg font-bold leading-none">18</span>
-               </div>
-               <div>
-                  <h4 className="font-medium text-slate-100 text-sm">Peer Review Due</h4>
-                  <p className="text-xs text-slate-400 mt-1">UX Research Module</p>
-               </div>
+              <div className="flex-center flex-col min-w-[48px] h-[48px] bg-slate-800/50 text-slate-400 rounded-lg shrink-0 border border-slate-700">
+                <span className="text-[10px] font-bold uppercase">Jul</span>
+                <span className="text-lg font-bold leading-none">18</span>
+              </div>
+              <div>
+                <h4 className="font-medium text-slate-100 text-sm">
+                  Peer Review Due
+                </h4>
+                <p className="text-xs text-slate-400 mt-1">
+                  UX Research Module
+                </p>
+              </div>
             </div>
           </Card>
-
         </div>
       </div>
     </div>
@@ -305,5 +341,3 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
-
-

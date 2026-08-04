@@ -89,5 +89,5 @@ export const executeHttpQueryRequest = async <T = any>(
   isMultipart: boolean = false,
 ): Promise<AxiosResponse<T>> => {
   const headers = isMultipart ? HEADER_MULTIPART : HEADER_JSON;
-  return await api.request({ method: 'QUERY', url, data, headers });
+  return await api.request({ method: "QUERY", url, data, headers });
 };

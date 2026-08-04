@@ -6,7 +6,15 @@ export interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
   size?: "default" | "sm" | "lg";
 }
 
-function Card({ className, size = "default", onMouseMove, onMouseEnter, onMouseLeave, children, ...props }: CardProps) {
+function Card({
+  className,
+  size = "default",
+  onMouseMove,
+  onMouseEnter,
+  onMouseLeave,
+  children,
+  ...props
+}: CardProps) {
   const divRef = React.useRef(null);
   const [position, setPosition] = React.useState({ x: 0, y: 0 });
   const [opacity, setOpacity] = React.useState(0);
@@ -58,10 +66,7 @@ function CardHeader({ className, ...props }: any) {
   return (
     <div
       data-slot="card-header"
-      className={cn(
-        "group/card-header flex flex-col space-y-1.5",
-        className,
-      )}
+      className={cn("group/card-header flex flex-col space-y-1.5", className)}
       {...props}
     />
   );
@@ -105,11 +110,7 @@ function CardAction({ className, ...props }: any) {
 
 function CardContent({ className, ...props }: any) {
   return (
-    <div
-      data-slot="card-content"
-      className={cn("", className)}
-      {...props}
-    />
+    <div data-slot="card-content" className={cn("", className)} {...props} />
   );
 }
 

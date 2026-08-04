@@ -9,11 +9,16 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        default: "bg-blue-600 hover:bg-blue-500 text-white shadow-[0_0_15px_rgba(37,99,235,0.2),inset_0_1px_1px_rgba(255,255,255,0.2)] hover:shadow-[0_0_25px_rgba(37,99,235,0.5),inset_0_1px_1px_rgba(255,255,255,0.3)] active:scale-[0.96]",
-        outline: "border border-slate-700 hover:border-blue-500 hover:bg-blue-500/10 bg-transparent text-slate-200 hover:text-white shadow-sm active:scale-[0.96]",
-        secondary: "border border-slate-800 hover:border-slate-700 bg-slate-900 text-slate-200 shadow-sm hover:shadow-lg active:scale-[0.96]",
-        ghost: "bg-transparent hover:bg-slate-800 text-slate-400 hover:text-slate-100 active:scale-[0.96]",
-        destructive: "bg-red-500/10 text-red-500 hover:bg-red-500/20 hover:shadow-[0_0_15px_rgba(239,68,68,0.3)] active:scale-[0.96]",
+        default:
+          "bg-blue-600 hover:bg-blue-500 text-white shadow-[0_0_15px_rgba(37,99,235,0.2),inset_0_1px_1px_rgba(255,255,255,0.2)] hover:shadow-[0_0_25px_rgba(37,99,235,0.5),inset_0_1px_1px_rgba(255,255,255,0.3)] active:scale-[0.96]",
+        outline:
+          "border border-slate-700 hover:border-blue-500 hover:bg-blue-500/10 bg-transparent text-slate-200 hover:text-white shadow-sm active:scale-[0.96]",
+        secondary:
+          "border border-slate-800 hover:border-slate-700 bg-slate-900 text-slate-200 shadow-sm hover:shadow-lg active:scale-[0.96]",
+        ghost:
+          "bg-transparent hover:bg-slate-800 text-slate-400 hover:text-slate-100 active:scale-[0.96]",
+        destructive:
+          "bg-red-500/10 text-red-500 hover:bg-red-500/20 hover:shadow-[0_0_15px_rgba(239,68,68,0.3)] active:scale-[0.96]",
         link: "text-blue-500 underline-offset-4 hover:underline",
       },
       size: {
@@ -35,7 +40,8 @@ const buttonVariants = cva(
 import { type VariantProps } from "class-variance-authority";
 
 export interface ButtonProps
-  extends React.ButtonHTMLAttributes<HTMLButtonElement>,
+  extends
+    React.ButtonHTMLAttributes<HTMLButtonElement>,
     VariantProps<typeof buttonVariants> {
   asChild?: boolean;
 }

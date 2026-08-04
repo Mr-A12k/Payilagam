@@ -61,14 +61,15 @@ export const API_PATHS = {
     TOGGLE_STATUS: (id: string) => `/admin/users/${id}/toggle-status`,
     ANALYTICS: {
       COURSES: "/admin/analytics/courses",
-      ENROLLMENTS: "/admin/analytics/enrollments"
-    }
+      ENROLLMENTS: "/admin/analytics/enrollments",
+    },
   },
   CHAT: {
     BASE: "/chat",
     MESSAGES: (convId: string) => `/chat/${convId}/messages`,
     WORKSPACES: "/chat/workspaces",
-    CHANNEL_MESSAGES: (channelId: string) => `/chat/channels/${channelId}/messages`,
+    CHANNEL_MESSAGES: (channelId: string) =>
+      `/chat/channels/${channelId}/messages`,
   },
   NETWORK: {
     FOLLOWERS: "/follows/followers",
@@ -86,10 +87,10 @@ export const API_PATHS = {
     MENTORS: "/users/mentors",
     MENTOR: (id: string) => `/users/mentors/${id}`,
     ACTIVITY: "/users/activity",
-    SEARCH: "/users/search"
+    SEARCH: "/users/search",
   },
   NOTIFICATIONS: {
     BASE: "/notifications",
-    READ: (id: string) => `/notifications/${id}/read`
-  }
+    READ: (id: string) => `/notifications/${id}/read`,
+  },
 };

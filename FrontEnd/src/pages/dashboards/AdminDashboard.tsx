@@ -5,15 +5,15 @@
  * and recent user/enrollment logs.
  */
 import { useEffect, useState } from "react";
-import { executeHttpGetRequest } from '@/api/commonServices';
-import { API_PATHS } from '@/api/constants';
+import { executeHttpGetRequest } from "@/api/commonServices";
+import { API_PATHS } from "@/api/constants";
 import {
   DollarSign,
   Users,
   CheckCircle,
   Activity,
   UserPlus,
-  BookOpen
+  BookOpen,
 } from "lucide-react";
 import { Card } from "@/components/ui";
 
@@ -23,12 +23,12 @@ const AdminDashboard = () => {
       totalRevenue: 0,
       newUsers: 0,
       completionRate: 0,
-      systemHealth: { serverLoad: 0, status: "Loading..." }
+      systemHealth: { serverLoad: 0, status: "Loading..." },
     },
     recentUsers: [],
-    recentEnrollments: []
+    recentEnrollments: [],
   });
-  
+
   const [courseAnalytics, setCourseAnalytics] = useState<any[]>([]);
   const [enrollmentAnalytics, setEnrollmentAnalytics] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -36,12 +36,13 @@ const AdminDashboard = () => {
   const fetchStats = async () => {
     try {
       setIsLoading(true);
-      const [statsResponse, coursesResponse, enrollmentsResponse] = await Promise.all([
-        executeHttpGetRequest(API_PATHS.ADMIN.STATS),
-        executeHttpGetRequest(API_PATHS.ADMIN.ANALYTICS.COURSES),
-        executeHttpGetRequest(API_PATHS.ADMIN.ANALYTICS.ENROLLMENTS)
-      ]);
-      
+      const [statsResponse, coursesResponse, enrollmentsResponse] =
+        await Promise.all([
+          executeHttpGetRequest(API_PATHS.ADMIN.STATS),
+          executeHttpGetRequest(API_PATHS.ADMIN.ANALYTICS.COURSES),
+          executeHttpGetRequest(API_PATHS.ADMIN.ANALYTICS.ENROLLMENTS),
+        ]);
+
       if (statsResponse.data?.success && statsResponse.data?.data) {
         setStats(statsResponse.data.data);
       }
@@ -65,47 +66,51 @@ const AdminDashboard = () => {
   // Helper for generating the SVG line chart
   const getLinePath = () => {
     if (!enrollmentAnalytics?.dailyBreakdown) return "M 0,100 L 100,100 Z";
-    
+
     const dates = Object.keys(enrollmentAnalytics.dailyBreakdown).sort();
     if (dates.length === 0) return "M 0,100 L 100,100 Z";
 
-    const counts = dates.map((dateKey: any) => enrollmentAnalytics.dailyBreakdown[dateKey]);
+    const counts = dates.map(
+      (dateKey: any) => enrollmentAnalytics.dailyBreakdown[dateKey],
+    );
     const maxCount = Math.max(...counts, 1);
     const stepX = 100 / Math.max(counts.length - 1, 1);
-    
+
     const points = counts.map((count: any, index: any) => {
       const x = index * stepX;
-      const y = 90 - ((count / maxCount) * 80); // padding at top
+      const y = 90 - (count / maxCount) * 80; // padding at top
       return `${x.toFixed(1)},${y.toFixed(1)}`;
     });
-    
-    return `M 0,100 L 0,${points[0].split(',')[1]} L ${points.join(' L ')} L 100,100 Z`;
+
+    return `M 0,100 L 0,${points[0].split(",")[1]} L ${points.join(" L ")} L 100,100 Z`;
   };
 
   const getLineStroke = () => {
     if (!enrollmentAnalytics?.dailyBreakdown) return "M 0,100 L 100,100";
-    
+
     const dates = Object.keys(enrollmentAnalytics.dailyBreakdown).sort();
     if (dates.length === 0) return "M 0,100 L 100,100";
 
-    const counts = dates.map((dateKey: any) => enrollmentAnalytics.dailyBreakdown[dateKey]);
+    const counts = dates.map(
+      (dateKey: any) => enrollmentAnalytics.dailyBreakdown[dateKey],
+    );
     const maxCount = Math.max(...counts, 1);
     const stepX = 100 / Math.max(counts.length - 1, 1);
-    
+
     const points = counts.map((count: any, index: any) => {
       const x = index * stepX;
-      const y = 90 - ((count / maxCount) * 80);
+      const y = 90 - (count / maxCount) * 80;
       return `${x.toFixed(1)},${y.toFixed(1)}`;
     });
-    
-    return `M 0,${points[0].split(',')[1]} L ${points.join(' L ')}`;
+
+    return `M 0,${points[0].split(",")[1]} L ${points.join(" L ")}`;
   };
 
   const getXAxisLabels = () => {
     if (!enrollmentAnalytics?.dailyBreakdown) return [];
     const dates = Object.keys(enrollmentAnalytics.dailyBreakdown).sort();
     if (dates.length === 0) return [];
-    
+
     // Pick ~6 evenly spaced dates to show
     const step = Math.max(1, Math.floor(dates.length / 5));
     const selected = [];
@@ -114,7 +119,10 @@ const AdminDashboard = () => {
     }
     return selected.map((dateKey: any) => {
       const dateObj = new Date(dateKey);
-      return dateObj.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+      return dateObj.toLocaleDateString(undefined, {
+        month: "short",
+        day: "numeric",
+      });
     });
   };
 
@@ -125,7 +133,9 @@ const AdminDashboard = () => {
           <h1 className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-sky-300 mb-1 tracking-tight">
             System Overview
           </h1>
-          <p className="text-slate-400 text-sm">Real-time statistics & activity</p>
+          <p className="text-slate-400 text-sm">
+            Real-time statistics & activity
+          </p>
         </div>
       </div>
 
@@ -194,10 +204,17 @@ const AdminDashboard = () => {
           <div className="relative z-10 mt-auto">
             <div className="flex items-center justify-between text-xs mb-1">
               <span className="text-slate-400">Server Load</span>
-              <span className="font-bold text-sky-300">{stats.overview?.systemHealth?.serverLoad || 0}%</span>
+              <span className="font-bold text-sky-300">
+                {stats.overview?.systemHealth?.serverLoad || 0}%
+              </span>
             </div>
             <div className="w-full bg-slate-950/50 border border-slate-800 h-1.5 rounded-full overflow-hidden">
-              <div className="bg-gradient-to-r from-blue-500 to-sky-400 h-full rounded-full transition-all duration-1000 shadow-[0_0_8px_rgba(56,189,248,0.6)]" style={{ width: `${stats.overview?.systemHealth?.serverLoad || 0}%` }}></div>
+              <div
+                className="bg-gradient-to-r from-blue-500 to-sky-400 h-full rounded-full transition-all duration-1000 shadow-[0_0_8px_rgba(56,189,248,0.6)]"
+                style={{
+                  width: `${stats.overview?.systemHealth?.serverLoad || 0}%`,
+                }}
+              ></div>
             </div>
           </div>
         </Card>
@@ -224,9 +241,9 @@ const AdminDashboard = () => {
 
           <div className="h-48 relative w-full flex items-end justify-between px-2">
             {isLoading ? (
-               <div className="absolute inset-0 flex items-center justify-center">
-                 <div className="w-6 h-6 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
-               </div>
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="w-6 h-6 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+              </div>
             ) : (
               <>
                 <svg
@@ -235,15 +252,18 @@ const AdminDashboard = () => {
                   viewBox="0 0 100 100"
                 >
                   <defs>
-                    <linearGradient id="chartGradient" x1="0" y1="0" x2="0" y2="1">
+                    <linearGradient
+                      id="chartGradient"
+                      x1="0"
+                      y1="0"
+                      x2="0"
+                      y2="1"
+                    >
                       <stop offset="0%" stopColor="#3b82f6" stopOpacity="0.3" />
                       <stop offset="100%" stopColor="#3b82f6" stopOpacity="0" />
                     </linearGradient>
                   </defs>
-                  <path
-                    d={getLinePath()}
-                    fill="url(#chartGradient)"
-                  />
+                  <path d={getLinePath()} fill="url(#chartGradient)" />
                   <path
                     d={getLineStroke()}
                     fill="none"
@@ -283,13 +303,19 @@ const AdminDashboard = () => {
           <div className="space-y-5 flex-1 overflow-y-auto pr-2 custom-scrollbar">
             {isLoading ? (
               <div className="flex justify-center py-10">
-                 <div className="w-6 h-6 border-2 border-sky-400 border-t-transparent rounded-full animate-spin"></div>
+                <div className="w-6 h-6 border-2 border-sky-400 border-t-transparent rounded-full animate-spin"></div>
               </div>
             ) : courseAnalytics.length > 0 ? (
               courseAnalytics.slice(0, 5).map((course: any, index: any) => {
-                const maxEnrollments = Math.max(...courseAnalytics.map((courseItem: any) => courseItem._count.enrollments), 1);
-                const widthPercent = (course._count.enrollments / maxEnrollments) * 100;
-                
+                const maxEnrollments = Math.max(
+                  ...courseAnalytics.map(
+                    (courseItem: any) => courseItem._count.enrollments,
+                  ),
+                  1,
+                );
+                const widthPercent =
+                  (course._count.enrollments / maxEnrollments) * 100;
+
                 return (
                   <div key={course.courseId} className="group/item">
                     <div className="flex justify-between text-xs mb-1.5">
@@ -301,16 +327,21 @@ const AdminDashboard = () => {
                       </span>
                     </div>
                     <div className="w-full bg-slate-950/50 border border-slate-800 h-2.5 rounded-full overflow-hidden flex">
-                      <div 
-                        className="bg-gradient-to-r from-blue-500 to-sky-400 h-full rounded-full transition-all duration-1000 shadow-[0_0_5px_rgba(56,189,248,0.5)] group-hover/item:shadow-[0_0_10px_rgba(56,189,248,0.8)]" 
-                        style={{ width: `${Math.max(widthPercent, 5)}%`, opacity: 1 - (index * 0.15) }}
+                      <div
+                        className="bg-gradient-to-r from-blue-500 to-sky-400 h-full rounded-full transition-all duration-1000 shadow-[0_0_5px_rgba(56,189,248,0.5)] group-hover/item:shadow-[0_0_10px_rgba(56,189,248,0.8)]"
+                        style={{
+                          width: `${Math.max(widthPercent, 5)}%`,
+                          opacity: 1 - index * 0.15,
+                        }}
                       ></div>
                     </div>
                   </div>
                 );
               })
             ) : (
-              <p className="text-sm text-slate-500 text-center mt-10">No course data available.</p>
+              <p className="text-sm text-slate-500 text-center mt-10">
+                No course data available.
+              </p>
             )}
           </div>
         </Card>
@@ -330,24 +361,36 @@ const AdminDashboard = () => {
             {stats.recentEnrollments?.length > 0 ? (
               <ul className="divide-y divide-slate-800/50">
                 {stats.recentEnrollments.map((enrollment: any) => (
-                  <li key={enrollment.enrollmentId} className="p-3 hover:bg-slate-800/50 rounded-xl transition-all duration-200 flex justify-between items-center group/row hover:shadow-[0_0_15px_rgba(59,130,246,0.1)]">
+                  <li
+                    key={enrollment.enrollmentId}
+                    className="p-3 hover:bg-slate-800/50 rounded-xl transition-all duration-200 flex justify-between items-center group/row hover:shadow-[0_0_15px_rgba(59,130,246,0.1)]"
+                  >
                     <div>
-                      <p className="text-sm font-bold text-slate-200 group-hover/row:text-blue-300 transition-colors">{enrollment.student?.fullName || enrollment.student?.userName}</p>
-                      <p className="text-xs text-slate-500 truncate max-w-[200px]">{enrollment.course?.courseName}</p>
+                      <p className="text-sm font-bold text-slate-200 group-hover/row:text-blue-300 transition-colors">
+                        {enrollment.student?.fullName ||
+                          enrollment.student?.userName}
+                      </p>
+                      <p className="text-xs text-slate-500 truncate max-w-[200px]">
+                        {enrollment.course?.courseName}
+                      </p>
                     </div>
                     <div className="text-right">
                       <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wide border bg-blue-500/10 text-blue-400 border-blue-500/20 shadow-[0_0_5px_rgba(59,130,246,0.2)]">
                         {enrollment.status}
                       </span>
                       <p className="text-[10px] text-slate-500 mt-1">
-                        {enrollment.enrolledAt ? new Date(enrollment.enrolledAt).toLocaleDateString() : 'N/A'}
+                        {enrollment.enrolledAt
+                          ? new Date(enrollment.enrolledAt).toLocaleDateString()
+                          : "N/A"}
                       </p>
                     </div>
                   </li>
                 ))}
               </ul>
             ) : (
-              <p className="text-sm text-slate-500 text-center p-8">No recent enrollments.</p>
+              <p className="text-sm text-slate-500 text-center p-8">
+                No recent enrollments.
+              </p>
             )}
           </div>
         </Card>
@@ -364,35 +407,47 @@ const AdminDashboard = () => {
             {stats.recentUsers?.length > 0 ? (
               <ul className="divide-y divide-slate-800/50">
                 {stats.recentUsers.map((userItem: any) => (
-                  <li key={userItem.userId} className="p-3 hover:bg-slate-800/50 rounded-xl transition-all duration-200 flex justify-between items-center group/row hover:shadow-[0_0_15px_rgba(56,189,248,0.1)]">
+                  <li
+                    key={userItem.userId}
+                    className="p-3 hover:bg-slate-800/50 rounded-xl transition-all duration-200 flex justify-between items-center group/row hover:shadow-[0_0_15px_rgba(56,189,248,0.1)]"
+                  >
                     <div>
-                      <p className="text-sm font-bold text-slate-200 group-hover/row:text-sky-300 transition-colors">{userItem.fullName}</p>
+                      <p className="text-sm font-bold text-slate-200 group-hover/row:text-sky-300 transition-colors">
+                        {userItem.fullName}
+                      </p>
                       <p className="text-xs text-slate-500">{userItem.email}</p>
                     </div>
                     <div className="text-right">
-                      <span className={`inline-flex items-center gap-1 text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wide border shadow-[0_0_5px_rgba(56,189,248,0.2)] ${
-                        userItem.role?.roleName === 'mentor' 
-                          ? 'bg-sky-500/10 text-sky-400 border-sky-500/20'
-                          : userItem.role?.roleName === 'admin'
-                          ? 'bg-blue-500/10 text-blue-400 border-blue-500/20'
-                          : 'bg-slate-800 text-slate-300 border-slate-700'
-                      }`}>
-                        {userItem.role?.roleName || 'User'}
+                      <span
+                        className={`inline-flex items-center gap-1 text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wide border shadow-[0_0_5px_rgba(56,189,248,0.2)] ${
+                          userItem.role?.roleName === "mentor"
+                            ? "bg-sky-500/10 text-sky-400 border-sky-500/20"
+                            : userItem.role?.roleName === "admin"
+                              ? "bg-blue-500/10 text-blue-400 border-blue-500/20"
+                              : "bg-slate-800 text-slate-300 border-slate-700"
+                        }`}
+                      >
+                        {userItem.role?.roleName || "User"}
                       </span>
                       <p className="text-[10px] text-slate-500 mt-1">
-                        Joined {userItem.createdAt ? new Date(userItem.createdAt).toLocaleDateString() : 'N/A'}
+                        Joined{" "}
+                        {userItem.createdAt
+                          ? new Date(userItem.createdAt).toLocaleDateString()
+                          : "N/A"}
                       </p>
                     </div>
                   </li>
                 ))}
               </ul>
             ) : (
-              <p className="text-sm text-slate-500 text-center p-8">No recent users.</p>
+              <p className="text-sm text-slate-500 text-center p-8">
+                No recent users.
+              </p>
             )}
           </div>
         </Card>
       </div>
-      
+
       <style>{`
         .custom-scrollbar::-webkit-scrollbar {
           width: 6px;
@@ -413,5 +468,3 @@ const AdminDashboard = () => {
 };
 
 export default AdminDashboard;
-
-

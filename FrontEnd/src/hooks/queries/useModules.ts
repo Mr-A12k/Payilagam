@@ -18,7 +18,8 @@ export const useModulesByCourse = (courseId: string) => {
 export const useLessonDetail = (lessonId: string) => {
   return useQuery({
     queryKey: ["lesson", lessonId],
-    queryFn: () => executeHttpGetRequest(`${API_PATHS.LESSONS.BASE}/${lessonId}`),
+    queryFn: () =>
+      executeHttpGetRequest(`${API_PATHS.LESSONS.BASE}/${lessonId}`),
     enabled: !!lessonId, // Defer fetch until lessonId is available
   });
 };

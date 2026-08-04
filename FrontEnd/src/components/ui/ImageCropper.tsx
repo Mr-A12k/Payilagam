@@ -22,9 +22,12 @@ export function ImageCropper({
   const [zoom, setZoom] = useState(1);
   const [croppedAreaPixels, setCroppedAreaPixels] = useState<any>(null);
 
-  const onCropComplete = useCallback((_croppedArea: any, croppedAreaPixels: any) => {
-    setCroppedAreaPixels(croppedAreaPixels);
-  }, []);
+  const onCropComplete = useCallback(
+    (_croppedArea: any, croppedAreaPixels: any) => {
+      setCroppedAreaPixels(croppedAreaPixels);
+    },
+    [],
+  );
 
   const handleCrop = async () => {
     try {
@@ -73,7 +76,9 @@ export function ImageCropper({
             max={3}
             step={0.1}
             aria-labelledby="Zoom"
-            onChange={(event: React.SyntheticEvent<any>) => setZoom(Number((event.target as HTMLInputElement).value))}
+            onChange={(event: React.SyntheticEvent<any>) =>
+              setZoom(Number((event.target as HTMLInputElement).value))
+            }
             className="w-full accent-blue-600"
           />
         </div>
@@ -91,4 +96,3 @@ export function ImageCropper({
     </Dialog>
   );
 }
-

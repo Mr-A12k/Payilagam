@@ -18,20 +18,41 @@ const PayilagamLogo = ({ size = 36, className = "" }: any) => (
   >
     <defs>
       {/* Primary blue gradient */}
-      <linearGradient id="payilagam-grad" x1="0" y1="0" x2="64" y2="64" gradientUnits="userSpaceOnUse">
+      <linearGradient
+        id="payilagam-grad"
+        x1="0"
+        y1="0"
+        x2="64"
+        y2="64"
+        gradientUnits="userSpaceOnUse"
+      >
         <stop offset="0%" stopColor="#3b82f6" /> {/* blue-500 */}
         <stop offset="100%" stopColor="#2563eb" /> {/* blue-600 */}
       </linearGradient>
 
       {/* Subtle lighter gradient for accent shapes */}
-      <linearGradient id="payilagam-accent" x1="10" y1="10" x2="54" y2="54" gradientUnits="userSpaceOnUse">
+      <linearGradient
+        id="payilagam-accent"
+        x1="10"
+        y1="10"
+        x2="54"
+        y2="54"
+        gradientUnits="userSpaceOnUse"
+      >
         <stop offset="0%" stopColor="#60a5fa" /> {/* blue-400 */}
         <stop offset="100%" stopColor="#3b82f6" /> {/* blue-500 */}
       </linearGradient>
     </defs>
 
     {/* ── Rounded-square background ─────────────────────────── */}
-    <rect x="2" y="2" width="60" height="60" rx="16" fill="url(#payilagam-grad)" />
+    <rect
+      x="2"
+      y="2"
+      width="60"
+      height="60"
+      rx="16"
+      fill="url(#payilagam-grad)"
+    />
 
     {/* ── Open book motif (two fanned pages) ────────────────── */}
     {/* Left page */}
@@ -47,7 +68,15 @@ const PayilagamLogo = ({ size = 36, className = "" }: any) => (
       opacity="0.25"
     />
     {/* Book spine highlight */}
-    <line x1="32" y1="14" x2="32" y2="42" stroke="white" strokeWidth="1.5" opacity="0.35" />
+    <line
+      x1="32"
+      y1="14"
+      x2="32"
+      y2="42"
+      stroke="white"
+      strokeWidth="1.5"
+      opacity="0.35"
+    />
 
     {/* ── Stylised letter "P" ───────────────────────────────── */}
     <path
@@ -56,16 +85,38 @@ const PayilagamLogo = ({ size = 36, className = "" }: any) => (
       fillRule="evenodd"
     />
     {/* P counter-shape (knockout) */}
-    <rect x="28" y="26.5" width="5" height="5" rx="1.5" fill="url(#payilagam-grad)" />
+    <rect
+      x="28"
+      y="26.5"
+      width="5"
+      height="5"
+      rx="1.5"
+      fill="url(#payilagam-grad)"
+    />
 
     {/* ── Graduation cap accent (top-right) ─────────────────── */}
     <polygon points="42,12 52,17 42,22 32,17" fill="white" opacity="0.9" />
-    <line x1="42" y1="22" x2="42" y2="28" stroke="white" strokeWidth="1.5" opacity="0.7" />
+    <line
+      x1="42"
+      y1="22"
+      x2="42"
+      y2="28"
+      stroke="white"
+      strokeWidth="1.5"
+      opacity="0.7"
+    />
     <circle cx="42" cy="28.5" r="1.5" fill="white" opacity="0.7" />
     {/* Tassel */}
-    <line x1="52" y1="17" x2="54" y2="24" stroke="white" strokeWidth="1.2" opacity="0.6" />
+    <line
+      x1="52"
+      y1="17"
+      x2="54"
+      y2="24"
+      stroke="white"
+      strokeWidth="1.2"
+      opacity="0.6"
+    />
   </svg>
 );
 
 export default PayilagamLogo;
-

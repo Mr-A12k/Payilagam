@@ -1,9 +1,17 @@
-import React, { createContext, useContext, ReactNode, useState, useEffect, useCallback } from "react";
-import { io, Socket } from 'socket.io-client';
-import { useSelector } from 'react-redux';
-import { RootState } from '@/store/store';
+import React, {
+  createContext,
+  useContext,
+  ReactNode,
+  useState,
+  useEffect,
+  useCallback,
+} from "react";
+import { io, Socket } from "socket.io-client";
+import { useSelector } from "react-redux";
+import { RootState } from "@/store/store";
 
-const SOCKET_URL = import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:5000';
+const SOCKET_URL =
+  import.meta.env.VITE_API_URL?.replace("/api", "") || "http://localhost:5000";
 
 interface SocketContextType {
   socket: Socket | null;
@@ -23,14 +31,16 @@ interface SocketProviderProps {
   children: ReactNode;
 }
 
-export const SocketProvider: React.FC<SocketProviderProps> = ({ children }: any) => {
+export const SocketProvider: React.FC<SocketProviderProps> = ({
+  children,
+}: any) => {
   const [socket, setSocket] = useState<Socket | null>(null);
   const [isConnected, setIsConnected] = useState<boolean>(false);
   const token = useSelector((state: RootState) => state.auth.token);
 
   useEffect(() => {
     // We only want to request permission once the component mounts
-    if (Notification.permission === 'default') {
+    if (Notification.permission === "default") {
       Notification.requestPermission();
     }
   }, []);
@@ -47,24 +57,27 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({ children }: any)
     });
 
     // Connection events
-    newSocket.on('connect', () => {
-      console.log('Global Socket connected:', newSocket.id);
+    newSocket.on("connect", () => {
+      console.log("Global Socket connected:", newSocket.id);
       setIsConnected(true);
     });
 
-    newSocket.on('disconnect', () => {
-      console.log('Global Socket disconnected');
+    newSocket.on("disconnect", () => {
+      console.log("Global Socket disconnected");
       setIsConnected(false);
     });
 
-    newSocket.on('connect_error', (error: unknown) => {
-      console.error('Global Socket connection error:', (error as import('axios').AxiosError<{message?: string}>)?.message);
+    newSocket.on("connect_error", (error: unknown) => {
+      console.error(
+        "Global Socket connection error:",
+        (error as import("axios").AxiosError<{ message?: string }>)?.message,
+      );
       setIsConnected(false);
     });
 
     // Handle global notifications
     const handleNotification = (messageData: any) => {
-      const isChatPage = window.location.pathname.startsWith('/chat');
+      const isChatPage = window.location.pathname.startsWith("/chat");
       const isFocused = document.hasFocus();
 
       // If user is focused on the chat page, don't send desktop push
@@ -73,16 +86,16 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({ children }: any)
       }
 
       // Otherwise send a desktop notification if permitted
-      if (Notification.permission === 'granted') {
-        const title = messageData.sender?.fullName 
-          ? `New message from ${messageData.sender.fullName}` 
-          : 'New Message';
-          
+      if (Notification.permission === "granted") {
+        const title = messageData.sender?.fullName
+          ? `New message from ${messageData.sender.fullName}`
+          : "New Message";
+
         const notif = new Notification(title, {
           body: messageData.content,
-          icon: messageData.sender?.profileUrl || '/logo.png', // Optional icon
+          icon: messageData.sender?.profileUrl || "/logo.png", // Optional icon
         });
-        
+
         notif.onclick = () => {
           window.focus();
           // Could also redirect to chat:
@@ -91,31 +104,34 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({ children }: any)
       }
     };
 
-    newSocket.on('new_message', handleNotification);
-    newSocket.on('new_channel_message', handleNotification);
+    newSocket.on("new_message", handleNotification);
+    newSocket.on("new_channel_message", handleNotification);
 
     setSocket(newSocket);
 
     // Cleanup on unmount
     return () => {
-      newSocket.off('new_message', handleNotification);
-      newSocket.off('new_channel_message', handleNotification);
+      newSocket.off("new_message", handleNotification);
+      newSocket.off("new_channel_message", handleNotification);
       newSocket.disconnect();
     };
   }, [token]);
 
   // Wrapper around emit to ensure socket exists
-  const emitEvent = useCallback((event: string, data?: any, callback?: Function) => {
-    if (socket && isConnected) {
-      if (callback) {
-        socket.emit(event, data, callback);
+  const emitEvent = useCallback(
+    (event: string, data?: any, callback?: Function) => {
+      if (socket && isConnected) {
+        if (callback) {
+          socket.emit(event, data, callback);
+        } else {
+          socket.emit(event, data);
+        }
       } else {
-        socket.emit(event, data);
+        console.warn(`Cannot emit ${event}: Socket not connected`);
       }
-    } else {
-      console.warn(`Cannot emit ${event}: Socket not connected`);
-    }
-  }, [socket, isConnected]);
+    },
+    [socket, isConnected],
+  );
 
   return (
     <SocketContext.Provider value={{ socket, isConnected, emitEvent }}>

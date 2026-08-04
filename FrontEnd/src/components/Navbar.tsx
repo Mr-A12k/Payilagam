@@ -55,7 +55,9 @@ const Navbar = () => {
 
   /* ── State ──────────────────────────────────────────── */
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [accordionOpen, setAccordionOpen] = useState<Record<string, boolean>>({});
+  const [accordionOpen, setAccordionOpen] = useState<Record<string, boolean>>(
+    {},
+  );
   const drawerRef = useRef<any>(null);
 
   /* ── Helpers ────────────────────────────────────────── */

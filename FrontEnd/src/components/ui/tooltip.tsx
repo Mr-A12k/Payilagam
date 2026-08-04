@@ -20,7 +20,12 @@ function TooltipTrigger({ ...props }: any) {
   return <TooltipPrimitive.Trigger data-slot="tooltip-trigger" {...props} />;
 }
 
-function TooltipContent({ className, sideOffset = 0, children, ...props }: any) {
+function TooltipContent({
+  className,
+  sideOffset = 0,
+  children,
+  ...props
+}: any) {
   return (
     <TooltipPrimitive.Portal>
       <TooltipPrimitive.Content

@@ -14,7 +14,7 @@ import {
   Cloud,
   Blocks,
   Activity,
-  Server
+  Server,
 } from "lucide-react";
 
 export const ALL_LABS = [
@@ -23,7 +23,8 @@ export const ALL_LABS = [
     name: "Coding Lab",
     category: "Software Development",
     tagline: "Write & run code in your browser",
-    description: "A full online compiler supporting Python, JavaScript, Java, C, C++ and more — powered by Judge0. No setup needed.",
+    description:
+      "A full online compiler supporting Python, JavaScript, Java, C, C++ and more — powered by Judge0. No setup needed.",
     icon: Code2,
     gradient: "from-blue-500 to-indigo-600",
     glowColor: "rgba(99,102,241,0.25)",
@@ -38,7 +39,8 @@ export const ALL_LABS = [
     name: "Database Lab",
     category: "Data & Analytics",
     tagline: "SQL queries on real schemas",
-    description: "Run SQL queries against PostgreSQL, MySQL, and SQLite schemas. Explore tables, write JOINs, and see instant results.",
+    description:
+      "Run SQL queries against PostgreSQL, MySQL, and SQLite schemas. Explore tables, write JOINs, and see instant results.",
     icon: Database,
     gradient: "from-emerald-500 to-teal-600",
     glowColor: "rgba(16,185,129,0.2)",
@@ -52,7 +54,8 @@ export const ALL_LABS = [
     name: "Circuit Lab",
     category: "Hardware",
     tagline: "Build & simulate digital circuits",
-    description: "Design logic gates, flip-flops, and full circuits in an interactive drag-and-drop simulator. Learn electronics visually.",
+    description:
+      "Design logic gates, flip-flops, and full circuits in an interactive drag-and-drop simulator. Learn electronics visually.",
     icon: Cpu,
     gradient: "from-orange-500 to-red-600",
     glowColor: "rgba(249,115,22,0.2)",
@@ -66,7 +69,8 @@ export const ALL_LABS = [
     name: "Web Dev Lab",
     category: "Software Development",
     tagline: "HTML, CSS & JS sandbox",
-    description: "A live-preview coding sandbox for web development. Write HTML, CSS, and JavaScript and see the result in real time.",
+    description:
+      "A live-preview coding sandbox for web development. Write HTML, CSS, and JavaScript and see the result in real time.",
     icon: Globe,
     gradient: "from-pink-500 to-rose-600",
     glowColor: "rgba(236,72,153,0.2)",
@@ -80,7 +84,8 @@ export const ALL_LABS = [
     name: "Network Lab",
     category: "Infrastructure",
     tagline: "Simulate network topologies",
-    description: "Design packet-switched networks, set up routing protocols, and simulate real network scenarios with visual feedback.",
+    description:
+      "Design packet-switched networks, set up routing protocols, and simulate real network scenarios with visual feedback.",
     icon: Wifi,
     gradient: "from-violet-500 to-purple-600",
     glowColor: "rgba(139,92,246,0.2)",
@@ -94,7 +99,8 @@ export const ALL_LABS = [
     name: "OS & Shell Lab",
     category: "Infrastructure",
     tagline: "Linux terminal in browser",
-    description: "Learn Linux commands, bash scripting, and OS concepts in a safe, sandboxed terminal environment.",
+    description:
+      "Learn Linux commands, bash scripting, and OS concepts in a safe, sandboxed terminal environment.",
     icon: Terminal,
     gradient: "from-slate-500 to-gray-600",
     glowColor: "rgba(100,116,139,0.2)",
@@ -108,7 +114,8 @@ export const ALL_LABS = [
     name: "AI & ML Lab",
     category: "Data & Analytics",
     tagline: "Train machine learning models",
-    description: "Build and train neural networks using PyTorch and TensorFlow right in your browser. Visualize loss and accuracy metrics.",
+    description:
+      "Build and train neural networks using PyTorch and TensorFlow right in your browser. Visualize loss and accuracy metrics.",
     icon: Brain,
     gradient: "from-indigo-500 to-purple-600",
     glowColor: "rgba(99,102,241,0.2)",
@@ -122,7 +129,8 @@ export const ALL_LABS = [
     name: "Cybersecurity Lab",
     category: "Security",
     tagline: "Pen-testing and ethical hacking",
-    description: "Safely practice exploiting vulnerabilities in sandbox web apps. Learn about XSS, SQLi, and defensive programming.",
+    description:
+      "Safely practice exploiting vulnerabilities in sandbox web apps. Learn about XSS, SQLi, and defensive programming.",
     icon: Lock,
     gradient: "from-red-500 to-rose-700",
     glowColor: "rgba(225,29,72,0.2)",
@@ -136,7 +144,8 @@ export const ALL_LABS = [
     name: "Mobile App Lab",
     category: "Software Development",
     tagline: "React Native & Flutter Sandbox",
-    description: "Develop cross-platform mobile apps with a live in-browser device emulator.",
+    description:
+      "Develop cross-platform mobile apps with a live in-browser device emulator.",
     icon: Smartphone,
     gradient: "from-sky-400 to-blue-600",
     glowColor: "rgba(14,165,233,0.2)",
@@ -150,7 +159,8 @@ export const ALL_LABS = [
     name: "Game Dev Lab",
     category: "Software Development",
     tagline: "2D & 3D Game Engine",
-    description: "Create interactive games using WebGL and HTML5 Canvas with a built-in physics engine.",
+    description:
+      "Create interactive games using WebGL and HTML5 Canvas with a built-in physics engine.",
     icon: Gamepad2,
     gradient: "from-fuchsia-500 to-pink-600",
     glowColor: "rgba(217,70,239,0.2)",
@@ -164,7 +174,8 @@ export const ALL_LABS = [
     name: "Cloud Native Lab",
     category: "Infrastructure",
     tagline: "Deploy to Kubernetes",
-    description: "Write Dockerfiles and Kubernetes manifests. See your microservices orchestrate in a virtual cluster.",
+    description:
+      "Write Dockerfiles and Kubernetes manifests. See your microservices orchestrate in a virtual cluster.",
     icon: Cloud,
     gradient: "from-cyan-500 to-blue-500",
     glowColor: "rgba(6,182,212,0.2)",
@@ -178,7 +189,8 @@ export const ALL_LABS = [
     name: "Blockchain Lab",
     category: "Emerging Tech",
     tagline: "Smart Contract Development",
-    description: "Write, compile, and deploy Solidity smart contracts to a local testnet. Interact with your contracts via a web3 interface.",
+    description:
+      "Write, compile, and deploy Solidity smart contracts to a local testnet. Interact with your contracts via a web3 interface.",
     icon: Blocks,
     gradient: "from-amber-400 to-orange-500",
     glowColor: "rgba(245,158,11,0.2)",
@@ -192,7 +204,8 @@ export const ALL_LABS = [
     name: "IoT Simulator Lab",
     category: "Hardware",
     tagline: "Connect virtual devices",
-    description: "Program virtual sensors and microcontrollers. Send telemetry data to a simulated cloud endpoint using MQTT.",
+    description:
+      "Program virtual sensors and microcontrollers. Send telemetry data to a simulated cloud endpoint using MQTT.",
     icon: Activity,
     gradient: "from-lime-500 to-green-600",
     glowColor: "rgba(132,204,22,0.2)",
@@ -206,7 +219,8 @@ export const ALL_LABS = [
     name: "DevOps Pipeline Lab",
     category: "Infrastructure",
     tagline: "Build CI/CD Workflows",
-    description: "Configure automated build, test, and deployment pipelines using a simulated GitHub Actions environment.",
+    description:
+      "Configure automated build, test, and deployment pipelines using a simulated GitHub Actions environment.",
     icon: Server,
     gradient: "from-slate-600 to-zinc-800",
     glowColor: "rgba(82,82,91,0.2)",
@@ -220,7 +234,8 @@ export const ALL_LABS = [
     name: "Data Engineering Lab",
     category: "Data & Analytics",
     tagline: "Build ETL Pipelines",
-    description: "Extract, transform, and load massive datasets using Apache Spark and Airflow DAGs.",
+    description:
+      "Extract, transform, and load massive datasets using Apache Spark and Airflow DAGs.",
     icon: Layers,
     gradient: "from-yellow-500 to-amber-600",
     glowColor: "rgba(234,179,8,0.2)",
@@ -234,7 +249,8 @@ export const ALL_LABS = [
     name: "Quantum Computing Lab",
     category: "Emerging Tech",
     tagline: "Qubit Circuit Designer",
-    description: "Explore quantum mechanics by dragging and dropping quantum gates (Hadamard, CNOT) to build circuits.",
+    description:
+      "Explore quantum mechanics by dragging and dropping quantum gates (Hadamard, CNOT) to build circuits.",
     icon: Sparkles,
     gradient: "from-indigo-600 to-violet-800",
     glowColor: "rgba(79,70,229,0.2)",
@@ -242,5 +258,5 @@ export const ALL_LABS = [
     available: false,
     badge: "Coming Soon",
     badgeColor: "#f59e0b",
-  }
+  },
 ];

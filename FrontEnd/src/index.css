@@ -91,35 +91,35 @@
 :root,
 [data-theme="dark"] {
   /* Backgrounds */
-  --bg-base: #020617;          /* slate-950 */
-  --bg-surface: #0f172a;       /* slate-900 */
-  --bg-surface-2: #1e293b;     /* slate-800 */
-  --bg-surface-3: #334155;     /* slate-700 */
-  --bg-hover: #1e293b;         /* slate-800 */
-  --bg-active: #0f172a;        /* slate-900 */
-  --bg-input: #020617;         /* slate-950 */
-  --bg-card: #0f172a;          /* slate-900 */
-  --bg-card-hover: #1e293b;    /* slate-800 */
+  --bg-base: #020617; /* slate-950 */
+  --bg-surface: #0f172a; /* slate-900 */
+  --bg-surface-2: #1e293b; /* slate-800 */
+  --bg-surface-3: #334155; /* slate-700 */
+  --bg-hover: #1e293b; /* slate-800 */
+  --bg-active: #0f172a; /* slate-900 */
+  --bg-input: #020617; /* slate-950 */
+  --bg-card: #0f172a; /* slate-900 */
+  --bg-card-hover: #1e293b; /* slate-800 */
   --bg-overlay: rgba(2, 6, 23, 0.7);
   --bg-glass: rgba(15, 23, 42, 0.8);
 
   /* Text */
-  --text-primary: #f1f5f9;     /* slate-100 */
-  --text-secondary: #94a3b8;   /* slate-400 */
-  --text-muted: #64748b;       /* slate-500 */
-  --text-disabled: #475569;    /* slate-600 */
-  --text-inverse: #0f172a;     /* slate-900 */
-  --text-heading: #f8fafc;     /* slate-50 */
+  --text-primary: #f1f5f9; /* slate-100 */
+  --text-secondary: #94a3b8; /* slate-400 */
+  --text-muted: #64748b; /* slate-500 */
+  --text-disabled: #475569; /* slate-600 */
+  --text-inverse: #0f172a; /* slate-900 */
+  --text-heading: #f8fafc; /* slate-50 */
 
   /* Borders */
-  --border-default: #1e293b;   /* slate-800 */
-  --border-subtle: #334155;    /* slate-700 */
-  --border-strong: #475569;    /* slate-600 */
-  --border-input: #1e293b;     /* slate-800 */
-  --border-focus: #60a5fa;     /* blue-400 */
+  --border-default: #1e293b; /* slate-800 */
+  --border-subtle: #334155; /* slate-700 */
+  --border-strong: #475569; /* slate-600 */
+  --border-input: #1e293b; /* slate-800 */
+  --border-focus: #60a5fa; /* blue-400 */
 
   /* Brand/Accent */
-  --accent-primary: #3b82f6;   /* blue-500 */
+  --accent-primary: #3b82f6; /* blue-500 */
   --accent-primary-hover: #2563eb; /* blue-600 */
   --accent-primary-subtle: rgba(59, 130, 246, 0.1);
   --accent-primary-border: rgba(59, 130, 246, 0.2);
@@ -185,35 +185,35 @@
 /* ── LIGHT THEME ────────────────────────────────── */
 [data-theme="light"] {
   /* Backgrounds */
-  --bg-base: #f1f5f9;          /* slate-100 - cooler deeper base */
-  --bg-surface: #ffffff;       /* white */
-  --bg-surface-2: #f8fafc;     /* slate-50 - headers, sidebar */
-  --bg-surface-3: #e2e8f0;     /* slate-200 */
-  --bg-hover: #f1f5f9;         /* slate-100 */
-  --bg-active: #e2e8f0;        /* slate-200 */
-  --bg-input: #ffffff;         /* white */
+  --bg-base: #f1f5f9; /* slate-100 - cooler deeper base */
+  --bg-surface: #ffffff; /* white */
+  --bg-surface-2: #f8fafc; /* slate-50 - headers, sidebar */
+  --bg-surface-3: #e2e8f0; /* slate-200 */
+  --bg-hover: #f1f5f9; /* slate-100 */
+  --bg-active: #e2e8f0; /* slate-200 */
+  --bg-input: #ffffff; /* white */
   --bg-card: #ffffff;
   --bg-card-hover: #f8fafc;
   --bg-overlay: rgba(255, 255, 255, 0.8);
   --bg-glass: rgba(255, 255, 255, 0.95);
 
   /* Text */
-  --text-primary: #0f172a;     /* slate-900 */
-  --text-secondary: #334155;   /* slate-700 */
-  --text-muted: #64748b;       /* slate-500 */
-  --text-disabled: #94a3b8;    /* slate-400 */
-  --text-inverse: #ffffff;     /* white */
-  --text-heading: #020617;     /* slate-950 */
+  --text-primary: #0f172a; /* slate-900 */
+  --text-secondary: #334155; /* slate-700 */
+  --text-muted: #64748b; /* slate-500 */
+  --text-disabled: #94a3b8; /* slate-400 */
+  --text-inverse: #ffffff; /* white */
+  --text-heading: #020617; /* slate-950 */
 
   /* Borders */
-  --border-default: #e2e8f0;   /* slate-200 */
-  --border-subtle: #f1f5f9;    /* slate-100 */
-  --border-strong: #cbd5e1;    /* slate-300 */
-  --border-input: #cbd5e1;     /* slate-300 */
-  --border-focus: #3b82f6;     /* blue-500 */
+  --border-default: #e2e8f0; /* slate-200 */
+  --border-subtle: #f1f5f9; /* slate-100 */
+  --border-strong: #cbd5e1; /* slate-300 */
+  --border-input: #cbd5e1; /* slate-300 */
+  --border-focus: #3b82f6; /* blue-500 */
 
   /* Brand/Accent */
-  --accent-primary: #2563eb;   /* blue-600 */
+  --accent-primary: #2563eb; /* blue-600 */
   --accent-primary-hover: #1d4ed8; /* blue-700 */
   --accent-primary-subtle: rgba(37, 99, 235, 0.08);
   --accent-primary-border: rgba(37, 99, 235, 0.2);
@@ -282,22 +282,42 @@
 
 @layer base {
   html {
-    transition: background-color 0.25s ease, color 0.25s ease;
+    transition:
+      background-color 0.25s ease,
+      color 0.25s ease;
   }
 
   body {
     margin: 0;
     padding: 0;
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    font-family:
+      "Inter",
+      -apple-system,
+      BlinkMacSystemFont,
+      "Segoe UI",
+      Roboto,
+      Oxygen,
+      Ubuntu,
+      Cantarell,
+      "Open Sans",
+      "Helvetica Neue",
+      sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     background-color: var(--bg-base);
     color: var(--text-primary);
-    transition: background-color 0.25s ease, color 0.25s ease;
+    transition:
+      background-color 0.25s ease,
+      color 0.25s ease;
   }
 
   /* Heading typography — uses the display font */
-  h1, h2, h3, h4, h5, h6 {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     font-family: var(--font-headline);
     color: var(--text-heading);
     transition: color 0.25s ease;
@@ -364,7 +384,10 @@
     box-shadow: var(--header-shadow);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
-    transition: background-color 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+    transition:
+      background-color 0.25s ease,
+      border-color 0.25s ease,
+      box-shadow 0.25s ease;
   }
 
   /* Mobile drawer overlay */
@@ -381,7 +404,9 @@
     background-color: var(--drawer-bg);
     border-left: 1px solid var(--drawer-border);
     @apply fixed top-0 right-0 h-full w-80 max-w-[85vw] shadow-2xl z-50;
-    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.25s ease;
+    transition:
+      transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+      background-color 0.25s ease;
   }
 
   /* ── Nav link animated underline ──────────────────── */
@@ -403,7 +428,7 @@
 
   /* Active link underline */
   .nav-link-active::after {
-    content: '';
+    content: "";
     position: absolute;
     bottom: -1px;
     left: 12px;
@@ -420,7 +445,9 @@
     border: 1px solid var(--card-border);
     box-shadow: var(--card-shadow);
     border-radius: 1rem;
-    transition: background-color 0.25s ease, border-color 0.25s ease;
+    transition:
+      background-color 0.25s ease,
+      border-color 0.25s ease;
   }
 
   /* ── Theme-aware input ───────────────────────────── */
@@ -428,7 +455,10 @@
     background-color: var(--input-bg);
     border: 1px solid var(--input-border);
     color: var(--input-text);
-    transition: background-color 0.25s ease, border-color 0.25s ease, color 0.25s ease;
+    transition:
+      background-color 0.25s ease,
+      border-color 0.25s ease,
+      color 0.25s ease;
   }
 
   .theme-input::placeholder {
@@ -445,25 +475,33 @@
   .theme-surface {
     background-color: var(--bg-surface);
     color: var(--text-primary);
-    transition: background-color 0.25s ease, color 0.25s ease;
+    transition:
+      background-color 0.25s ease,
+      color 0.25s ease;
   }
 
   .theme-surface-2 {
     background-color: var(--bg-surface-2);
     color: var(--text-primary);
-    transition: background-color 0.25s ease, color 0.25s ease;
+    transition:
+      background-color 0.25s ease,
+      color 0.25s ease;
   }
 
   /* ── Sidebar theme styles ────────────────────────── */
   .sidebar-root {
     background-color: var(--sidebar-bg);
     border-right: 1px solid var(--sidebar-border);
-    transition: background-color 0.25s ease, border-color 0.25s ease;
+    transition:
+      background-color 0.25s ease,
+      border-color 0.25s ease;
   }
 
   .sidebar-nav-item {
     color: var(--sidebar-text);
-    transition: background-color 0.2s ease, color 0.2s ease;
+    transition:
+      background-color 0.2s ease,
+      color 0.2s ease;
   }
 
   .sidebar-nav-item:hover {
@@ -522,10 +560,18 @@
 @theme inline {
   --animate-blob: blob 7s infinite;
   @keyframes blob {
-    0% { transform: translate(0px, 0px) scale(1); }
-    33% { transform: translate(30px, -50px) scale(1.1); }
-    66% { transform: translate(-20px, 20px) scale(0.9); }
-    100% { transform: translate(0px, 0px) scale(1); }
+    0% {
+      transform: translate(0px, 0px) scale(1);
+    }
+    33% {
+      transform: translate(30px, -50px) scale(1.1);
+    }
+    66% {
+      transform: translate(-20px, 20px) scale(0.9);
+    }
+    100% {
+      transform: translate(0px, 0px) scale(1);
+    }
   }
 }
 
@@ -547,19 +593,37 @@
     animation: hero-rise 700ms ease-out both;
   }
 
-  .hero-title { animation-delay: 90ms; }
-  .hero-subtitle { animation-delay: 170ms; }
-  .hero-copy { animation-delay: 240ms; }
-  .hero-actions { animation-delay: 320ms; }
+  .hero-title {
+    animation-delay: 90ms;
+  }
+  .hero-subtitle {
+    animation-delay: 170ms;
+  }
+  .hero-copy {
+    animation-delay: 240ms;
+  }
+  .hero-actions {
+    animation-delay: 320ms;
+  }
 
   @keyframes hero-rise {
-    from { opacity: 0; transform: translateY(18px); }
-    to   { opacity: 1; transform: translateY(0); }
+    from {
+      opacity: 0;
+      transform: translateY(18px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
 
   @keyframes hero-orbit-drift {
-    from { transform: translate3d(0, 0, 0) scale(1); }
-    to   { transform: translate3d(-14px, -18px, 0) scale(1.015); }
+    from {
+      transform: translate3d(0, 0, 0) scale(1);
+    }
+    to {
+      transform: translate3d(-14px, -18px, 0) scale(1.015);
+    }
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -573,8 +637,12 @@
     }
   }
 
-  .animation-delay-2000 { animation-delay: 2s; }
-  .animation-delay-4000 { animation-delay: 4s; }
+  .animation-delay-2000 {
+    animation-delay: 2s;
+  }
+  .animation-delay-4000 {
+    animation-delay: 4s;
+  }
 
   .hide-scrollbar {
     -ms-overflow-style: none;

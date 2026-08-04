@@ -8,7 +8,13 @@ import { Navigate, useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
 import Loader from "./ui/Loader";
 
-const ProtectedRoute = ({ children, allowedRoles }: { children: React.ReactNode, allowedRoles?: any[] }) => {
+const ProtectedRoute = ({
+  children,
+  allowedRoles,
+}: {
+  children: React.ReactNode;
+  allowedRoles?: any[];
+}) => {
   const { user, loading } = useSelector((state: any) => state.auth);
   const location = useLocation();
 
@@ -28,9 +34,11 @@ const ProtectedRoute = ({ children, allowedRoles }: { children: React.ReactNode,
     !allowedRoles.includes(user.roleId)
   ) {
     // Role not authorized — cascade through access levels to find the best fallback based on roleId
-    if (user.roleId === 1) // Fallback for Admins
+    if (user.roleId === 1)
+      // Fallback for Admins
       return <Navigate to="/admin" replace />;
-    if (user.roleId === 2) // Fallback for Mentors
+    if (user.roleId === 2)
+      // Fallback for Mentors
       return <Navigate to="/mentor" replace />;
     // Default fallback for Students (roleId 3)
     return <Navigate to="/dashboard" replace />;

@@ -6,7 +6,13 @@
  * - Persists to localStorage immediately on change
  * - Persists to DB via PUT /auth/profile when user is authenticated
  */
-import { createContext, useContext, useEffect, useState, useCallback } from "react";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  useCallback,
+} from "react";
 import { useSelector } from "react-redux";
 import { executeHttpPutRequest } from "@/api/commonServices";
 import { API_PATHS } from "@/api/constants";
@@ -73,14 +79,16 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
       // Persist to DB if authenticated
       if (user) {
         try {
-          await executeHttpPutRequest(API_PATHS.AUTH.PROFILE, { theme: newTheme });
+          await executeHttpPutRequest(API_PATHS.AUTH.PROFILE, {
+            theme: newTheme,
+          });
         } catch (error) {
-                    // Silent failure — localStorage is still updated
+          // Silent failure — localStorage is still updated
           console.warn("Failed to persist theme to server:", error);
         }
       }
     },
-    [user, applyTheme]
+    [user, applyTheme],
   );
 
   const toggleTheme = useCallback(() => {

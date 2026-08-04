@@ -5,7 +5,11 @@ import { cn } from "@/lib/utils";
  * Features a sleek, modern concentric rings animation with a glowing core,
  * providing a premium glassmorphic feel.
  */
-const Loader = ({ fullScreen = false, text = "Loading...", className }: any) => {
+const Loader = ({
+  fullScreen = false,
+  text = "Loading...",
+  className,
+}: any) => {
   const loaderContent = (
     <div
       className={cn(
@@ -16,19 +20,19 @@ const Loader = ({ fullScreen = false, text = "Loading...", className }: any) => 
       <div className="relative w-16 h-16 flex items-center justify-center">
         {/* Ambient background glow */}
         <div className="absolute inset-0 bg-blue-500/20 blur-xl rounded-full animate-pulse"></div>
-        
+
         {/* Outer spinning ring */}
-        <div 
-          className="absolute inset-0 rounded-full border-2 border-transparent border-t-blue-500 border-r-blue-500/50 animate-spin" 
-          style={{ animationDuration: '1.5s' }}
+        <div
+          className="absolute inset-0 rounded-full border-2 border-transparent border-t-blue-500 border-r-blue-500/50 animate-spin"
+          style={{ animationDuration: "1.5s" }}
         ></div>
-        
+
         {/* Inner spinning ring (opposite direction) */}
-        <div 
-          className="absolute inset-2 rounded-full border-2 border-transparent border-b-sky-400 border-l-sky-400/50 animate-spin" 
-          style={{ animationDirection: 'reverse', animationDuration: '1s' }}
+        <div
+          className="absolute inset-2 rounded-full border-2 border-transparent border-b-sky-400 border-l-sky-400/50 animate-spin"
+          style={{ animationDirection: "reverse", animationDuration: "1s" }}
         ></div>
-        
+
         {/* Glowing core */}
         <div className="w-3 h-3 bg-blue-400 rounded-full shadow-[0_0_15px_rgba(56,189,248,0.8)] animate-pulse"></div>
       </div>

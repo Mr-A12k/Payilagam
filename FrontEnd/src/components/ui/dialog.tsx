@@ -72,7 +72,10 @@ function DialogHeader({ className, ...props }: any) {
   return (
     <div
       data-slot="dialog-header"
-      className={cn("flex flex-col gap-1.5 text-center sm:text-left", className)}
+      className={cn(
+        "flex flex-col gap-1.5 text-center sm:text-left",
+        className,
+      )}
       {...props}
     />
   );
@@ -107,7 +110,10 @@ function DialogTitle({ className, ...props }: any) {
   return (
     <DialogPrimitive.Title
       data-slot="dialog-title"
-      className={cn("text-lg font-semibold tracking-tight text-slate-100", className)}
+      className={cn(
+        "text-lg font-semibold tracking-tight text-slate-100",
+        className,
+      )}
       {...props}
     />
   );
@@ -138,4 +144,3 @@ export {
   DialogTitle,
   DialogTrigger,
 };
-

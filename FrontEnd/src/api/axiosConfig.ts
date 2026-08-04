@@ -60,7 +60,10 @@ api.interceptors.response.use(
     return response;
   },
   (error: unknown) => {
-    const axiosError = error as import('axios').AxiosError<{message?: string, errors?: Array<{message: string}>}>;
+    const axiosError = error as import("axios").AxiosError<{
+      message?: string;
+      errors?: Array<{ message: string }>;
+    }>;
     const response = axiosError.response;
 
     if (response) {
@@ -71,11 +74,18 @@ api.interceptors.response.use(
       }
 
       // Extract the valid error reason from the backend response
-      let errorMessage = response.data?.message || "An unexpected error occurred";
-      
+      let errorMessage =
+        response.data?.message || "An unexpected error occurred";
+
       // Handle validation error arrays
-      if (response.data?.errors && Array.isArray(response.data.errors) && response.data.errors.length > 0) {
-        errorMessage = response.data.errors.map((e: any) => e.message).join(", ");
+      if (
+        response.data?.errors &&
+        Array.isArray(response.data.errors) &&
+        response.data.errors.length > 0
+      ) {
+        errorMessage = response.data.errors
+          .map((e: any) => e.message)
+          .join(", ");
       }
 
       // Display the toast for every API failure so the user knows the valid reason

@@ -38,7 +38,9 @@ const ChangePassword = () => {
   const handleChange = (event: React.SyntheticEvent<any>) => {
     setPasswords({
       ...passwords,
-      [(event.target as HTMLInputElement).name]: (event.target as HTMLInputElement).value,
+      [(event.target as HTMLInputElement).name]: (
+        event.target as HTMLInputElement
+      ).value,
     });
   };
 
@@ -84,7 +86,10 @@ const ChangePassword = () => {
         else navigate("/dashboard", { replace: true });
       }
     } catch (error) {
-      toast.error((error as import('axios').AxiosError<{message?: string}>)?.response?.data?.message || "Failed to change password");
+      toast.error(
+        (error as import("axios").AxiosError<{ message?: string }>)?.response
+          ?.data?.message || "Failed to change password",
+      );
     } finally {
       setIsLoading(true);
     }
@@ -140,8 +145,8 @@ const ChangePassword = () => {
                 className="peer w-full pt-6 pb-2 px-4 bg-slate-950 border border-slate-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition-all text-slate-100 placeholder-transparent pr-10"
                 placeholder="Current Password"
               />
-              <label 
-                htmlFor="currentPassword" 
+              <label
+                htmlFor="currentPassword"
                 className="absolute left-4 top-4 text-slate-400 text-sm transition-all peer-placeholder-shown:text-base peer-placeholder-shown:top-4 peer-focus:top-2 peer-focus:text-xs peer-focus:text-blue-400"
               >
                 Current Password
@@ -170,8 +175,8 @@ const ChangePassword = () => {
                 className="peer w-full pt-6 pb-2 px-4 bg-slate-950 border border-slate-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition-all text-slate-100 placeholder-transparent pr-10"
                 placeholder="New Password"
               />
-              <label 
-                htmlFor="newPassword" 
+              <label
+                htmlFor="newPassword"
                 className="absolute left-4 top-4 text-slate-400 text-sm transition-all peer-placeholder-shown:text-base peer-placeholder-shown:top-4 peer-focus:top-2 peer-focus:text-xs peer-focus:text-blue-400"
               >
                 New Password
@@ -200,8 +205,8 @@ const ChangePassword = () => {
                 className="peer w-full pt-6 pb-2 px-4 bg-slate-950 border border-slate-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition-all text-slate-100 placeholder-transparent pr-10"
                 placeholder="Confirm New Password"
               />
-              <label 
-                htmlFor="confirmPassword" 
+              <label
+                htmlFor="confirmPassword"
                 className="absolute left-4 top-4 text-slate-400 text-sm transition-all peer-placeholder-shown:text-base peer-placeholder-shown:top-4 peer-focus:top-2 peer-focus:text-xs peer-focus:text-blue-400"
               >
                 Confirm New Password
@@ -235,6 +240,3 @@ const ChangePassword = () => {
 };
 
 export default ChangePassword;
-
-
-

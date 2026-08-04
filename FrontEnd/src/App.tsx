@@ -27,7 +27,10 @@ const AppContent = () => {
   }, [dispatch]);
 
   return (
-    <div className="min-h-screen font-sans flex flex-col" style={{ background: "var(--bg-base)", color: "var(--text-primary)" }}>
+    <div
+      className="min-h-screen font-sans flex flex-col"
+      style={{ background: "var(--bg-base)", color: "var(--text-primary)" }}
+    >
       <Toaster
         position="top-center"
         toastOptions={{
@@ -37,7 +40,8 @@ const AppContent = () => {
             color: isLight ? "#0f172a" : "#f1f5f9",
             border: isLight ? "1px solid #e2e8f0" : "1px solid #334155",
             borderRadius: "8px",
-            boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
+            boxShadow:
+              "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
             padding: "12px 16px",
             fontSize: "14px",
             fontWeight: "500",
@@ -72,4 +76,3 @@ function App() {
 }
 
 export default App;
-

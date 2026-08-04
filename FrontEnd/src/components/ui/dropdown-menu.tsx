@@ -52,7 +52,12 @@ function DropdownMenuGroup({ ...props }: any) {
   );
 }
 
-function DropdownMenuItem({ className, inset, variant = "default", ...props }: any) {
+function DropdownMenuItem({
+  className,
+  inset,
+  variant = "default",
+  ...props
+}: any) {
   return (
     <DropdownMenuPrimitive.Item
       data-slot="dropdown-menu-item"

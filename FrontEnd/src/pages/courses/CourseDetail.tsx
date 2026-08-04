@@ -9,7 +9,11 @@ import { Card } from "@/components/ui/Card";
 import { useState, useEffect } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
-import { executeHttpGetRequest, executeHttpPostRequest, executeHttpDeleteRequest } from "@/api/commonServices";
+import {
+  executeHttpGetRequest,
+  executeHttpPostRequest,
+  executeHttpDeleteRequest,
+} from "@/api/commonServices";
 import { API_PATHS } from "@/api/constants";
 import { toast } from "react-hot-toast";
 import {
@@ -42,7 +46,9 @@ const CourseDetail = () => {
   useEffect(() => {
     const fetchCourseData = async () => {
       try {
-        const courseResponse = await executeHttpGetRequest(`${API_PATHS.COURSES.BASE}/${uniqueId}`);
+        const courseResponse = await executeHttpGetRequest(
+          `${API_PATHS.COURSES.BASE}/${uniqueId}`,
+        );
         if (courseResponse.data.success) {
           setCourse(courseResponse.data.data);
           // If the API doesn't return modules directly, fetch them
@@ -50,7 +56,9 @@ const CourseDetail = () => {
             !courseResponse.data.data.modules ||
             courseResponse.data.data.modules.length === 0
           ) {
-            const modulesResponse = await executeHttpGetRequest(API_PATHS.MODULES.COURSE(uniqueId!));
+            const modulesResponse = await executeHttpGetRequest(
+              API_PATHS.MODULES.COURSE(uniqueId!),
+            );
             if (modulesResponse.data.success) {
               setModules(modulesResponse.data.data);
             }
@@ -65,12 +73,17 @@ const CourseDetail = () => {
             const enrollCheckResponse = await executeHttpGetRequest(
               API_PATHS.ENROLLMENTS.CHECK(uniqueId!),
             );
-            if (enrollCheckResponse.data.success && enrollCheckResponse.data.data.enrolled) {
+            if (
+              enrollCheckResponse.data.success &&
+              enrollCheckResponse.data.data.enrolled
+            ) {
               setIsEnrolled(true);
-              setEnrollmentProgress(enrollCheckResponse.data.data.enrollment?.progress || 0);
+              setEnrollmentProgress(
+                enrollCheckResponse.data.data.enrollment?.progress || 0,
+              );
             }
           } catch {
-                        // Not enrolled, ignore 404
+            // Not enrolled, ignore 404
           }
         }
       } catch (error) {
@@ -85,13 +98,18 @@ const CourseDetail = () => {
 
   const handleEnroll = async () => {
     if (!user) {
-      navigate("/login", { state: { from: { pathname: `/courses/${uniqueId}` } } });
+      navigate("/login", {
+        state: { from: { pathname: `/courses/${uniqueId}` } },
+      });
       return;
     }
 
     setIsEnrolling(true);
     try {
-      const response = await executeHttpPostRequest(API_PATHS.ENROLLMENTS.ENROLL(uniqueId!), {});
+      const response = await executeHttpPostRequest(
+        API_PATHS.ENROLLMENTS.ENROLL(uniqueId!),
+        {},
+      );
       if (response.data.success) {
         setIsEnrolled(true);
         toast.success("Successfully enrolled in the course!");
@@ -104,34 +122,57 @@ const CourseDetail = () => {
       }
     } catch (error) {
       console.error("Enrollment failed", error);
-      alert((error as import('axios').AxiosError<{message?: string}>)?.response?.data?.message || "Failed to enroll");
+      alert(
+        (error as import("axios").AxiosError<{ message?: string }>)?.response
+          ?.data?.message || "Failed to enroll",
+      );
     } finally {
       setIsEnrolling(false);
     }
   };
 
   const handleDeleteCourse = async () => {
-    if (!window.confirm("Are you sure you want to permanently delete this course? This action cannot be undone.")) return;
+    if (
+      !window.confirm(
+        "Are you sure you want to permanently delete this course? This action cannot be undone.",
+      )
+    )
+      return;
     try {
-      const response = await executeHttpDeleteRequest(`${API_PATHS.COURSES.BASE}/${uniqueId}`);
+      const response = await executeHttpDeleteRequest(
+        `${API_PATHS.COURSES.BASE}/${uniqueId}`,
+      );
       if (response.data.success) {
         toast.success("Course deleted successfully");
         navigate("/courses");
       }
     } catch (error) {
-      toast.error((error as import('axios').AxiosError<{message?: string}>)?.response?.data?.message || "Failed to delete course");
+      toast.error(
+        (error as import("axios").AxiosError<{ message?: string }>)?.response
+          ?.data?.message || "Failed to delete course",
+      );
     }
   };
 
   const handleRequestDeletion = async () => {
-    if (!window.confirm("Are you sure you want to request deletion for this course? An admin will review your request.")) return;
+    if (
+      !window.confirm(
+        "Are you sure you want to request deletion for this course? An admin will review your request.",
+      )
+    )
+      return;
     try {
-      const response = await executeHttpPostRequest(`${API_PATHS.COURSES.BASE}/${uniqueId}/request-deletion`);
+      const response = await executeHttpPostRequest(
+        `${API_PATHS.COURSES.BASE}/${uniqueId}/request-deletion`,
+      );
       if (response.data.success) {
         toast.success("Deletion request sent to Administrators");
       }
     } catch (error) {
-      toast.error((error as import('axios').AxiosError<{message?: string}>)?.response?.data?.message || "Failed to send deletion request");
+      toast.error(
+        (error as import("axios").AxiosError<{ message?: string }>)?.response
+          ?.data?.message || "Failed to send deletion request",
+      );
     }
   };
 
@@ -153,7 +194,8 @@ const CourseDetail = () => {
     );
 
   const totalLessons = modules.reduce(
-    (accumulator: any, moduleItem: any) => accumulator + (moduleItem.lessons?.length || 0),
+    (accumulator: any, moduleItem: any) =>
+      accumulator + (moduleItem.lessons?.length || 0),
     0,
   );
 
@@ -244,7 +286,7 @@ const CourseDetail = () => {
 
             {/* Action Card */}
             <div className="lg:col-span-1">
-              <Card  className="!rounded-3xl !bg-slate-900/80 backdrop-blur-md sticky top-24 shadow-2xl shadow-blue-900/20 hover:border-blue-500/30 transition-all">
+              <Card className="!rounded-3xl !bg-slate-900/80 backdrop-blur-md sticky top-24 shadow-2xl shadow-blue-900/20 hover:border-blue-500/30 transition-all">
                 <div className="aspect-video w-full bg-slate-950 rounded-xl overflow-hidden mb-8 relative group cursor-pointer border border-slate-800 shadow-inner">
                   {course.thumbnail ? (
                     <img
@@ -294,11 +336,18 @@ const CourseDetail = () => {
                         to={`/learn/${uniqueId}/module/${modules[0].moduleId}/lesson/${modules[0].lessons[0].lessonId}`}
                         className="w-full flex justify-center py-4 text-lg font-bold rounded-xl shadow-[0_0_20px_rgba(37,99,235,0.4)] hover:-translate-y-1 transition-all bg-blue-600 text-white"
                       >
-                        {enrollmentProgress > 0 ? "Resume Course" : "Start Learning"}
+                        {enrollmentProgress > 0
+                          ? "Resume Course"
+                          : "Start Learning"}
                       </Link>
                     ) : (
                       <button
-                        onClick={() => toast("This course doesn't have any lessons yet. Check back later!", { icon: "🚧" })}
+                        onClick={() =>
+                          toast(
+                            "This course doesn't have any lessons yet. Check back later!",
+                            { icon: "🚧" },
+                          )
+                        }
                         className="w-full flex justify-center py-4 text-lg font-bold rounded-xl shadow-[0_0_20px_rgba(37,99,235,0.4)] hover:-translate-y-1 transition-all bg-blue-600 text-white opacity-80"
                       >
                         Start Learning
@@ -309,7 +358,7 @@ const CourseDetail = () => {
                   <Button
                     onClick={handleEnroll}
                     disabled={isEnrolling}
-                     className="w-full py-4 text-lg font-bold rounded-xl flex-center gap-2 shadow-[0_0_20px_rgba(37,99,235,0.4)] hover:-translate-y-1 transition-all disabled:opacity-70 disabled:hover:translate-y-0"
+                    className="w-full py-4 text-lg font-bold rounded-xl flex-center gap-2 shadow-[0_0_20px_rgba(37,99,235,0.4)] hover:-translate-y-1 transition-all disabled:opacity-70 disabled:hover:translate-y-0"
                   >
                     {isEnrolling ? (
                       <Loader2 className="icon-md animate-spin" />
@@ -341,35 +390,39 @@ const CourseDetail = () => {
                 </div>
 
                 {/* Admin / Mentor Actions */}
-                {user && (user.roleId === 1 || (user.roleId === 2 && user.userId === course.mentorId)) && (
-                  <div className="mt-8 pt-6 border-t border-slate-800">
-                    <h4 className="text-sm font-bold text-white mb-3">Management</h4>
-                    <div className="flex flex-col gap-2">
-                      <Link 
-                        to={`/mentor/course/edit/${uniqueId}`}
-                        className="w-full py-2.5 text-sm font-semibold rounded-lg bg-slate-800 text-white hover:bg-slate-700 text-center transition-colors"
-                      >
-                        Edit Course
-                      </Link>
-                      
-                      {user.roleId === 1 ? (
-                        <button 
-                          onClick={handleDeleteCourse}
-                          className="w-full py-2.5 text-sm font-semibold rounded-lg bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white border border-red-500/20 transition-colors"
+                {user &&
+                  (user.roleId === 1 ||
+                    (user.roleId === 2 && user.userId === course.mentorId)) && (
+                    <div className="mt-8 pt-6 border-t border-slate-800">
+                      <h4 className="text-sm font-bold text-white mb-3">
+                        Management
+                      </h4>
+                      <div className="flex flex-col gap-2">
+                        <Link
+                          to={`/mentor/course/edit/${uniqueId}`}
+                          className="w-full py-2.5 text-sm font-semibold rounded-lg bg-slate-800 text-white hover:bg-slate-700 text-center transition-colors"
                         >
-                          Delete Course
-                        </button>
-                      ) : (
-                        <button 
-                          onClick={handleRequestDeletion}
-                          className="w-full py-2.5 text-sm font-semibold rounded-lg bg-orange-500/10 text-orange-500 hover:bg-orange-500 hover:text-white border border-orange-500/20 transition-colors"
-                        >
-                          Request Deletion
-                        </button>
-                      )}
+                          Edit Course
+                        </Link>
+
+                        {user.roleId === 1 ? (
+                          <button
+                            onClick={handleDeleteCourse}
+                            className="w-full py-2.5 text-sm font-semibold rounded-lg bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white border border-red-500/20 transition-colors"
+                          >
+                            Delete Course
+                          </button>
+                        ) : (
+                          <button
+                            onClick={handleRequestDeletion}
+                            className="w-full py-2.5 text-sm font-semibold rounded-lg bg-orange-500/10 text-orange-500 hover:bg-orange-500 hover:text-white border border-orange-500/20 transition-colors"
+                          >
+                            Request Deletion
+                          </button>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                )}
+                  )}
               </Card>
             </div>
           </div>
@@ -392,7 +445,7 @@ const CourseDetail = () => {
               {modules.map((moduleItem: any, moduleIndex: any) => (
                 <Card
                   key={moduleItem.moduleId}
-                   className="!p-0 !bg-slate-900/50 overflow-hidden shadow-lg hover:border-slate-700 transition-colors"
+                  className="!p-0 !bg-slate-900/50 overflow-hidden shadow-lg hover:border-slate-700 transition-colors"
                 >
                   <div className="p-6 flex-between bg-slate-900 border-b border-slate-800/50">
                     <div>
@@ -415,38 +468,41 @@ const CourseDetail = () => {
 
                   {moduleItem.lessons && moduleItem.lessons.length > 0 && (
                     <div className="divide-y divide-slate-800/50">
-                      {moduleItem.lessons.map((lessonItem: any, lessonIndex: any) => (
-                        <div
-                          key={lessonItem.lessonId}
-                          className="p-5 pl-8 flex-between hover:bg-slate-800/40 transition-colors group"
-                        >
-                          <div className="flex items-center gap-4">
-                            {lessonItem.type === "video" ? (
-                              <PlayCircle className="icon-md text-sky-400 group-hover:scale-110 transition-transform" />
-                            ) : lessonItem.type === "coding" ? (
-                              <Code2 className="icon-md text-blue-400 group-hover:scale-110 transition-transform" />
-                            ) : (
-                              <FileText className="icon-md text-slate-400 group-hover:scale-110 transition-transform" />
-                            )}
-                            <span className="text-slate-300 font-semibold text-sm group-hover:text-blue-300 transition-colors">
-                              {moduleIndex + 1}.{lessonIndex + 1} {lessonItem.title}
-                            </span>
-                          </div>
-
-                          <div className="flex items-center gap-5">
-                            {lessonItem.duration > 0 && (
-                              <span className="text-xs font-medium text-slate-500 bg-slate-950 px-2 py-1 rounded-md">
-                                {lessonItem.duration} min
+                      {moduleItem.lessons.map(
+                        (lessonItem: any, lessonIndex: any) => (
+                          <div
+                            key={lessonItem.lessonId}
+                            className="p-5 pl-8 flex-between hover:bg-slate-800/40 transition-colors group"
+                          >
+                            <div className="flex items-center gap-4">
+                              {lessonItem.type === "video" ? (
+                                <PlayCircle className="icon-md text-sky-400 group-hover:scale-110 transition-transform" />
+                              ) : lessonItem.type === "coding" ? (
+                                <Code2 className="icon-md text-blue-400 group-hover:scale-110 transition-transform" />
+                              ) : (
+                                <FileText className="icon-md text-slate-400 group-hover:scale-110 transition-transform" />
+                              )}
+                              <span className="text-slate-300 font-semibold text-sm group-hover:text-blue-300 transition-colors">
+                                {moduleIndex + 1}.{lessonIndex + 1}{" "}
+                                {lessonItem.title}
                               </span>
-                            )}
-                            {!isEnrolled && !lessonItem.isFree ? (
-                              <Lock className="icon-base text-slate-600" />
-                            ) : (
-                              <div className="w-5 h-5 rounded-full border-2 border-slate-700 bg-slate-900 group-hover:border-blue-500/50 transition-colors"></div> // Placeholder for completion circle
-                            )}
+                            </div>
+
+                            <div className="flex items-center gap-5">
+                              {lessonItem.duration > 0 && (
+                                <span className="text-xs font-medium text-slate-500 bg-slate-950 px-2 py-1 rounded-md">
+                                  {lessonItem.duration} min
+                                </span>
+                              )}
+                              {!isEnrolled && !lessonItem.isFree ? (
+                                <Lock className="icon-base text-slate-600" />
+                              ) : (
+                                <div className="w-5 h-5 rounded-full border-2 border-slate-700 bg-slate-900 group-hover:border-blue-500/50 transition-colors"></div> // Placeholder for completion circle
+                              )}
+                            </div>
                           </div>
-                        </div>
-                      ))}
+                        ),
+                      )}
                     </div>
                   )}
                 </Card>
@@ -460,5 +516,3 @@ const CourseDetail = () => {
 };
 
 export default CourseDetail;
-
-

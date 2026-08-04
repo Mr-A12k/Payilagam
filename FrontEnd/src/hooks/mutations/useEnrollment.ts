@@ -23,7 +23,8 @@ export const useEnrollCourse = () => {
     },
     onError: (error: unknown) => {
       toast.error(
-        (error as any).response?.data?.message || "Failed to enroll. Please try again."
+        (error as any).response?.data?.message ||
+          "Failed to enroll. Please try again.",
       );
     },
   });

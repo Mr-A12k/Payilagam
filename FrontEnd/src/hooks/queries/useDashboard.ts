@@ -23,7 +23,8 @@ export const useDashboardStats = () => {
 export const useMyEnrollments = (params = {}) => {
   return useQuery({
     queryKey: ["enrollments", "my", params],
-    queryFn: () => executeHttpGetRequest(API_PATHS.ENROLLMENTS.MY_COURSES, params),
+    queryFn: () =>
+      executeHttpGetRequest(API_PATHS.ENROLLMENTS.MY_COURSES, params),
   });
 };
 
@@ -31,6 +32,7 @@ export const useMyEnrollments = (params = {}) => {
 export const useUserActivity = (days = 365) => {
   return useQuery({
     queryKey: ["user", "activity", days],
-    queryFn: () => executeHttpGetRequest(`${API_PATHS.USERS.ACTIVITY}?days=${days}`),
+    queryFn: () =>
+      executeHttpGetRequest(`${API_PATHS.USERS.ACTIVITY}?days=${days}`),
   });
 };
