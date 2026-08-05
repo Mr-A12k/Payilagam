@@ -3,6 +3,7 @@
  * @description WebSocket event handlers for real-time chat functionality
  */
 const chatService = require("./chat.service");
+const prisma = require("../../config/prisma");
 
 module.exports = (io, socket) => {
   const userId = socket.user.userId;
@@ -51,6 +52,92 @@ module.exports = (io, socket) => {
       }
     } catch (error) {
       console.error("Socket send_message error:", error);
+      if (typeof callback === "function") {
+        callback({ success: false, error: error.message });
+      }
+    }
+  });
+
+  // Handle editing a message
+  socket.on("edit_message", async (data, callback) => {
+    try {
+      const { messageId, content } = data;
+      const message = await chatService.editMessage(messageId, userId, content);
+      
+      // Broadcast to other participants in the conversation
+      socket.to(`chat_${message.conversationId}`).emit("message_edited", message);
+
+      if (typeof callback === "function") {
+        callback({ success: true, message });
+      }
+    } catch (error) {
+      console.error("Socket edit_message error:", error);
+      if (typeof callback === "function") {
+        callback({ success: false, error: error.message });
+      }
+    }
+  });
+
+  // Handle deleting a message
+  socket.on("delete_message", async (data, callback) => {
+    try {
+      const { messageId } = data;
+      const message = await prisma.message.findUnique({ where: { messageId } });
+      if (!message) throw new Error("Message not found");
+
+      await chatService.deleteMessage(messageId, userId);
+      
+      // Broadcast deletion to other participants
+      socket.to(`chat_${message.conversationId}`).emit("message_deleted", { messageId, conversationId: message.conversationId });
+
+      if (typeof callback === "function") {
+        callback({ success: true });
+      }
+    } catch (error) {
+      console.error("Socket delete_message error:", error);
+      if (typeof callback === "function") {
+        callback({ success: false, error: error.message });
+      }
+    }
+  });
+
+  // Handle editing a channel message
+  socket.on("edit_channel_message", async (data, callback) => {
+    try {
+      const { messageId, content } = data;
+      const message = await chatService.editChannelMessage(messageId, userId, content);
+      
+      // Broadcast to other channel members
+      socket.to(`channel_${message.channelId}`).emit("channel_message_edited", message);
+
+      if (typeof callback === "function") {
+        callback({ success: true, message });
+      }
+    } catch (error) {
+      console.error("Socket edit_channel_message error:", error);
+      if (typeof callback === "function") {
+        callback({ success: false, error: error.message });
+      }
+    }
+  });
+
+  // Handle deleting a channel message
+  socket.on("delete_channel_message", async (data, callback) => {
+    try {
+      const { messageId } = data;
+      const message = await prisma.channelMessage.findUnique({ where: { messageId } });
+      if (!message) throw new Error("Message not found");
+
+      await chatService.deleteChannelMessage(messageId, userId);
+      
+      // Broadcast to other channel members
+      socket.to(`channel_${message.channelId}`).emit("channel_message_deleted", { messageId, channelId: message.channelId });
+
+      if (typeof callback === "function") {
+        callback({ success: true });
+      }
+    } catch (error) {
+      console.error("Socket delete_channel_message error:", error);
       if (typeof callback === "function") {
         callback({ success: false, error: error.message });
       }

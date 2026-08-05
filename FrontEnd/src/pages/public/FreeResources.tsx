@@ -57,7 +57,7 @@ const ResourceCard = ({ resource }: any) => {
       window.open(
         resource.fileUrl.startsWith("http")
           ? resource.fileUrl
-          : `http://localhost:5000${resource.fileUrl}`,
+          : `http://localhost:5005${resource.fileUrl}`,
         "_blank",
       );
     } catch (error) {
@@ -281,145 +281,140 @@ const FreeResources = () => {
                   Upload Resource
                 </Button>
               </DialogTrigger>
-              <DialogContent className="sm:max-w-md border-slate-800">
-                <DialogHeader>
-                  <DialogTitle className="text-lg font-bold text-slate-100">
-                    Upload a Resource
-                  </DialogTitle>
-                  <p className="text-xs text-slate-500">
-                    Share your knowledge with the Payilagam community.
-                  </p>
-                </DialogHeader>
-                <div className="space-y-4 py-4">
+              <DialogContent showCloseButton={false} className="w-[480px] max-w-[95vw] bg-[#0d1117] border border-slate-700/50 rounded-2xl shadow-2xl shadow-black/60 p-0 overflow-hidden">
+                {/* Top gradient bar */}
+                <div className="h-px w-full bg-gradient-to-r from-transparent via-blue-500/50 to-transparent" />
+
+                {/* Header */}
+                <div className="px-6 pt-5 pb-4 border-b border-slate-800/60">
+                  <div className="flex items-start justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center shadow-inner shrink-0">
+                        <UploadCloud className="w-5 h-5 text-blue-400" />
+                      </div>
+                      <div>
+                        <DialogTitle className="text-[15px] font-bold text-slate-100 tracking-tight leading-tight">
+                          Upload a Resource
+                        </DialogTitle>
+                        <p className="text-[11px] text-slate-500 mt-0.5">Share your knowledge with the Payilagam community</p>
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => setIsUploadOpen(false)}
+                      className="p-1.5 text-slate-500 hover:text-slate-200 hover:bg-slate-800 rounded-lg transition-all cursor-pointer mt-0.5"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+
+                {/* Body */}
+                <div className="px-6 py-5 space-y-4">
+                  {/* Drop zone */}
                   {!uploadFile ? (
                     <div
                       onClick={() => fileInputRef.current?.click()}
-                      onDragOver={(event: React.SyntheticEvent<any>) => {
-                        event.preventDefault();
-                        event.stopPropagation();
-                        setDragActive(true);
-                      }}
-                      onDragLeave={(event: React.SyntheticEvent<any>) => {
-                        event.preventDefault();
-                        event.stopPropagation();
-                        setDragActive(false);
-                      }}
+                      onDragOver={(event: React.SyntheticEvent<any>) => { event.preventDefault(); event.stopPropagation(); setDragActive(true); }}
+                      onDragLeave={(event: React.SyntheticEvent<any>) => { event.preventDefault(); event.stopPropagation(); setDragActive(false); }}
                       onDrop={(event: React.SyntheticEvent<any>) => {
-                        event.preventDefault();
-                        event.stopPropagation();
-                        setDragActive(false);
-                        if ((event as React.DragEvent).dataTransfer.files && (event as React.DragEvent).dataTransfer.files[0])
+                        event.preventDefault(); event.stopPropagation(); setDragActive(false);
+                        if ((event as React.DragEvent).dataTransfer.files?.[0])
                           setUploadFile((event as React.DragEvent).dataTransfer.files[0]);
                       }}
-                      className={`border-2 border-dashed rounded-md p-8 flex flex-col items-center justify-center text-center transition-colors cursor-pointer group ${dragActive ? "border-blue-500 bg-blue-500/10" : "border-slate-800 hover:border-blue-500 hover:bg-blue-500/10/50 bg-slate-950"}`}
+                      className={`relative rounded-xl border-2 border-dashed p-8 flex flex-col items-center justify-center text-center cursor-pointer transition-all duration-200 group ${
+                        dragActive
+                          ? "border-blue-500 bg-blue-500/[0.08] shadow-[0_0_0_4px_rgba(59,130,246,0.06)]"
+                          : "border-slate-700/60 bg-slate-800/20 hover:border-blue-500/50 hover:bg-blue-500/[0.04]"
+                      }`}
                     >
-                      <div className="w-10 h-10 bg-blue-500/20 rounded-full flex items-center justify-center mb-3 group-hover:bg-blue-200 group-hover:scale-110 transition-all">
-                        <UploadCloud className="w-5 h-5 text-blue-600" />
+                      <div className={`w-12 h-12 rounded-2xl flex items-center justify-center mb-4 transition-all duration-200 shadow-lg ${
+                        dragActive ? "bg-blue-500/20 scale-110" : "bg-slate-800 group-hover:bg-blue-500/15 group-hover:scale-105"
+                      }`}>
+                        <UploadCloud className={`w-5 h-5 transition-colors ${
+                          dragActive ? "text-blue-400" : "text-slate-400 group-hover:text-blue-400"
+                        }`} />
                       </div>
-                      <h4 className="text-sm font-semibold text-slate-100 mb-1">
-                        Click to upload or drag and drop
-                      </h4>
-                      <p className="text-[10px] text-slate-500">
-                        PDF, ZIP, PPT, or MP4 (max. 500MB)
+                      <p className="text-[13.5px] font-semibold text-slate-200 mb-1">
+                        {dragActive ? "Drop your file here" : "Click to upload or drag & drop"}
                       </p>
-                      <input
-                        type="file"
-                        ref={fileInputRef}
-                        className="hidden"
-                        onChange={handleFileChange}
-                      />
+                      <p className="text-[11px] text-slate-500">PDF, ZIP, PPT or MP4 &nbsp;·&nbsp; Max 500MB</p>
+                      <input type="file" ref={fileInputRef} className="hidden" onChange={handleFileChange} />
                     </div>
                   ) : (
-                    <div className="bg-blue-500/10 border border-blue-500/20 rounded-md p-4 flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <FileIcon className="w-8 h-8 text-blue-500" />
-                        <div>
-                          <p className="text-sm font-semibold text-slate-100 truncate max-w-[200px]">
-                            {uploadFile.name}
-                          </p>
-                          <p className="text-[10px] text-slate-500">
-                            {(uploadFile.size / 1024 / 1024).toFixed(2)} MB
-                          </p>
-                        </div>
+                    <div className="flex items-center gap-4 bg-blue-500/[0.08] border border-blue-500/20 rounded-xl px-4 py-3.5">
+                      <div className="w-10 h-10 rounded-xl bg-blue-500/20 flex items-center justify-center shrink-0">
+                        <FileIcon className="w-5 h-5 text-blue-400" />
                       </div>
-                      <button
-                        onClick={() => setUploadFile(null)}
-                        className="text-slate-400 hover:text-red-500 transition-colors"
-                      >
+                      <div className="flex-1 min-w-0">
+                        <p className="text-[13px] font-semibold text-slate-100 truncate">{uploadFile.name}</p>
+                        <p className="text-[11px] text-slate-500 mt-0.5">{(uploadFile.size / 1024 / 1024).toFixed(2)} MB &nbsp;·&nbsp; Ready to upload</p>
+                      </div>
+                      <button onClick={() => setUploadFile(null)} className="p-1.5 text-slate-500 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-all cursor-pointer shrink-0">
                         <X className="w-4 h-4" />
                       </button>
                     </div>
                   )}
 
+                  {/* Fields */}
                   <div className="space-y-3">
                     <div>
-                      <Label
-                        htmlFor="title"
-                        className="text-xs font-semibold text-slate-300"
-                      >
-                        Resource Title
-                      </Label>
+                      <label htmlFor="res-title" className="block text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Resource Title</label>
                       <Input
-                        id="title"
+                        id="res-title"
                         value={uploadTitle}
                         onChange={(event: React.SyntheticEvent<any>) => setUploadTitle((event.target as HTMLInputElement).value)}
-                        placeholder="e.g., Python Cheat Sheet"
-                        className="mt-1 h-8 text-xs rounded-md"
+                        placeholder="e.g., Python Cheat Sheet 2024"
+                        className="h-10 bg-slate-800/60 border-slate-700/60 text-slate-100 placeholder-slate-600 text-[13px] rounded-xl focus:border-blue-500/60 focus:ring-blue-500/10"
                       />
                     </div>
+
                     <div>
-                      <Label
-                        htmlFor="category"
-                        className="text-xs font-semibold text-slate-300"
-                      >
-                        Category
-                      </Label>
+                      <label htmlFor="res-category" className="block text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Category</label>
                       <select
-                        id="category"
+                        id="res-category"
                         value={uploadCategory}
                         onChange={(event: React.SyntheticEvent<any>) => setUploadCategory((event.target as HTMLInputElement).value)}
-                        className="mt-1 w-full h-8 text-xs rounded-md border border-slate-800 px-3 bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500 text-slate-300"
+                        className="w-full h-10 text-[13px] rounded-xl border border-slate-700/60 px-3 bg-slate-800/60 text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500/60 cursor-pointer"
                       >
                         {CATEGORIES.filter((c: any) => c !== "All").map((c: any) => (
-                          <option key={c} value={c}>
-                            {c}
-                          </option>
+                          <option key={c} value={c} className="bg-slate-900">{c}</option>
                         ))}
                       </select>
                     </div>
+
                     <div>
-                      <Label
-                        htmlFor="desc"
-                        className="text-xs font-semibold text-slate-300"
-                      >
-                        Description (Optional)
-                      </Label>
+                      <label htmlFor="res-desc" className="block text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Description <span className="text-slate-600 normal-case font-normal tracking-normal">(optional)</span></label>
                       <Input
-                        id="desc"
+                        id="res-desc"
                         value={uploadDesc}
                         onChange={(event: React.SyntheticEvent<any>) => setUploadDesc((event.target as HTMLInputElement).value)}
-                        placeholder="Briefly describe what this resource contains..."
-                        className="mt-1 h-8 text-xs rounded-md"
+                        placeholder="Briefly describe what this resource covers…"
+                        className="h-10 bg-slate-800/60 border-slate-700/60 text-slate-100 placeholder-slate-600 text-[13px] rounded-xl focus:border-blue-500/60 focus:ring-blue-500/10"
                       />
                     </div>
                   </div>
                 </div>
-                <div className="flex justify-end gap-2 pt-3 border-t border-slate-800">
-                  <Button
-                    variant="outline"
-                    className="h-8 text-xs px-4 rounded-md"
+
+                {/* Footer */}
+                <div className="px-6 pb-5 flex items-center justify-end gap-2.5">
+                  <button
                     onClick={() => setIsUploadOpen(false)}
                     disabled={isUploading}
+                    className="h-10 px-5 rounded-xl text-[13px] font-semibold text-slate-400 hover:text-slate-100 hover:bg-slate-800 border border-slate-700/50 transition-all cursor-pointer disabled:opacity-50"
                   >
                     Cancel
-                  </Button>
-                  <Button
-                    className="h-8 text-xs px-5 rounded-md bg-blue-600 hover:bg-blue-700"
+                  </button>
+                  <button
                     onClick={handleUploadSubmit}
-                    disabled={isUploading}
+                    disabled={isUploading || !uploadFile}
+                    className="h-10 px-6 rounded-xl text-[13px] font-bold text-white bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 shadow-lg shadow-blue-500/20 transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98] flex items-center gap-2"
                   >
-                    {isUploading ? "Uploading..." : "Upload File"}
-                  </Button>
+                    {isUploading ? (
+                      <><svg className="animate-spin w-3.5 h-3.5" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg> Uploading…</>
+                    ) : (
+                      <><UploadCloud className="w-3.5 h-3.5" /> Upload Resource</>
+                    )}
+                  </button>
                 </div>
               </DialogContent>
             </Dialog>

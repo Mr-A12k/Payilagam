@@ -20,6 +20,8 @@ const {
   updateWorkspace,
   addWorkspaceMember,
   joinWorkspace,
+  deleteConversation,
+  clearConversation,
 } = require("./chat.controller");
 
 router.use(authenticate);
@@ -89,6 +91,8 @@ router.get("/:id/messages", getMessages);
  *         description: OK
  */
 router.post("/:id/messages", sendMessage);
+router.delete("/:id", deleteConversation);
+router.delete("/:id/messages", clearConversation);
 
 // New Workspace/Channel routes
 /**

@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { useSelector } from "react-redux";
+import { useLocation } from "react-router-dom";
 import { executeHttpGetRequest, executeHttpPostRequest } from "@/api/commonServices";
 import { API_PATHS } from "@/api/constants";
 import { useSocketContext } from "@/context/SocketContext";
@@ -21,6 +22,7 @@ import { Users } from "lucide-react";
 
 const Chat = () => {
   const { user } = useSelector((state: any) => state.auth);
+  const location = useLocation();
 
   // State
   const [workspaces, setWorkspaces] = useState<any[]>([]);
@@ -99,7 +101,47 @@ const Chat = () => {
       }
     };
     fetchData();
+
+    const handleRefresh = () => {
+      fetchData();
+    };
+    window.addEventListener("refresh_conversations", handleRefresh);
+    return () => {
+      window.removeEventListener("refresh_conversations", handleRefresh);
+    };
   }, []);
+
+  // Auto-select conversation or channel from query parameters
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const queryConvId = params.get("conversationId");
+    const queryChannelId = params.get("channelId");
+
+    if (queryConvId && conversations.length > 0) {
+      const convExists = conversations.some((c: any) => c.conversationId === queryConvId);
+      if (convExists) {
+        setActiveWorkspaceId(null);
+        setActiveConvId(queryConvId);
+        // Clear query parameters so clicking around doesn't re-trigger it
+        window.history.replaceState({}, document.title, "/chat");
+      }
+    } else if (queryChannelId && workspaces.length > 0) {
+      // Find workspace containing this channel
+      let foundWorkspaceId = null;
+      for (const ws of workspaces) {
+        if (ws.channels?.some((ch: any) => ch.channelId === queryChannelId)) {
+          foundWorkspaceId = ws.workspaceId;
+          break;
+        }
+      }
+      if (foundWorkspaceId) {
+        setActiveWorkspaceId(foundWorkspaceId);
+        setActiveChannelId(queryChannelId);
+        // Clear query parameters so clicking around doesn't re-trigger it
+        window.history.replaceState({}, document.title, "/chat");
+      }
+    }
+  }, [conversations, workspaces, location.search]);
 
   // Set default active channel when workspace changes
   useEffect(() => {
@@ -220,16 +262,104 @@ const Chat = () => {
     socket.on("channel_user_typing", handleChannelTyping);
     socket.on("messages_read", handleMessagesRead);
 
+    socket.on("message_edited", (editedMsg: any) => {
+      setMessages((prev: any) =>
+        prev.map((m: any) => (m.messageId === editedMsg.messageId ? editedMsg : m))
+      );
+    });
+
+    socket.on("message_deleted", ({ messageId }: any) => {
+      setMessages((prev: any) => prev.filter((m: any) => m.messageId !== messageId));
+    });
+
+    socket.on("channel_message_edited", (editedMsg: any) => {
+      setMessages((prev: any) =>
+        prev.map((m: any) => (m.messageId === editedMsg.messageId ? editedMsg : m))
+      );
+    });
+
+    socket.on("channel_message_deleted", ({ messageId }: any) => {
+      setMessages((prev: any) => prev.filter((m: any) => m.messageId !== messageId));
+    });
+
     return () => {
       socket.off("new_message", handleNewMessage);
       socket.off("new_channel_message", handleNewChannelMessage);
-      socket.off("user_typing", handleUserTyping);
-      socket.off("channel_user_typing", handleChannelTyping);
+      socket.off("message_edited");
+      socket.off("message_deleted");
+      socket.off("channel_message_edited");
+      socket.off("channel_message_deleted");
+      socket.off("user_typing");
+      socket.off("channel_user_typing");
       socket.off("messages_read", handleMessagesRead);
     };
   }, [socket, activeWorkspaceId, activeConvId, activeChannelId]);
 
   // Handlers
+  const handleEditMessage = useCallback(
+    (messageId: number, content: string) => {
+      if (!socket) return;
+      socket.emit("edit_message", { messageId, content }, (res: any) => {
+        if (res.success) {
+          setMessages((prev: any) =>
+            prev.map((m: any) => (m.messageId === messageId ? res.message : m))
+          );
+          toast.success("Message updated!");
+        } else {
+          toast.error(res.error || "Failed to edit message");
+        }
+      });
+    },
+    [socket]
+  );
+
+  const handleDeleteMessage = useCallback(
+    (messageId: number) => {
+      if (!socket) return;
+      socket.emit("delete_message", { messageId }, (res: any) => {
+        if (res.success) {
+          setMessages((prev: any) => prev.filter((m: any) => m.messageId !== messageId));
+          toast.success("Message deleted!");
+        } else {
+          toast.error(res.error || "Failed to delete message");
+        }
+      });
+    },
+    [socket]
+  );
+
+  const handleEditChannelMessage = useCallback(
+    (messageId: number, content: string) => {
+      if (!socket) return;
+      socket.emit("edit_channel_message", { messageId, content }, (res: any) => {
+        if (res.success) {
+          setMessages((prev: any) =>
+            prev.map((m: any) => (m.messageId === messageId ? res.message : m))
+          );
+          toast.success("Message updated!");
+        } else {
+          toast.error(res.error || "Failed to edit message");
+        }
+      });
+    },
+    [socket]
+  );
+
+  const handleDeleteChannelMessage = useCallback(
+    (messageId: number) => {
+      if (!socket) return;
+      socket.emit("delete_channel_message", { messageId }, (res: any) => {
+        if (res.success) {
+          setMessages((prev: any) => prev.filter((m: any) => m.messageId !== messageId));
+          toast.success("Message deleted!");
+        } else {
+          toast.error(res.error || "Failed to delete message");
+        }
+      });
+    },
+    [socket]
+  );
+
   const handleSendMessage = useCallback(
     (content: any) => {
       const isDMView = activeWorkspaceId === null;
@@ -377,6 +507,10 @@ const Chat = () => {
         onSendMessage={handleSendMessage}
         onTyping={handleTyping}
         emitReadReceipt={emitReadReceipt}
+        onEditMessage={handleEditMessage}
+        onDeleteMessage={handleDeleteMessage}
+        onEditChannelMessage={handleEditChannelMessage}
+        onDeleteChannelMessage={handleDeleteChannelMessage}
       />
 
       {/* Create Workspace Modal */}

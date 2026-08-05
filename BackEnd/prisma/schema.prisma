@@ -544,6 +544,8 @@ model ConversationParticipant {
   userId         Int @map("user_id")
 
   joinedAt DateTime @default(now()) @map("joined_at")
+  isDeleted Boolean   @default(false) @map("is_deleted")
+  clearedAt DateTime? @map("cleared_at")
 
   conversation Conversation @relation(fields: [conversationId], references: [conversationId], onDelete: Cascade)
   user         User         @relation(fields: [userId], references: [userId], onDelete: Cascade)
@@ -560,6 +562,8 @@ model Message {
 
   content String
   isRead  Boolean @default(false) @map("is_read")
+  isEdited  Boolean  @default(false) @map("is_edited")
+  isDeleted Boolean  @default(false) @map("is_deleted")
 
   createdAt DateTime @default(now()) @map("created_at")
 
@@ -635,6 +639,9 @@ model ChannelMessage {
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
+
+  isEdited  Boolean  @default(false) @map("is_edited")
+  isDeleted Boolean  @default(false) @map("is_deleted")
 
   channel Channel @relation(fields: [channelId], references: [channelId], onDelete: Cascade)
   sender  User    @relation(fields: [senderId], references: [userId], onDelete: Cascade)

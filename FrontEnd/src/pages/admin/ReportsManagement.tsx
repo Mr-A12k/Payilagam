@@ -173,7 +173,7 @@ const ReportsManagement = () => {
                             {report.resource?.title || "Deleted Resource"}
                             {report.resource && (
                               <a
-                                href={`http://localhost:5000${report.resource.fileUrl}`}
+                                href={`http://localhost:5005${report.resource.fileUrl}`}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="text-blue-500/70 hover:text-blue-400 transition-colors"

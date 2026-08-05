@@ -49,7 +49,7 @@ const AIAssistant = () => {
 
     try {
       const baseUrl =
-        import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api";
+        import.meta.env.VITE_API_BASE_URL || "http://localhost:5005/api";
       const response = await fetch(`${baseUrl}/ai/chat`, {
         method: "POST",
         headers: {

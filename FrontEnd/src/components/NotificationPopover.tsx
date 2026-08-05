@@ -77,7 +77,7 @@ const NotificationPopover = () => {
                 {notifications.map((notif, idx) => (
                   <Link
                     key={idx}
-                    to="/chat"
+                    to={notif.channelId ? `/chat?channelId=${notif.channelId}` : `/chat?conversationId=${notif.conversationId}`}
                     onClick={() => setIsOpen(false)}
                     className="flex items-start gap-3 p-4 hover:bg-slate-800/50 transition-colors border-b border-slate-800/50 last:border-0 group"
                   >
@@ -98,14 +98,33 @@ const NotificationPopover = () => {
             )}
           </div>
           
-          <div className="p-3 border-t border-slate-800 bg-slate-900/50 text-center">
-            <Link
-              to="/chat"
-              onClick={() => setIsOpen(false)}
-              className="text-xs font-medium text-slate-400 hover:text-white transition-colors"
-            >
-              View all messages
-            </Link>
+          <div className="p-3 border-t border-slate-800 bg-slate-900/50 text-center flex items-center justify-center gap-4">
+            {unreadCount > 0 ? (
+              <>
+                <button
+                  onClick={clearNotifications}
+                  className="text-xs font-bold text-red-400 hover:text-red-300 transition-colors py-1 px-3 hover:bg-red-500/10 rounded-lg cursor-pointer"
+                >
+                  Clear all
+                </button>
+                <div className="w-[1px] h-3 bg-slate-800" />
+                <Link
+                  to="/chat"
+                  onClick={() => setIsOpen(false)}
+                  className="text-xs font-medium text-slate-400 hover:text-white transition-colors"
+                >
+                  View all
+                </Link>
+              </>
+            ) : (
+              <Link
+                to="/chat"
+                onClick={() => setIsOpen(false)}
+                className="text-xs font-medium text-slate-400 hover:text-white transition-colors"
+              >
+                View all messages
+              </Link>
+            )}
           </div>
         </div>
       )}

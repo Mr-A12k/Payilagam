@@ -43,7 +43,7 @@ export default function AIImageTool() {
     formData.append('image', file);
 
     try {
-      const response = await fetch('http://localhost:5000/api/ai/image/verify', {
+      const response = await fetch('http://localhost:5005/api/ai/image/verify', {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`,
@@ -74,7 +74,7 @@ export default function AIImageTool() {
     formData.append('image', file);
 
     try {
-      const response = await fetch('http://localhost:5000/api/ai/image/strip-metadata', {
+      const response = await fetch('http://localhost:5005/api/ai/image/strip-metadata', {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`,

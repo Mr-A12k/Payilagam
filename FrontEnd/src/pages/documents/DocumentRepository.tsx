@@ -102,7 +102,7 @@ const DocumentRepository = () => {
         return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
     };
 
-    const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
+    const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5005';
 
     return (
         <div className="p-6 max-w-7xl mx-auto bg-slate-950 min-h-[calc(100vh-80px)]">

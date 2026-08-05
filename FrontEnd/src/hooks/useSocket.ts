@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { io } from "socket.io-client";
 
 const SOCKET_URL =
-  import.meta.env.VITE_API_URL?.replace("/api", "") || "http://localhost:5000";
+  import.meta.env.VITE_API_URL?.replace("/api", "") || "http://localhost:5005";
 
 export const useSocket = (token: any) => {
   const [socket, setSocket] = useState<any>(null);

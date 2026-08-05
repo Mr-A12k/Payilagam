@@ -950,7 +950,7 @@ const Settings = () => {
         <DialogContent className="sm:max-w-md p-0 border-none bg-transparent shadow-none overflow-hidden flex items-center justify-center">
           <div className="relative group rounded-full overflow-hidden w-64 h-64 border-4 border-white/20 shadow-2xl backdrop-blur-sm">
             <img 
-              src={user?.profileUrl ? (user.profileUrl.startsWith('http') ? user.profileUrl : `http://localhost:5000${user.profileUrl}`) : ''} 
+              src={user?.profileUrl ? (user.profileUrl.startsWith('http') ? user.profileUrl : `http://localhost:5005${user.profileUrl}`) : ''} 
               alt="Profile Preview" 
               className="w-full h-full object-cover"
             />

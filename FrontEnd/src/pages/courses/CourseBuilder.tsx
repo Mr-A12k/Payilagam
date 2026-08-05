@@ -131,7 +131,7 @@ const CourseBuilder = () => {
       });
       if (course.thumbnail) {
         setThumbnailPreview(
-          `${import.meta.env.VITE_API_BASE_URL?.replace("/api", "") || "http://localhost:5000"}${course.thumbnail}`,
+          `${import.meta.env.VITE_API_BASE_URL?.replace("/api", "") || "http://localhost:5005"}${course.thumbnail}`,
         );
       }
     }

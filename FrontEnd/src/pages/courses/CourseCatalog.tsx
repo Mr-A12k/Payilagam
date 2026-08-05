@@ -153,7 +153,7 @@ const ResourceCard = ({ resource }: any) => {
   const [reportReason, setReportReason] = useState("");
 
   const baseUrl =
-    import.meta.env.VITE_API_URL?.split("/api")[0] || "http://localhost:5000";
+    import.meta.env.VITE_API_URL?.split("/api")[0] || "http://localhost:5005";
   const fileUrl = `${baseUrl}${resource.fileUrl}`;
 
   const handleDownload = (event: React.SyntheticEvent<any>) => {

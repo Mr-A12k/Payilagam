@@ -22,7 +22,7 @@ const getNotifications = catchAsync(async (request, response) => {
     success: true,
     message: "Notifications retrieved",
     data: notifications,
-    pagination: meta,
+    pagination: paginationMetadata,
     unreadCount,
   });
 });
@@ -53,10 +53,16 @@ const getUnreadCount = catchAsync(async (request, response) => {
   return success(response, result, "Unread count retrieved");
 });
 
+const clearAll = catchAsync(async (request, response) => {
+  const result = await notificationService.deleteAllNotifications(request.user.userId);
+  return success(response, result, "All notifications cleared successfully");
+});
+
 module.exports = {
   getNotifications,
   markAsRead,
   markAllAsRead,
   remove,
   getUnreadCount,
+  clearAll,
 };

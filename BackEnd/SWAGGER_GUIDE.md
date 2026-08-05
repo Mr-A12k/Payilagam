@@ -11,7 +11,7 @@ Instead of using external tools like Postman or Insomnia to test APIs, you can j
 
 **Where to find it?**
 When your backend server is running, just go to:
-👉 **[http://localhost:5000/api-docs](http://localhost:5000/api-docs)**
+👉 **[http://localhost:5005/api-docs](http://localhost:5005/api-docs)**
 
 ---
 
@@ -94,7 +94,7 @@ router.get("/profile", authenticate, getProfile);
 
 ## 🎮 How to Test an API in the Browser
 
-1. Open **[http://localhost:5000/api-docs](http://localhost:5000/api-docs)**
+1. Open **[http://localhost:5005/api-docs](http://localhost:5005/api-docs)**
 2. Find the API endpoint you want to test and click on it to expand it.
 3. Click the **"Try it out"** button on the right side.
 4. If it's a `POST` or `PUT` request, type your JSON data into the text box.

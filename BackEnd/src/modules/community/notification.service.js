@@ -103,6 +103,13 @@ const getUnreadCount = async (userId) => {
   return { unreadCount: count };
 };
 
+const deleteAllNotifications = async (userId) => {
+  await prisma.notification.deleteMany({
+    where: { userId },
+  });
+  return { message: "All notifications cleared" };
+};
+
 module.exports = {
   createNotification,
   createBulkNotifications,
@@ -111,4 +118,5 @@ module.exports = {
   markAllAsRead,
   deleteNotification,
   getUnreadCount,
+  deleteAllNotifications,
 };

@@ -85,7 +85,7 @@ const submitToJudge0 = async (code, languageId, stdin = '') => {
     const response = await axios.post(
         `${apiUrl}/submissions?base64_encoded=false&wait=false`,
         payload,
-        { headers, timeout: 15000 }
+        { headers, timeout: 15005 }
     );
 
     return response.data.token;

@@ -91,3 +91,5 @@ export {
   TooltipTrigger,
 } from "./tooltip";
 export { default as EmptyState } from "./EmptyState";
+export { ConfirmDialog } from "./ConfirmDialog";
+

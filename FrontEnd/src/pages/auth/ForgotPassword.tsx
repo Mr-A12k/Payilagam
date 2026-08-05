@@ -23,7 +23,7 @@ export default function ForgotPassword() {
     
     setIsSubmitting(true);
     try {
-      const response = await fetch("http://localhost:5000/api/auth/request-password-reset", {
+      const response = await fetch("http://localhost:5005/api/auth/request-password-reset", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email })
@@ -51,7 +51,7 @@ export default function ForgotPassword() {
 
     setIsSubmitting(true);
     try {
-      const response = await fetch("http://localhost:5000/api/auth/verify-password-reset", {
+      const response = await fetch("http://localhost:5005/api/auth/verify-password-reset", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, otp, newPassword })

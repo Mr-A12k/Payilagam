@@ -22,7 +22,7 @@ import { Avatar, Card, Button } from "@/components/ui";
 const Dashboard = () => {
   const { user } = useSelector((state: any) => state.auth);
   const { data: myCoursesData } = useMyEnrollments();
-  const myCourses = myCoursesData?.data || [];
+  const myCourses = myCoursesData?.data?.data || [];
   const navigate = useNavigate();
 
   const handleResumeLesson = () => {

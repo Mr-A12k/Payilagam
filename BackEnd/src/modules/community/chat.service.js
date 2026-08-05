@@ -2,8 +2,15 @@ const prisma = require("../../config/prisma");
 
 const getConversations = async (userId, role) => {
   if (role === "admin") {
-    // Admin can see ALL conversations
+    // Admin can see ALL conversations except those they are a participant in and have soft-deleted
     return await prisma.conversation.findMany({
+      where: {
+        NOT: {
+          participants: {
+            some: { userId, isDeleted: true },
+          },
+        },
+      },
       orderBy: { updatedAt: "desc" },
       include: {
         participants: {
@@ -17,11 +24,11 @@ const getConversations = async (userId, role) => {
       },
     });
   } else {
-    // Regular user sees only their conversations
+    // Regular user sees only their conversations that are NOT soft-deleted
     return await prisma.conversation.findMany({
       where: {
         participants: {
-          some: { userId },
+          some: { userId, isDeleted: false },
         },
       },
       orderBy: { updatedAt: "desc" },
@@ -59,6 +66,14 @@ const getOrCreateConversation = async (userId, targetUserId) => {
   });
 
   if (existingConvos.length > 0) {
+    // Restore the conversation (isDeleted: false) for both participants
+    await prisma.conversationParticipant.updateMany({
+      where: {
+        conversationId: existingConvos[0].conversationId,
+        userId: { in: [userId, targetUserId] },
+      },
+      data: { isDeleted: false },
+    });
     return existingConvos[0];
   }
 
@@ -81,20 +96,26 @@ const getOrCreateConversation = async (userId, targetUserId) => {
 };
 
 const getMessages = async (conversationId, userId, role) => {
-  // Check auth
-  if (role !== "admin") {
-    const participant = await prisma.conversationParticipant.findUnique({
-      where: {
-        conversationId_userId: { conversationId, userId },
-      },
-    });
-    if (!participant) {
-      throw new Error("Not authorized to view this conversation");
-    }
+  // Check auth and retrieve participant info if they are part of it
+  let participant = await prisma.conversationParticipant.findUnique({
+    where: {
+      conversationId_userId: { conversationId, userId },
+    },
+  }).catch(() => null);
+
+  if (role !== "admin" && !participant) {
+    throw new Error("Not authorized to view this conversation");
+  }
+
+  const whereClause = { conversationId, isDeleted: false };
+  if (participant && participant.clearedAt) {
+    whereClause.createdAt = {
+      gt: participant.clearedAt,
+    };
   }
 
   return await prisma.message.findMany({
-    where: { conversationId },
+    where: whereClause,
     orderBy: { createdAt: "asc" },
     include: {
       sender: {
@@ -127,6 +148,12 @@ const sendMessage = async (conversationId, senderId, content) => {
         select: { userId: true, fullName: true, profileUrl: true },
       },
     },
+  });
+
+  // Restore the conversation (isDeleted: false) for all participants upon receiving a new message
+  await prisma.conversationParticipant.updateMany({
+    where: { conversationId },
+    data: { isDeleted: false },
   });
 
   // Update conversation updatedAt
@@ -178,7 +205,7 @@ const getChannelMessages = async (channelId, cursor) => {
   const limit = 50;
   const query = {
     take: limit,
-    where: { channelId },
+    where: { channelId, isDeleted: false },
     orderBy: { createdAt: "desc" },
     include: {
       sender: {
@@ -290,6 +317,92 @@ const addWorkspaceMember = async (workspaceId, userId) => {
   });
 };
 
+const deleteConversation = async (conversationId, userId) => {
+  return await prisma.conversationParticipant.update({
+    where: {
+      conversationId_userId: { conversationId: parseInt(conversationId), userId },
+    },
+    data: {
+      isDeleted: true,
+    },
+  });
+};
+
+const clearConversation = async (conversationId, userId) => {
+  return await prisma.conversationParticipant.update({
+    where: {
+      conversationId_userId: { conversationId: parseInt(conversationId), userId },
+    },
+    data: {
+      clearedAt: new Date(),
+    },
+  });
+};
+
+const editMessage = async (messageId, senderId, newContent) => {
+  const message = await prisma.message.findUnique({ where: { messageId } });
+  if (!message) throw new Error("Message not found");
+  if (message.senderId !== senderId) throw new Error("Unauthorized to edit this message");
+
+  return await prisma.message.update({
+    where: { messageId },
+    data: {
+      content: newContent,
+      isEdited: true,
+    },
+    include: {
+      sender: {
+        select: { userId: true, fullName: true, profileUrl: true },
+      },
+    },
+  });
+};
+
+const deleteMessage = async (messageId, senderId) => {
+  const message = await prisma.message.findUnique({ where: { messageId } });
+  if (!message) throw new Error("Message not found");
+  if (message.senderId !== senderId) throw new Error("Unauthorized to delete this message");
+
+  return await prisma.message.update({
+    where: { messageId },
+    data: {
+      isDeleted: true,
+    },
+  });
+};
+
+const editChannelMessage = async (messageId, senderId, newContent) => {
+  const message = await prisma.channelMessage.findUnique({ where: { messageId } });
+  if (!message) throw new Error("Message not found");
+  if (message.senderId !== senderId) throw new Error("Unauthorized to edit this message");
+
+  return await prisma.channelMessage.update({
+    where: { messageId },
+    data: {
+      content: newContent,
+      isEdited: true,
+    },
+    include: {
+      sender: {
+        select: { userId: true, fullName: true, profileUrl: true },
+      },
+    },
+  });
+};
+
+const deleteChannelMessage = async (messageId, senderId) => {
+  const message = await prisma.channelMessage.findUnique({ where: { messageId } });
+  if (!message) throw new Error("Message not found");
+  if (message.senderId !== senderId) throw new Error("Unauthorized to delete this message");
+
+  return await prisma.channelMessage.update({
+    where: { messageId },
+    data: {
+      isDeleted: true,
+    },
+  });
+};
+
 module.exports = {
   getOrCreateConversation,
   getConversations,
@@ -302,4 +415,10 @@ module.exports = {
   createWorkspace,
   updateWorkspace,
   addWorkspaceMember,
+  deleteConversation,
+  clearConversation,
+  editMessage,
+  deleteMessage,
+  editChannelMessage,
+  deleteChannelMessage,
 };

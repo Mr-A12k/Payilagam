@@ -5,7 +5,7 @@ const http = require("http");
 const { initializeSocket } = require("./config/socket");
 
 const PORT =
-  process.env.PORT || 5000;
+  process.env.PORT || 5005;
 
 const server = http.createServer(app);
 initializeSocket(server);

@@ -5,18 +5,21 @@ import React, {
   useState,
   useEffect,
   useCallback,
+  useRef,
 } from "react";
 import { io, Socket } from "socket.io-client";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
 import toast from "react-hot-toast";
+import { executeHttpDeleteRequest, executeHttpGetRequest } from "@/api/commonServices";
 
 const SOCKET_URL =
-  import.meta.env.VITE_API_URL?.replace("/api", "") || "http://localhost:5000";
+  import.meta.env.VITE_API_URL?.replace("/api", "") || "http://localhost:5005";
 
 interface SocketContextType {
   socket: Socket | null;
   isConnected: boolean;
+  onlineUsers: number[];
   emitEvent: (event: string, data?: any, callback?: Function) => void;
   notifications: any[];
   clearNotifications: () => void;
@@ -27,6 +30,7 @@ interface SocketContextType {
 const SocketContext = createContext<SocketContextType>({
   socket: null,
   isConnected: false,
+  onlineUsers: [],
   emitEvent: () => {},
   notifications: [],
   clearNotifications: () => {},
@@ -45,12 +49,14 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({
 }: any) => {
   const [socket, setSocket] = useState<Socket | null>(null);
   const [isConnected, setIsConnected] = useState<boolean>(false);
+  const [onlineUsers, setOnlineUsers] = useState<number[]>([]);
   const [notifications, setNotifications] = useState<any[]>([]);
   const [isMuted, setIsMuted] = useState<boolean>(
     localStorage.getItem("notificationsMuted") === "true"
   );
   
   const token = useSelector((state: RootState) => state.auth.token);
+  const receivedMessageIds = useRef(new Set<string>());
 
   const toggleMute = useCallback(() => {
     setIsMuted((prev) => {
@@ -65,8 +71,13 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({
     });
   }, []);
 
-  const clearNotifications = useCallback(() => {
+  const clearNotifications = useCallback(async () => {
     setNotifications([]);
+    try {
+      await executeHttpDeleteRequest("/notifications/clear-all");
+    } catch (error) {
+      console.error("Failed to clear notifications in DB", error);
+    }
   }, []);
 
   useEffect(() => {
@@ -78,6 +89,26 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({
 
   useEffect(() => {
     if (!token) return;
+
+    const fetchDBNotifications = async () => {
+      try {
+        const res = await executeHttpGetRequest("/notifications");
+        if (res.data.success && res.data.data) {
+          const unreads = res.data.data.filter((n: any) => !n.isRead);
+          const mapped = unreads.map((n: any) => ({
+            title: n.title,
+            content: n.message,
+            link: n.link,
+            createdAt: n.createdAt,
+            // Fallback parameters if needed
+          }));
+          setNotifications(mapped);
+        }
+      } catch (error) {
+        console.error("Failed to load notifications from DB on mount", error);
+      }
+    };
+    fetchDBNotifications();
 
     // Initialize socket connection
     const newSocket = io(SOCKET_URL, {
@@ -108,6 +139,14 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({
 
     // Handle global notifications
     const handleNotification = (messageData: any) => {
+      const msgId = messageData.messageId;
+      if (msgId) {
+        if (receivedMessageIds.current.has(msgId)) {
+          return; // Skip duplicate notification
+        }
+        receivedMessageIds.current.add(msgId);
+      }
+
       const isChatPage = window.location.pathname.startsWith("/chat");
       const isFocused = document.hasFocus();
 
@@ -129,7 +168,10 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({
            (t) => (
              <div className="flex flex-col cursor-pointer" onClick={() => {
                 toast.dismiss(t.id);
-                window.location.href = '/chat';
+                const targetPath = messageData.channelId
+                  ? `/chat?channelId=${messageData.channelId}`
+                  : `/chat?conversationId=${messageData.conversationId}`;
+                window.location.href = targetPath;
              }}>
                 <span className="font-bold">{title}</span>
                 <span className="text-sm truncate max-w-[200px]">{messageData.content}</span>
@@ -148,13 +190,22 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({
 
         notif.onclick = () => {
           window.focus();
-          window.location.href = '/chat';
+          const targetPath = messageData.channelId
+            ? `/chat?channelId=${messageData.channelId}`
+            : `/chat?conversationId=${messageData.conversationId}`;
+          window.location.href = targetPath;
         };
       }
     };
 
+    const handleOnlineUsers = (userArray: any[]) => {
+      const ids = (userArray || []).map((id) => Number(id));
+      setOnlineUsers(ids);
+    };
+
     newSocket.on("new_message", handleNotification);
     newSocket.on("new_channel_message", handleNotification);
+    newSocket.on("online_users", handleOnlineUsers);
 
     setSocket(newSocket);
 
@@ -162,6 +213,7 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({
     return () => {
       newSocket.off("new_message", handleNotification);
       newSocket.off("new_channel_message", handleNotification);
+      newSocket.off("online_users", handleOnlineUsers);
       newSocket.disconnect();
     };
   }, [token, isMuted]); // Re-bind when isMuted changes
@@ -183,7 +235,7 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({
   );
 
   return (
-    <SocketContext.Provider value={{ socket, isConnected, emitEvent, notifications, clearNotifications, isMuted, toggleMute }}>
+    <SocketContext.Provider value={{ socket, isConnected, onlineUsers, emitEvent, notifications, clearNotifications, isMuted, toggleMute }}>
       {children}
     </SocketContext.Provider>
   );

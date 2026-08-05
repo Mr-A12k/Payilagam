@@ -114,6 +114,20 @@ const joinWorkspace = catchAsync(async (request, response) => {
   return success(response, member, "Joined workspace successfully");
 });
 
+const deleteConversation = catchAsync(async (request, response) => {
+  const conversationId = parseInt(request.params.id);
+  const userId = request.user.userId;
+  await chatService.deleteConversation(conversationId, userId);
+  return success(response, null, "Conversation deleted successfully");
+});
+
+const clearConversation = catchAsync(async (request, response) => {
+  const conversationId = parseInt(request.params.id);
+  const userId = request.user.userId;
+  await chatService.clearConversation(conversationId, userId);
+  return success(response, null, "Chat cleared successfully");
+});
+
 module.exports = {
   getConversations,
   getOrCreateConversation,
@@ -126,4 +140,6 @@ module.exports = {
   updateWorkspace,
   addWorkspaceMember,
   joinWorkspace,
+  deleteConversation,
+  clearConversation,
 };

@@ -54,7 +54,7 @@ const Signup = () => {
     if (step === "details") {
       setIsSubmitting(true);
       try {
-        const response = await fetch("http://localhost:5000/api/auth/request-signup-otp", {
+        const response = await fetch("http://localhost:5005/api/auth/request-signup-otp", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ email: formData.email })

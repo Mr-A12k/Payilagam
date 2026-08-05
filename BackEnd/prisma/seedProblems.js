@@ -98,7 +98,7 @@ const problems = [
       "Given the `head` of a singly linked list, reverse the list, and return the reversed list.",
     difficulty: "easy",
     constraints:
-      "- The number of nodes in the list is the range `[0, 5000]`.\n- `-5000 <= Node.val <= 5000`",
+      "- The number of nodes in the list is the range `[0, 5005]`.\n- `-5005 <= Node.val <= 5005`",
     inputFormat: "An array representation of a linked list.",
     outputFormat: "An array representation of the reversed linked list.",
     sampleInput: `[1,2,3,4,5]`,

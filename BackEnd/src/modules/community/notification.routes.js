@@ -14,6 +14,7 @@ const {
   markAllAsRead,
   remove,
   getUnreadCount,
+  clearAll,
 } = require("./notification.controller");
 
 const { authenticate } = require("../../middlewares/authMiddleware");
@@ -97,6 +98,7 @@ router.put("/:id/read", markAsRead);
  *       200:
  *         description: OK
  */
+router.delete("/clear-all", clearAll);
 router.delete("/:id", remove);
 
 module.exports = router;
