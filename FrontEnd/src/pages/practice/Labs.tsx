@@ -58,7 +58,7 @@ export default function Labs() {
               <Beaker className="w-8 h-8 text-blue-400" />
             </div>
             <h1 className="text-4xl md:text-5xl font-extrabold text-white tracking-tight mb-6 leading-tight">
-              TaskPro <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-400">Labs</span>
+              Payilagam <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-400">Labs</span>
             </h1>
             <p className="text-lg text-slate-400 mb-8 leading-relaxed">
               Immersive, browser-based environments to practice coding, networking, databases, and more. Stop watching and start building.

@@ -282,6 +282,7 @@
 
 @layer base {
   html {
+    font-size: 14.5px;
     transition:
       background-color 0.25s ease,
       color 0.25s ease;

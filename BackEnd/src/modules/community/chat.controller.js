@@ -73,6 +73,47 @@ const sendChannelMessage = catchAsync(async (request, response) => {
   return success(response, message, "Channel message sent successfully");
 });
 
+const createWorkspace = catchAsync(async (request, response) => {
+  const { name, description } = request.body;
+  const ownerId = request.user.userId;
+  const role = request.user.role;
+
+  if (role !== "admin" && role !== "mentor") {
+    return response.status(403).json({ success: false, message: "Only mentors and admins can create groups" });
+  }
+
+  const workspace = await chatService.createWorkspace(name, description, ownerId);
+  return success(response, workspace, "Workspace created successfully");
+});
+
+const updateWorkspace = catchAsync(async (request, response) => {
+  const workspaceId = parseInt(request.params.id);
+  const { name, description } = request.body;
+  const userId = request.user.userId;
+  const role = request.user.role;
+
+  try {
+    const workspace = await chatService.updateWorkspace(workspaceId, name, description, userId, role);
+    return success(response, workspace, "Workspace updated successfully");
+  } catch (error) {
+    return response.status(403).json({ success: false, message: error.message });
+  }
+});
+
+const addWorkspaceMember = catchAsync(async (request, response) => {
+  const workspaceId = parseInt(request.params.id);
+  const { userId } = request.body;
+  const member = await chatService.addWorkspaceMember(workspaceId, parseInt(userId));
+  return success(response, member, "Member added successfully");
+});
+
+const joinWorkspace = catchAsync(async (request, response) => {
+  const workspaceId = parseInt(request.body.workspaceId);
+  const userId = request.user.userId;
+  const member = await chatService.addWorkspaceMember(workspaceId, userId);
+  return success(response, member, "Joined workspace successfully");
+});
+
 module.exports = {
   getConversations,
   getOrCreateConversation,
@@ -81,4 +122,8 @@ module.exports = {
   getWorkspaces,
   getChannelMessages,
   sendChannelMessage,
+  createWorkspace,
+  updateWorkspace,
+  addWorkspaceMember,
+  joinWorkspace,
 };

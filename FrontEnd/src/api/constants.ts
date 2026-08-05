@@ -88,6 +88,10 @@ export const API_PATHS = {
     MENTOR: (id: string) => `/users/mentors/${id}`,
     ACTIVITY: "/users/activity",
     SEARCH: "/users/search",
+    APPLY_MENTOR: "/users/apply-mentor",
+    MY_MENTOR_APPLICATION: "/users/my-mentor-application",
+    MENTOR_APPLICATIONS: "/users/mentor-applications",
+    MENTOR_APPLICATION_STATUS: (id: string) => `/users/mentor-applications/${id}/status`,
   },
   NOTIFICATIONS: {
     BASE: "/notifications",

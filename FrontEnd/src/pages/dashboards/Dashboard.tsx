@@ -65,6 +65,21 @@ const Dashboard = () => {
     heatmapGrid.push(column);
   }
 
+  // Calculate Streak
+  let currentStreak = 0;
+  for (let i = 0; i < totalDays; i++) {
+    const date = subDays(today, i);
+    const dateStr = format(date, "yyyy-MM-dd");
+    if (activityData[dateStr] && activityData[dateStr] > 0) {
+      currentStreak++;
+    } else if (i > 0) { // allow missing today, but break if yesterday was missed
+      break;
+    }
+  }
+
+  // Calculate Completed Courses
+  const completedCourses = myCourses.filter((course: any) => course.progressPercentage === 100).length;
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 text-slate-100">
       {/* Header section */}
@@ -270,12 +285,12 @@ const Dashboard = () => {
                 </div>
                 <div>
                   <div className="text-2xl font-bold text-slate-100">
-                    14{" "}
+                    {currentStreak}{" "}
                     <span className="text-sm font-normal text-slate-400">
                       Day Streak
                     </span>
                   </div>
-                  <div className="text-xs text-sky-300">Top 5% of learners</div>
+                  <div className="text-xs text-sky-300">{currentStreak > 0 ? "You're on fire!" : "Start learning today!"}</div>
                 </div>
               </div>
               <div className="flex items-center gap-4">
@@ -284,56 +299,17 @@ const Dashboard = () => {
                 </div>
                 <div>
                   <div className="text-2xl font-bold text-slate-100">
-                    3{" "}
+                    {completedCourses}{" "}
                     <span className="text-sm font-normal text-slate-400">
                       Certificates
                     </span>
                   </div>
-                  <div className="text-xs text-slate-400">Keep earning!</div>
+                  <div className="text-xs text-slate-400">{completedCourses > 0 ? "Great job!" : "Keep learning to earn!"}</div>
                 </div>
               </div>
             </div>
           </Card>
 
-          {/* Upcoming Section */}
-          <Card className="!rounded-3xl !p-6 shadow-lg shadow-blue-900/10">
-            <h3 className="text-lg font-bold text-slate-100 mb-4 flex items-center justify-between">
-              Upcoming
-              <button className="text-xs text-blue-400 hover:underline">
-                Manage
-              </button>
-            </h3>
-
-            <div className="bg-slate-950 rounded-xl p-4 border border-slate-800 flex items-start gap-4">
-              <div className="flex-center flex-col min-w-[48px] h-[48px] bg-blue-900/20 text-blue-400 rounded-lg shrink-0 border border-blue-800/50">
-                <span className="text-[10px] font-bold uppercase">Jul</span>
-                <span className="text-lg font-bold leading-none">12</span>
-              </div>
-              <div>
-                <h4 className="font-medium text-slate-100 text-sm">
-                  System Design Assessment
-                </h4>
-                <p className="text-xs text-slate-400 mt-1">
-                  Cloud Systems Architecture
-                </p>
-              </div>
-            </div>
-
-            <div className="bg-slate-950 rounded-xl p-4 border border-slate-800 flex items-start gap-4 mt-3 opacity-60">
-              <div className="flex-center flex-col min-w-[48px] h-[48px] bg-slate-800/50 text-slate-400 rounded-lg shrink-0 border border-slate-700">
-                <span className="text-[10px] font-bold uppercase">Jul</span>
-                <span className="text-lg font-bold leading-none">18</span>
-              </div>
-              <div>
-                <h4 className="font-medium text-slate-100 text-sm">
-                  Peer Review Due
-                </h4>
-                <p className="text-xs text-slate-400 mt-1">
-                  UX Research Module
-                </p>
-              </div>
-            </div>
-          </Card>
         </div>
       </div>
     </div>

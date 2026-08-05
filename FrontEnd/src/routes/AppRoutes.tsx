@@ -10,7 +10,9 @@ import ComingSoon from "@/pages/public/ComingSoon";
 import Home from "@/pages/public/Home";
 import Login from "@/pages/auth/Login";
 import Signup from "@/pages/auth/Signup";
+import ForgotPassword from "@/pages/auth/ForgotPassword";
 import ChangePassword from "@/pages/auth/ChangePassword";
+import AIImageTool from "@/pages/public/AIImageTool";
 import Labs from "@/pages/practice/Labs";
 import Mentors from "@/pages/community/Mentors";
 import MentorDetail from "@/pages/community/MentorDetail";
@@ -20,6 +22,7 @@ import Government from "@/pages/public/Government";
 import FreeResources from "@/pages/public/FreeResources";
 import About from "@/pages/public/About";
 import Contact from "@/pages/public/Contact";
+import Terms from "@/pages/public/Terms";
 
 // Student Pages
 import Dashboard from "@/pages/dashboards/Dashboard";
@@ -63,6 +66,7 @@ const AppRoutes = () => {
       <Route element={<PublicLayout />}>
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/change-password" element={<ChangePassword />} />
       </Route>
 
@@ -83,6 +87,8 @@ const AppRoutes = () => {
         <Route path="/resources" element={<FreeResources />} />
         <Route path="/about" element={<About />} />
         <Route path="/contact" element={<Contact />} />
+        <Route path="/terms" element={<Terms />} />
+        <Route path="/ai-image" element={<AIImageTool />} />
 
         {/* Student Protected Routes (Access: Student=3, Admin=1) */}
         <Route path="/dashboard" element={<ProtectedRoute allowedRoles={[3, 1]}><Dashboard /></ProtectedRoute>} />
@@ -101,7 +107,7 @@ const AppRoutes = () => {
         {/* Mentor Protected Routes (Access: Mentor=2, Admin=1) */}
         <Route path="/mentor" element={<ProtectedRoute allowedRoles={[2, 1]}><MentorDashboard /></ProtectedRoute>} />
         <Route path="/mentor/course/create" element={<ProtectedRoute allowedRoles={[2, 1]}><CourseBuilder /></ProtectedRoute>} />
-        <Route path="/mentor/course/edit/:uniqueId" element={<ProtectedRoute allowedRoles={[2, 1]}><CourseBuilder /></ProtectedRoute>} />
+        <Route path="/mentor/course/edit/:id" element={<ProtectedRoute allowedRoles={[2, 1]}><CourseBuilder /></ProtectedRoute>} />
         <Route path="/mentor/students" element={<ProtectedRoute allowedRoles={[2, 1]}><UserManagement /></ProtectedRoute>} />
         <Route path="/mentor/analytics" element={<ProtectedRoute allowedRoles={[2, 1]}><Analytics /></ProtectedRoute>} />
 

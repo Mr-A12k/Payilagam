@@ -1,8 +1,28 @@
 import { useEffect, useRef } from "react";
-import { Hash, Users, Pin, Check, CheckCheck } from "lucide-react";
+import { Hash, Users, Pin, CheckCheck } from "lucide-react";
 import { Avatar } from "@/components/ui";
 import ChatInput from "./ChatInput";
 import ReactMarkdown from "react-markdown";
+
+const getMessageDateLabel = (dateStr: string) => {
+  if (!dateStr) return "";
+  try {
+    const date = new Date(dateStr);
+    const today = new Date();
+    const yesterday = new Date();
+    yesterday.setDate(today.getDate() - 1);
+    
+    if (date.toDateString() === today.toDateString()) {
+      return "Today";
+    } else if (date.toDateString() === yesterday.toDateString()) {
+      return "Yesterday";
+    } else {
+      return date.toLocaleDateString([], { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+    }
+  } catch (e) {
+    return "";
+  }
+};
 
 const ChatArena = ({
   // activeWorkspaceId,
@@ -39,16 +59,15 @@ const ChatArena = ({
 
   if (isDMView && !activeConv) {
     return (
-      <div className="flex-1 flex flex-col items-center justify-center bg-slate-900 border-l border-slate-800">
-        <div className="w-24 h-24 bg-slate-800 rounded-full flex items-center justify-center mb-6">
-          <Users className="w-10 h-10 text-slate-500" />
+      <div className="flex-1 flex flex-col items-center justify-center bg-[#0b141a] border-l border-slate-900">
+        <div className="w-20 h-20 bg-slate-900 rounded-full flex items-center justify-center mb-5 border border-slate-800/50">
+          <Users className="w-8 h-8 text-slate-500" />
         </div>
-        <h2 className="text-2xl font-bold text-slate-100 mb-2">
+        <h2 className="text-xl font-bold text-slate-100 mb-1">
           Select a Message
         </h2>
-        <p className="text-slate-400 max-w-md text-center">
-          Choose an existing conversation from the sidebar or start a new one to
-          connect with mentors and peers.
+        <p className="text-xs text-slate-400 max-w-xs text-center leading-relaxed">
+          Choose an existing conversation from the sidebar or start a new one to connect with mentors and peers.
         </p>
       </div>
     );
@@ -56,14 +75,14 @@ const ChatArena = ({
 
   if (!isDMView && !activeChannel) {
     return (
-      <div className="flex-1 flex flex-col items-center justify-center bg-slate-900 border-l border-slate-800">
-        <div className="w-24 h-24 bg-slate-800 rounded-full flex items-center justify-center mb-6">
-          <Hash className="w-10 h-10 text-slate-500" />
+      <div className="flex-1 flex flex-col items-center justify-center bg-[#0b141a] border-l border-slate-900">
+        <div className="w-20 h-20 bg-slate-900 rounded-full flex items-center justify-center mb-5 border border-slate-800/50">
+          <Hash className="w-8 h-8 text-slate-500" />
         </div>
-        <h2 className="text-2xl font-bold text-slate-100 mb-2">
+        <h2 className="text-xl font-bold text-slate-100 mb-1">
           Welcome to the Workspace
         </h2>
-        <p className="text-slate-400 max-w-md text-center">
+        <p className="text-xs text-slate-400 max-w-xs text-center leading-relaxed">
           Select a channel on the left to start collaborating and sharing code.
         </p>
       </div>
@@ -82,13 +101,11 @@ const ChatArena = ({
 
   if (isDMView) {
     const otherParticipant = getOtherParticipant(activeConv);
-    chatTitle = isAdmin
-      ? `${activeConv.participants[0]?.user.fullName} & ${activeConv.participants[1]?.user.fullName}`
-      : otherParticipant?.fullName;
+    chatTitle = otherParticipant?.fullName;
     avatarUrl = otherParticipant?.profileUrl;
     avatarFallback = chatTitle?.[0] || "U";
     chatSubtitle = isTyping ? (
-      <span className="text-blue-400 font-medium">typing...</span>
+      <span className="text-emerald-400 font-medium">typing...</span>
     ) : otherParticipant?.role === "mentor" ? (
       "Mentor"
     ) : (
@@ -101,28 +118,30 @@ const ChatArena = ({
   }
 
   return (
-    <div className="flex-1 flex flex-col min-w-0 bg-[#0e1621] relative">
+    <div className="flex-1 flex flex-col min-w-0 bg-[#0e1621] relative border-l border-slate-900">
       {/* Header */}
-      <div className="h-14 px-4 flex items-center justify-between shrink-0 z-10 bg-[#17212b]">
+      <div className="h-14 px-4 flex items-center justify-between shrink-0 z-10 bg-[#17212b] border-b border-slate-950/40">
         <div className="flex items-center gap-3">
           {isDMView ? (
             <Avatar
               src={avatarUrl}
               fallback={avatarFallback}
               size="sm"
-              className="w-8 h-8 rounded-full"
+              className="w-8 h-8 rounded-full border border-slate-800"
             />
           ) : (
-            <Hash className="w-6 h-6 text-slate-400" />
+            <div className="w-8 h-8 rounded-full bg-slate-900 flex items-center justify-center text-slate-400 border border-slate-850">
+              <Hash className="w-4 h-4" />
+            </div>
           )}
           <div className="flex flex-col">
-            <span className="text-[15px] font-bold text-slate-100 flex items-center gap-2">
+            <span className="text-sm font-bold text-slate-100 flex items-center gap-2">
               {isDMView
                 ? chatTitle
                 : chatTitle.toLowerCase().replace(/\s+/g, "-")}
             </span>
             {chatSubtitle && (
-              <span className="text-[12px] text-slate-400 line-clamp-1">
+              <span className="text-[11px] text-slate-400 line-clamp-1">
                 {chatSubtitle}
               </span>
             )}
@@ -130,23 +149,23 @@ const ChatArena = ({
         </div>
 
         <div className="flex items-center gap-4 text-slate-400">
-          <Pin className="w-5 h-5 cursor-pointer hover:text-slate-100 transition-colors" />
-          <Users className="w-5 h-5 cursor-pointer hover:text-slate-100 transition-colors" />
+          <Pin className="w-4 h-4 cursor-pointer hover:text-slate-100 transition-colors" />
+          <Users className="w-4 h-4 cursor-pointer hover:text-slate-100 transition-colors" />
         </div>
       </div>
 
       {/* Messages Feed */}
-      <div className="flex-1 overflow-y-auto px-6 py-6 space-y-6 custom-scrollbar relative z-0">
+      <div className="flex-1 overflow-y-auto px-6 py-6 space-y-4 custom-scrollbar relative z-0 bg-[#0e1621]">
         {/* Intro Message */}
         {!isDMView && messages.length === 0 && (
           <div className="mb-10">
-            <div className="w-16 h-16 bg-slate-800 rounded-full flex items-center justify-center mb-4">
-              <Hash className="w-8 h-8 text-white" />
+            <div className="w-14 h-14 bg-slate-900 rounded-2xl flex items-center justify-center mb-4 border border-slate-800">
+              <Hash className="w-6 h-6 text-white" />
             </div>
-            <h1 className="text-3xl font-bold text-white mb-2">
+            <h1 className="text-2xl font-bold text-white mb-1.5">
               Welcome to #{chatTitle.toLowerCase().replace(/\s+/g, "-")}!
             </h1>
-            <p className="text-slate-400">
+            <p className="text-xs text-slate-400">
               This is the start of the #{chatTitle} channel.
             </p>
           </div>
@@ -159,67 +178,74 @@ const ChatArena = ({
             (index === 0 ||
               messages[index - 1]?.sender?.userId !== message.sender?.userId);
 
+          const dateLabel = getMessageDateLabel(message.createdAt);
+          const prevDateLabel = index > 0 ? getMessageDateLabel(messages[index - 1].createdAt) : null;
+          const showDateDivider = dateLabel && dateLabel !== prevDateLabel;
+
           return (
-            <div
-              key={message.messageId || index}
-              className={`flex gap-4 ${isOwn ? "justify-end" : "justify-start"}`}
-            >
-              {!isOwn && (
-                <div className="w-10 shrink-0">
-                  {showAvatar && (
-                    <Avatar
-                      src={message.sender?.profileUrl}
-                      fallback={message.sender?.fullName?.[0] || "U"}
-                      size="sm"
-                      className="w-10 h-10 rounded-full shadow-md"
-                    />
-                  )}
+            <div key={message.messageId || index} className="space-y-4">
+              {showDateDivider && (
+                <div className="flex justify-center my-6 select-none">
+                  <span className="bg-slate-850 text-slate-400 text-[10px] font-bold px-3 py-1 rounded-lg shadow-sm uppercase tracking-wider">
+                    {dateLabel}
+                  </span>
                 </div>
               )}
 
-              <div
-                className={`flex flex-col ${isOwn ? "items-end" : "items-start"} max-w-[70%]`}
-              >
-                {!isOwn && showAvatar && (
-                  <span className="text-sm font-semibold text-slate-300 mb-1 ml-1">
-                    {message.sender?.fullName}
-                  </span>
+              <div className={`flex gap-3 ${isOwn ? "justify-end" : "justify-start"}`}>
+                {!isOwn && (
+                  <div className="w-8 shrink-0">
+                    {showAvatar && (
+                      <Avatar
+                        src={message.sender?.profileUrl}
+                        fallback={message.sender?.fullName?.[0] || "U"}
+                        size="sm"
+                        className="w-8 h-8 rounded-full border border-slate-800 shadow-sm"
+                      />
+                    )}
+                  </div>
                 )}
 
-                <div
-                  className={`px-3 pt-1 pb-5 rounded-2xl shadow-sm relative min-w-[90px] ${
-                    isOwn
-                      ? "bg-[#2b5278] text-white rounded-br-sm"
-                      : "bg-[#182533] text-white rounded-bl-sm"
-                  }`}
-                >
-                  {message.type === "CODE_SNIPPET" ? (
-                    <pre className="bg-[#0e1621] p-3 rounded-md overflow-x-auto my-1 font-mono text-sm">
-                      <code className="text-blue-300">{message.content}</code>
-                    </pre>
-                  ) : (
-                    <div className="prose prose-invert prose-sm max-w-none break-words">
-                      <ReactMarkdown>{message.content}</ReactMarkdown>
-                    </div>
+                <div className={`flex flex-col ${isOwn ? "items-end" : "items-start"} max-w-[65%]`}>
+                  {!isOwn && showAvatar && (
+                    <span className="text-[11px] font-semibold text-emerald-400 mb-1 ml-1">
+                      {message.sender?.fullName}
+                    </span>
                   )}
 
-                  {/* Meta info floating bottom right */}
-                  <div className="absolute bottom-1 right-2 flex items-center gap-1">
-                    <span
-                      className={`text-[9px] font-medium leading-none ${isOwn ? "text-[#7da8ce]" : "text-[#6b7d8d]"}`}
-                    >
-                      {new Date(message.createdAt).toLocaleTimeString([], {
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })}
-                    </span>
-                    {isOwn &&
-                      isDMView &&
-                      (message.isRead ? (
-                        <CheckCheck className="w-3.5 h-3.5 text-[#7da8ce]" />
-                      ) : (
-                        <Check className="w-3.5 h-3.5 text-[#7da8ce]" />
-                      ))}
+                  <div
+                    className={`px-3 py-1.5 rounded-2xl shadow-sm relative min-w-[90px] pb-5.5 text-sm leading-relaxed break-words ${
+                      isOwn
+                        ? "bg-[#2b5278] text-white rounded-tr-sm"
+                        : "bg-[#182533] text-white rounded-tl-sm"
+                    }`}
+                  >
+                    {message.type === "CODE_SNIPPET" ? (
+                      <pre className="bg-[#0e1621] p-2.5 rounded-lg overflow-x-auto my-1 font-mono text-xs border border-slate-800">
+                        <code className="text-blue-300">{message.content}</code>
+                      </pre>
+                    ) : (
+                      <div className="prose prose-invert prose-xs max-w-none break-words text-white">
+                        <ReactMarkdown>{message.content}</ReactMarkdown>
+                      </div>
+                    )}
+
+                    {/* Meta info floating bottom right */}
+                    <div className="absolute bottom-1 right-2 flex items-center gap-1 select-none">
+                      <span className={`text-[9px] font-medium leading-none ${isOwn ? "text-[#7da8ce]" : "text-[#6b7d8d]"}`}>
+                        {new Date(message.createdAt).toLocaleTimeString([], {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}
+                      </span>
+                      {isOwn && isDMView && (
+                        message.isRead ? (
+                          <CheckCheck className="w-3.5 h-3.5 text-[#53bdeb]" />
+                        ) : (
+                          <CheckCheck className="w-3.5 h-3.5 text-[#6b7d8d]" />
+                        )
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>

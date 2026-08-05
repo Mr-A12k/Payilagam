@@ -1,11 +1,23 @@
 import { useState, useEffect, useCallback } from "react";
 import { useSelector } from "react-redux";
-import { executeHttpGetRequest } from "@/api/commonServices";
+import { executeHttpGetRequest, executeHttpPostRequest } from "@/api/commonServices";
 import { API_PATHS } from "@/api/constants";
 import { useSocketContext } from "@/context/SocketContext";
 import WorkspaceRail from "./components/WorkspaceRail";
 import ChannelSidebar from "./components/ChannelSidebar";
 import ChatArena from "./components/ChatArena";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  Input,
+  Button,
+  Label
+} from "@/components/ui";
+import toast from "react-hot-toast";
+import { Users } from "lucide-react";
 
 const Chat = () => {
   const { user } = useSelector((state: any) => state.auth);
@@ -21,6 +33,43 @@ const Chat = () => {
   const [messages, setMessages] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isTyping, setIsTyping] = useState(false);
+
+  const [showCreateWorkspaceModal, setShowCreateWorkspaceModal] = useState(false);
+  const [newWorkspaceName, setNewWorkspaceName] = useState("");
+  const [newWorkspaceDesc, setNewWorkspaceDesc] = useState("");
+
+  const fetchWorkspaces = async () => {
+    try {
+      const wsRes = await executeHttpGetRequest(API_PATHS.CHAT.WORKSPACES);
+      if (wsRes.data.success) {
+        setWorkspaces(wsRes.data.data);
+      }
+    } catch (error) {
+      console.error("Failed to fetch workspaces", error);
+    }
+  };
+
+  const handleCreateWorkspace = async (e: any) => {
+    e.preventDefault();
+    if (!newWorkspaceName.trim()) return;
+    try {
+      const response: any = await executeHttpPostRequest(API_PATHS.CHAT.WORKSPACES, {
+        name: newWorkspaceName,
+        description: newWorkspaceDesc,
+      });
+      if (response.data.success) {
+        toast.success("Group created successfully!");
+        setNewWorkspaceName("");
+        setNewWorkspaceDesc("");
+        setShowCreateWorkspaceModal(false);
+        await fetchWorkspaces();
+      } else {
+        toast.error(response.data.message || "Failed to create group");
+      }
+    } catch (err) {
+      toast.error((err as any)?.response?.data?.message || "Failed to create group");
+    }
+  };
 
   const isAdmin = user?.pageAccess?.includes("PG_ADM");
 
@@ -293,6 +342,7 @@ const Chat = () => {
         workspaces={workspaces}
         activeWorkspaceId={activeWorkspaceId}
         setActiveWorkspaceId={setActiveWorkspaceId}
+        onCreateWorkspace={() => setShowCreateWorkspaceModal(true)}
       />
 
       {/* Pane 2: Channel/DM Sidebar */}
@@ -328,6 +378,63 @@ const Chat = () => {
         onTyping={handleTyping}
         emitReadReceipt={emitReadReceipt}
       />
+
+      {/* Create Workspace Modal */}
+      <Dialog open={showCreateWorkspaceModal} onOpenChange={setShowCreateWorkspaceModal}>
+        <DialogContent className="sm:max-w-[420px] bg-gradient-to-br from-[#182533] to-[#0e1621] border border-blue-500/25 text-slate-200 rounded-3xl shadow-2xl p-8 overflow-hidden relative">
+          <div className="absolute -right-24 -top-24 w-48 h-48 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
+          <div className="absolute -left-24 -bottom-24 w-48 h-48 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
+          
+          <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-blue-600/20 to-indigo-600/20 border border-blue-500/35 flex items-center justify-center text-blue-400 mx-auto mb-4 shadow-[0_0_15px_rgba(59,130,246,0.15)] animate-bounce duration-1000">
+            <Users className="w-5.5 h-5.5" />
+          </div>
+
+          <DialogHeader className="text-center space-y-2">
+            <DialogTitle className="text-xl font-black text-slate-100 text-center">Create Group</DialogTitle>
+            <DialogDescription className="text-xs text-slate-400 text-center leading-relaxed">
+              Create a collaborative workspace for your team and student members.
+            </DialogDescription>
+          </DialogHeader>
+
+          <form onSubmit={handleCreateWorkspace} className="space-y-5 mt-5">
+            <div className="space-y-2">
+              <Label className="text-xs text-slate-400 font-bold tracking-wider uppercase">Group Name</Label>
+              <Input
+                value={newWorkspaceName}
+                onChange={(e: any) => setNewWorkspaceName(e.target.value)}
+                placeholder="e.g. Advanced Java Prep"
+                className="h-11 bg-[#0e1621]/80 border-slate-800 focus:border-blue-500/60 focus:ring-4 focus:ring-blue-500/10 text-slate-200 rounded-xl transition-all duration-300 shadow-inner px-4 text-sm"
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label className="text-xs text-slate-400 font-bold tracking-wider uppercase">Description</Label>
+              <Input
+                value={newWorkspaceDesc}
+                onChange={(e: any) => setNewWorkspaceDesc(e.target.value)}
+                placeholder="A brief description of this group..."
+                className="h-11 bg-[#0e1621]/80 border-slate-800 focus:border-blue-500/60 focus:ring-4 focus:ring-blue-500/10 text-slate-200 rounded-xl transition-all duration-300 shadow-inner px-4 text-sm"
+              />
+            </div>
+            <div className="flex justify-end gap-3 pt-4 border-t border-slate-800/80 mt-6">
+              <Button
+                type="button"
+                variant="ghost"
+                onClick={() => setShowCreateWorkspaceModal(false)}
+                className="text-slate-400 hover:text-slate-200 hover:bg-slate-850/60 rounded-xl font-bold px-5 h-10.5"
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white rounded-xl shadow-lg shadow-blue-500/15 hover:shadow-blue-500/25 transition-all font-bold px-6 h-10.5 cursor-pointer"
+              >
+                Create
+              </Button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

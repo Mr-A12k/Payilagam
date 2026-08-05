@@ -39,9 +39,62 @@ const searchUsers = catchAsync(async (request, response) => {
     return success(response, users, 'Users retrieved successfully');
 });
 
+const applyAsMentor = catchAsync(async (request, response) => {
+    const userId = request.user.userId;
+    const { bio, skills, experience } = request.body;
+    
+    try {
+        const application = await userService.applyAsMentor(userId, bio, skills, experience);
+        return success(response, application, 'Mentor application submitted successfully');
+    } catch (err) {
+        return response.status(400).json({ success: false, message: err.message });
+    }
+});
+
+const getMentorApplications = catchAsync(async (request, response) => {
+    const role = request.user.role;
+    if (role !== "admin") {
+        return response.status(403).json({ success: false, message: "Unauthorized. Admin access only." });
+    }
+
+    const applications = await userService.getMentorApplications();
+    return success(response, applications, 'Mentor applications retrieved successfully');
+});
+
+const updateMentorApplicationStatus = catchAsync(async (request, response) => {
+    const role = request.user.role;
+    if (role !== "admin") {
+        return response.status(403).json({ success: false, message: "Unauthorized. Admin access only." });
+    }
+
+    const { id } = request.params;
+    const { status } = request.body; // APPROVED or REJECTED
+
+    if (status !== "APPROVED" && status !== "REJECTED") {
+        return response.status(400).json({ success: false, message: "Invalid application status" });
+    }
+
+    try {
+        const updated = await userService.updateMentorApplicationStatus(id, status);
+        return success(response, updated, `Application status updated to ${status}`);
+    } catch (err) {
+        return response.status(400).json({ success: false, message: err.message });
+    }
+});
+
+const getMyMentorApplication = catchAsync(async (request, response) => {
+    const userId = request.user.userId;
+    const application = await userService.getMyMentorApplication(userId);
+    return success(response, application, 'My mentor application retrieved successfully');
+});
+
 module.exports = {
     getMentors,
     getMentorDetails,
     getActivity,
-    searchUsers
+    searchUsers,
+    applyAsMentor,
+    getMentorApplications,
+    updateMentorApplicationStatus,
+    getMyMentorApplication
 };

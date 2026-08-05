@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { Avatar } from "@/components/ui";
 import toast from "react-hot-toast";
+import { cn } from "@/lib/utils";
 
 const Network = () => {
   const [activeTab, setActiveTab] = useState("pending");
@@ -117,7 +118,7 @@ const Network = () => {
     ];
 
     return (
-      <div className="flex gap-4 mb-8 overflow-x-auto pb-2 scrollbar-hide">
+      <div className="flex bg-slate-950 p-1.5 rounded-xl border border-slate-900 w-fit mb-8 shadow-inner shadow-black/40">
         {tabs.map((tab: any) => {
           const Icon = tab.icon;
           const isActive = activeTab === tab.id;
@@ -125,21 +126,20 @@ const Network = () => {
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center gap-3 px-6 py-4 rounded-2xl font-bold text-sm transition-all whitespace-nowrap
-                ${
-                  isActive
-                    ? "bg-blue-600 text-white shadow-[0_0_20px_-5px_rgba(37,99,235,0.4)]"
-                    : "bg-slate-900 text-slate-400 hover:bg-slate-800 hover:text-slate-200 border border-slate-800/50"
-                }`}
+              className={cn(
+                "flex items-center gap-2 px-5 py-2 rounded-lg font-bold text-xs transition-all whitespace-nowrap border border-transparent cursor-pointer",
+                isActive
+                  ? "bg-[#2b5278] text-white shadow-sm border-blue-500/20"
+                  : "text-slate-500 hover:text-slate-350 hover:bg-slate-900/60"
+              )}
             >
-              <Icon
-                className={`w-5 h-5 ${isActive ? "text-white" : "text-slate-500"}`}
-              />
-              {tab.label}
-              {!isLoading && activeTab === tab.id && (
-                <span
-                  className={`ml-2 px-2 py-0.5 rounded-lg text-xs ${isActive ? "bg-white/20 text-white" : "bg-slate-800 text-slate-400"}`}
-                >
+              <Icon className={cn("w-4 h-4", isActive ? "text-white" : "text-slate-500")} />
+              <span>{tab.label}</span>
+              {!isLoading && (
+                <span className={cn(
+                  "ml-1.5 px-2 py-0.5 rounded-md text-[10px] font-black",
+                  isActive ? "bg-white/20 text-white" : "bg-slate-900 text-slate-500"
+                )}>
                   {tab.count}
                 </span>
               )}
@@ -154,48 +154,50 @@ const Network = () => {
     return (
       <div
         key={userObj.id || reqId}
-        className="bg-slate-900 border border-slate-800 rounded-[32px] p-4 flex flex-col gap-4 group hover:border-slate-700 transition-all duration-300 hover:shadow-2xl hover:shadow-slate-900/50"
+        className="bg-slate-900/30 backdrop-blur-md border border-slate-800/80 rounded-2xl p-5 flex flex-col gap-4 group hover:border-blue-500/35 hover:-translate-y-1 hover:shadow-xl hover:shadow-blue-500/5 transition-all duration-300 relative overflow-hidden"
       >
-        <div className="flex gap-4">
+        <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-blue-500/5 to-indigo-500/5 rounded-full blur-2xl pointer-events-none" />
+        
+        <div className="flex items-center gap-4">
           <div className="shrink-0">
             <Avatar
               src={userObj.profileUrl}
               fallback={userObj.fullName?.[0]}
-              size="xl"
-              className="w-24 h-24 rounded-[24px] border border-slate-700/50 object-cover"
+              size="lg"
+              className="w-16 h-16 rounded-xl border border-slate-700/40 object-cover shadow-md"
             />
           </div>
-          <div className="flex-1 bg-slate-950/50 rounded-[24px] p-5 flex flex-col justify-center border border-slate-800/50">
-            <h4 className="font-bold text-slate-100 text-lg leading-tight mb-1 line-clamp-1">
+          <div className="flex-1 bg-slate-950/20 border border-slate-800/40 rounded-xl p-3 flex flex-col justify-center shadow-inner shadow-black/25">
+            <h4 className="font-bold text-slate-200 text-sm leading-tight mb-1 line-clamp-1 group-hover:text-blue-400 transition-colors">
               {userObj.fullName}
             </h4>
-            <p className="text-sky-400/80 text-[13px] font-medium leading-snug line-clamp-1">
+            <p className="text-slate-500 text-xs font-semibold leading-snug line-clamp-1">
               {userObj.role?.roleName || userObj.bio || "Platform Member"}
             </p>
           </div>
         </div>
 
         {isPending ? (
-          <div className="grid grid-cols-2 gap-3 mt-2">
+          <div className="grid grid-cols-2 gap-2.5 mt-2">
             <button
               onClick={() => handleRespond(reqId, "approved")}
-              className="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold text-[15px] py-4 rounded-[24px] flex items-center justify-center gap-2 transition-all shadow-[0_8px_20px_-6px_rgba(37,99,235,0.4)] active:scale-[0.98]"
+              className="w-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs py-2.5 rounded-xl flex items-center justify-center gap-1.5 transition-all shadow-md shadow-emerald-500/10 active:scale-98 cursor-pointer"
             >
-              <Check className="w-5 h-5" />
+              <Check className="w-4 h-4" />
               Approve
             </button>
             <button
               onClick={() => handleRespond(reqId, "rejected")}
-              className="w-full bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-[15px] py-4 rounded-[24px] flex items-center justify-center gap-2 transition-all active:scale-[0.98]"
+              className="w-full bg-slate-800 hover:bg-slate-750 text-slate-350 font-bold text-xs py-2.5 rounded-xl flex items-center justify-center gap-1.5 transition-all active:scale-98 cursor-pointer"
             >
-              <X className="w-5 h-5" />
+              <X className="w-4 h-4" />
               Decline
             </button>
           </div>
         ) : (
-          <button className="mt-2 w-full bg-slate-800/80 hover:bg-slate-700 border border-slate-700/50 text-slate-200 font-bold text-[15px] py-4 rounded-[24px] flex items-center justify-center gap-2 transition-all active:scale-[0.98]">
+          <button className="mt-2 w-full bg-slate-850 hover:bg-slate-800 border border-slate-800/80 hover:border-slate-700 text-slate-300 font-bold text-xs py-2.5 rounded-xl flex items-center justify-center gap-1.5 transition-all active:scale-98 cursor-pointer">
             View Profile
-            <ChevronRight className="w-4 h-4 text-slate-400" />
+            <ChevronRight className="w-3.5 h-3.5 text-slate-500" />
           </button>
         )}
       </div>
@@ -203,21 +205,21 @@ const Network = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 p-8">
-      <div className="max-w-7xl mx-auto">
+    <div className="w-full h-full p-6 sm:p-8 flex flex-col bg-transparent overflow-y-auto custom-scrollbar">
+      <div className="max-w-7xl mx-auto w-full">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
           <div>
-            <h1 className="text-4xl font-bold text-slate-100 tracking-tight mb-2">
+            <h1 className="text-3xl font-black text-slate-100 tracking-tight mb-1 bg-gradient-to-r from-slate-100 to-slate-400 bg-clip-text text-transparent">
               Network
             </h1>
-            <p className="text-slate-400 text-lg">
+            <p className="text-slate-400 text-sm font-medium">
               Manage your connections and discover new peers.
             </p>
           </div>
 
           <form
             onSubmit={handleSendRequest}
-            className="flex gap-2 relative bg-slate-900 p-2 rounded-2xl border border-slate-800 shadow-xl w-full md:w-auto"
+            className="flex gap-2 relative bg-slate-900/60 p-2 rounded-2xl border border-slate-800/80 shadow-xl w-full md:w-auto"
           >
             <div className="relative flex-1 md:w-64">
               <Search className="w-4 h-4 absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" />
@@ -228,12 +230,12 @@ const Network = () => {
                   setSearchTargetId((event.target as HTMLInputElement).value)
                 }
                 placeholder="User ID to connect..."
-                className="w-full pl-11 pr-4 py-3 bg-slate-950 border border-slate-800/50 rounded-xl text-sm text-slate-200 focus:outline-none focus:ring-1 focus:ring-blue-500/50 transition-all placeholder:text-slate-500"
+                className="w-full pl-11 pr-4 py-2.5 bg-slate-950/60 border border-slate-800/85 focus:border-blue-500/60 focus:ring-4 focus:ring-blue-500/10 text-slate-200 rounded-xl text-sm focus:outline-none transition-all placeholder:text-slate-600 shadow-inner"
               />
             </div>
             <button
               type="submit"
-              className="bg-blue-600 hover:bg-blue-500 text-white px-6 py-3 rounded-xl font-bold text-sm transition-all shadow-[0_0_15px_-3px_rgba(37,99,235,0.4)]"
+              className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white px-6 py-2.5 rounded-xl font-bold text-sm transition-all shadow-md shadow-blue-500/15 cursor-pointer"
             >
               Connect
             </button>
@@ -245,25 +247,25 @@ const Network = () => {
         <div className="min-h-[400px]">
           {isLoading ? (
             <div className="flex flex-col items-center justify-center h-64 text-slate-400 gap-4">
-              <div className="w-8 h-8 border-4 border-blue-500/30 border-t-blue-500 rounded-full animate-spin"></div>
-              <p className="font-medium">Loading connections...</p>
+              <div className="w-8 h-8 border-3 border-blue-500/35 border-t-blue-500 rounded-full animate-spin"></div>
+              <p className="text-xs font-semibold text-slate-550">Loading connections...</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {/* PENDING TAB */}
               {activeTab === "pending" &&
                 pendingRequests.map((request: any) =>
                   renderBentoCard(request.requester, true, request.id),
                 )}
               {activeTab === "pending" && pendingRequests.length === 0 && (
-                <div className="col-span-full flex flex-col items-center justify-center py-20 text-slate-500 bg-slate-900/50 rounded-[32px] border border-slate-800/50 dashed">
-                  <div className="w-20 h-20 bg-slate-900 rounded-full flex items-center justify-center mb-4 border border-slate-800">
-                    <Clock className="w-8 h-8 text-slate-400" />
+                <div className="col-span-full flex flex-col items-center justify-center py-20 text-slate-500 bg-slate-900/20 rounded-2xl border border-dashed border-slate-800">
+                  <div className="w-16 h-16 bg-slate-900 rounded-full flex items-center justify-center mb-4 border border-slate-800">
+                    <Clock className="w-6 h-6 text-slate-500" />
                   </div>
-                  <h3 className="text-xl font-bold text-slate-300 mb-2">
+                  <h3 className="text-lg font-bold text-slate-350 mb-1">
                     No Pending Requests
                   </h3>
-                  <p>You're all caught up on connection requests.</p>
+                  <p className="text-xs text-slate-550">You're all caught up on connection requests.</p>
                 </div>
               )}
 
@@ -273,14 +275,14 @@ const Network = () => {
                   renderBentoCard(f.follower, false, f.id),
                 )}
               {activeTab === "followers" && followers.length === 0 && (
-                <div className="col-span-full flex flex-col items-center justify-center py-20 text-slate-500 bg-slate-900/50 rounded-[32px] border border-slate-800/50 dashed">
-                  <div className="w-20 h-20 bg-slate-900 rounded-full flex items-center justify-center mb-4 border border-slate-800">
-                    <Users className="w-8 h-8 text-slate-400" />
+                <div className="col-span-full flex flex-col items-center justify-center py-20 text-slate-500 bg-slate-900/20 rounded-2xl border border-dashed border-slate-800">
+                  <div className="w-16 h-16 bg-slate-900 rounded-full flex items-center justify-center mb-4 border border-slate-800">
+                    <Users className="w-6 h-6 text-slate-500" />
                   </div>
-                  <h3 className="text-xl font-bold text-slate-300 mb-2">
+                  <h3 className="text-lg font-bold text-slate-350 mb-1">
                     No Followers Yet
                   </h3>
-                  <p>
+                  <p className="text-xs text-slate-550">
                     Start interacting in the community to build your network.
                   </p>
                 </div>
@@ -292,14 +294,14 @@ const Network = () => {
                   renderBentoCard(f.following, false, f.id),
                 )}
               {activeTab === "following" && following.length === 0 && (
-                <div className="col-span-full flex flex-col items-center justify-center py-20 text-slate-500 bg-slate-900/50 rounded-[32px] border border-slate-800/50 dashed">
-                  <div className="w-20 h-20 bg-slate-900 rounded-full flex items-center justify-center mb-4 border border-slate-800">
-                    <UserPlus className="w-8 h-8 text-slate-400" />
+                <div className="col-span-full flex flex-col items-center justify-center py-20 text-slate-500 bg-slate-900/20 rounded-2xl border border-dashed border-slate-800">
+                  <div className="w-16 h-16 bg-slate-900 rounded-full flex items-center justify-center mb-4 border border-slate-800">
+                    <UserPlus className="w-6 h-6 text-slate-500" />
                   </div>
-                  <h3 className="text-xl font-bold text-slate-300 mb-2">
+                  <h3 className="text-lg font-bold text-slate-350 mb-1">
                     Not Following Anyone
                   </h3>
-                  <p>Discover interesting people and connect with them.</p>
+                  <p className="text-xs text-slate-550">Discover interesting people and connect with them.</p>
                 </div>
               )}
             </div>

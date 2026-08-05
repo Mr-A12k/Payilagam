@@ -304,6 +304,7 @@ const MentorDashboard = () => {
                 {placeholderCourses.map((course: any, index: any) => (
                   <div
                     key={index}
+                    onClick={() => window.location.href = `/mentor/course/edit/${course.courseId}`}
                     className="grid grid-cols-12 gap-4 items-center py-3 hover:bg-slate-800/40 rounded-xl px-2 transition-all duration-200 -mx-2 group hover:shadow-[0_0_10px_rgba(56,189,248,0.05)] cursor-pointer"
                   >
                     <div className="col-span-6 flex items-center gap-4">

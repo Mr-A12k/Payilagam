@@ -16,6 +16,10 @@ const {
   getWorkspaces,
   getChannelMessages,
   sendChannelMessage,
+  createWorkspace,
+  updateWorkspace,
+  addWorkspaceMember,
+  joinWorkspace,
 } = require("./chat.controller");
 
 router.use(authenticate);
@@ -138,5 +142,11 @@ router.get("/channels/:channelId/messages", getChannelMessages);
  *         description: OK
  */
 router.post("/channels/:channelId/messages", sendChannelMessage);
+
+// Workspace Group Management Routes
+router.post("/workspaces", createWorkspace);
+router.put("/workspaces/:id", updateWorkspace);
+router.post("/workspaces/:id/members", addWorkspaceMember);
+router.post("/workspaces/join", joinWorkspace);
 
 module.exports = router;

@@ -23,6 +23,7 @@ import {
   CardContent,
 } from "@/components/ui";
 import { useSelector } from "react-redux";
+import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 
 import {
   Save,
@@ -42,10 +43,13 @@ import {
   AlignLeft,
   HelpCircle,
   Code,
+  ChevronDown,
+  Check,
 } from "lucide-react";
 
 const CourseBuilder = () => {
-  const { id: courseId } = useParams();
+  const params = useParams();
+  const courseId = params.id || params.uniqueId;
   const isEditMode = !!courseId;
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -76,6 +80,12 @@ const CourseBuilder = () => {
     title: "",
     type: "video",
   });
+
+  const [lessonToDelete, setLessonToDelete] = useState<string | null>(null);
+  const [showDeleteLessonModal, setShowDeleteLessonModal] = useState(false);
+  
+  const [isCategoryDropdownOpen, setIsCategoryDropdownOpen] = useState(false);
+  const [categorySearchQuery, setCategorySearchQuery] = useState("");
 
   // -------------------------------------------------------------------------------- //
   // QUERIES
@@ -309,13 +319,15 @@ const CourseBuilder = () => {
         category.categoryId.toString() === courseData.categoryId,
     )?.name || "Category";
 
-  const inputClasses = "shadow-inner shadow-black/20";
-  const labelClasses = "text-slate-300 font-medium";
+  const inputClasses =
+    "bg-slate-900/40 border-slate-700/50 focus:border-blue-500/50 focus:ring-4 focus:ring-blue-500/10 shadow-inner shadow-black/40 hover:border-slate-600 transition-all duration-300 rounded-xl h-11 px-4";
+  const labelClasses =
+    "text-slate-300 font-semibold text-sm mb-1.5 block tracking-wide";
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] bg-slate-950 text-slate-200 pb-24">
+    <div className="min-h-[calc(100vh-4rem)] bg-gradient-to-b from-slate-950 via-slate-950 to-slate-900 text-slate-200 pb-24 font-sans selection:bg-blue-500/30">
       {/* Premium Header */}
-      <div className="bg-slate-900/80 backdrop-blur-xl border-b border-slate-800 sticky top-0 z-30 shadow-lg shadow-black/20">
+      <div className="bg-slate-900/70 backdrop-blur-2xl border-b border-white/5 sticky top-0 z-40 shadow-[0_4px_30px_rgba(0,0,0,0.3)]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex-between h-20">
             <div className="flex items-center gap-4">
@@ -358,15 +370,16 @@ const CourseBuilder = () => {
           {/* Left Column: Form Editor */}
           <div className="flex-1 space-y-6">
             {/* Nav Tabs */}
-            <div className="flex gap-2 p-1.5 bg-slate-900/60 backdrop-blur-md border border-slate-800 rounded-2xl overflow-x-auto shadow-inner shadow-black/20">
+            {/* Nav Tabs */}
+            <div className="flex gap-2 p-2 bg-slate-900/40 backdrop-blur-xl border border-slate-700/50 rounded-2xl overflow-x-auto shadow-inner shadow-black/40">
               <Button
                 variant="ghost"
                 onClick={() => setActiveSection("basic")}
                 className={cn(
-                  "rounded-xl transition-all duration-300",
+                  "rounded-xl transition-all duration-300 font-semibold px-6",
                   activeSection === "basic"
-                    ? "bg-blue-600 hover:bg-blue-600 text-white shadow-[0_0_15px_rgba(37,99,235,0.4)]"
-                    : "text-slate-400 hover:text-slate-200 hover:bg-slate-800/80",
+                    ? "bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-[0_0_20px_rgba(37,99,235,0.4)] ring-1 ring-white/10"
+                    : "text-slate-400 hover:text-slate-100 hover:bg-slate-800/80",
                 )}
               >
                 <BookOpen className="icon-base mr-2" /> Basic Info
@@ -375,10 +388,10 @@ const CourseBuilder = () => {
                 variant="ghost"
                 onClick={() => setActiveSection("details")}
                 className={cn(
-                  "rounded-xl transition-all duration-300",
+                  "rounded-xl transition-all duration-300 font-semibold px-6",
                   activeSection === "details"
-                    ? "bg-blue-600 hover:bg-blue-600 text-white shadow-[0_0_15px_rgba(37,99,235,0.4)]"
-                    : "text-slate-400 hover:text-slate-200 hover:bg-slate-800/80",
+                    ? "bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-[0_0_20px_rgba(37,99,235,0.4)] ring-1 ring-white/10"
+                    : "text-slate-400 hover:text-slate-100 hover:bg-slate-800/80",
                 )}
               >
                 <BarChart className="icon-base mr-2" /> Details
@@ -387,10 +400,10 @@ const CourseBuilder = () => {
                 variant="ghost"
                 onClick={() => setActiveSection("media")}
                 className={cn(
-                  "rounded-xl transition-all duration-300",
+                  "rounded-xl transition-all duration-300 font-semibold px-6",
                   activeSection === "media"
-                    ? "bg-blue-600 hover:bg-blue-600 text-white shadow-[0_0_15px_rgba(37,99,235,0.4)]"
-                    : "text-slate-400 hover:text-slate-200 hover:bg-slate-800/80",
+                    ? "bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-[0_0_20px_rgba(37,99,235,0.4)] ring-1 ring-white/10"
+                    : "text-slate-400 hover:text-slate-100 hover:bg-slate-800/80",
                 )}
               >
                 <ImageIcon className="icon-base mr-2" /> Media
@@ -403,11 +416,11 @@ const CourseBuilder = () => {
                     : toast.error("Save course first to build curriculum!")
                 }
                 className={cn(
-                  "rounded-xl transition-all duration-300",
+                  "rounded-xl transition-all duration-300 font-semibold px-6",
                   !isEditMode && "opacity-50 cursor-not-allowed",
                   activeSection === "curriculum"
-                    ? "bg-blue-600 hover:bg-blue-600 text-white shadow-[0_0_15px_rgba(37,99,235,0.4)]"
-                    : "text-slate-400 hover:text-slate-200 hover:bg-slate-800/80",
+                    ? "bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-[0_0_20px_rgba(37,99,235,0.4)] ring-1 ring-white/10"
+                    : "text-slate-400 hover:text-slate-100 hover:bg-slate-800/80",
                 )}
               >
                 <Layers className="icon-base mr-2" /> Curriculum
@@ -416,9 +429,9 @@ const CourseBuilder = () => {
 
             {/* Section 1: Basic Info */}
             {activeSection === "basic" && (
-              <Card className="!bg-slate-900/60 backdrop-blur-xl shadow-2xl shadow-black/40 animate-in fade-in zoom-in-95 duration-300 !p-0">
-                <div className="p-6 border-b border-slate-800/80 flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-2xl flex-center bg-blue-500/10 text-blue-400 border border-blue-500/20 shadow-[0_0_15px_rgba(59,130,246,0.15)]">
+              <Card className="!bg-slate-900/40 backdrop-blur-2xl border-slate-700/50 shadow-[0_8px_30px_rgb(0,0,0,0.12)] animate-in fade-in zoom-in-95 duration-300 !p-0 overflow-hidden">
+                <div className="p-6 border-b border-white/5 flex items-center gap-4 bg-gradient-to-r from-slate-800/50 to-transparent">
+                  <div className="w-12 h-12 rounded-2xl flex-center bg-gradient-to-br from-blue-500/20 to-indigo-500/20 text-blue-400 border border-blue-500/30 shadow-[0_0_15px_rgba(59,130,246,0.2)]">
                     <BookOpen className="icon-lg" />
                   </div>
                   <div>
@@ -456,27 +469,65 @@ const CourseBuilder = () => {
                     </div>
                     <div className="space-y-2">
                       <Label className={labelClasses}>Category</Label>
-                      <Select
-                        value={courseData.categoryId}
-                        onValueChange={(value: any) =>
-                          handleSelectChange("categoryId", value)
-                        }
-                      >
-                        <SelectTrigger className={cn("h-10", inputClasses)}>
-                          <SelectValue placeholder="Select Category..." />
-                        </SelectTrigger>
-                        <SelectContent className="bg-slate-900 border-slate-800 text-slate-200">
-                          {categories.map((category: any) => (
-                            <SelectItem
-                              key={category.categoryId}
-                              value={category.categoryId.toString()}
-                              className="focus:bg-blue-600 focus:text-white"
-                            >
-                              {category.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                      <div className="relative">
+                        <button
+                          type="button"
+                          onClick={() => setIsCategoryDropdownOpen(!isCategoryDropdownOpen)}
+                          className="w-full h-11 bg-slate-900/40 border border-slate-700/50 hover:border-blue-500/50 focus:border-blue-500/50 focus:ring-4 focus:ring-blue-500/10 transition-all rounded-xl px-4 flex items-center justify-between text-slate-200 text-sm shadow-inner shadow-black/20"
+                        >
+                          <span className="truncate">
+                            {categories.find((c: any) => c.categoryId.toString() === courseData.categoryId)?.name || "Select Category..."}
+                          </span>
+                          <ChevronDown className={cn("w-4 h-4 text-slate-400 transition-transform duration-300 shrink-0 ml-2", isCategoryDropdownOpen && "rotate-180")} />
+                        </button>
+
+                        {isCategoryDropdownOpen && (
+                          <>
+                            <div className="fixed inset-0 z-40" onClick={() => setIsCategoryDropdownOpen(false)} />
+                            <div className="absolute top-12 left-0 right-0 z-50 bg-slate-950/95 backdrop-blur-md border border-slate-800 rounded-xl shadow-[0_15px_40px_rgba(0,0,0,0.6)] overflow-hidden animate-in fade-in slide-in-from-top-1.5 duration-200">
+                              <div className="p-2 border-b border-slate-900">
+                                <input
+                                  type="text"
+                                  value={categorySearchQuery}
+                                  onChange={(e) => setCategorySearchQuery(e.target.value)}
+                                  placeholder="Search categories..."
+                                  className="w-full bg-slate-900/60 border border-slate-800/80 rounded-lg px-3 py-1.5 text-xs text-slate-200 placeholder-slate-650 focus:outline-none focus:border-blue-500/50"
+                                />
+                              </div>
+                              <div className="max-h-60 overflow-y-auto custom-scrollbar p-1 space-y-0.5">
+                                {categories
+                                  .filter((c: any) => c.name.toLowerCase().includes(categorySearchQuery.toLowerCase()))
+                                  .map((category: any) => {
+                                    const isSelected = category.categoryId.toString() === courseData.categoryId;
+                                    return (
+                                      <button
+                                        key={category.categoryId}
+                                        type="button"
+                                        onClick={() => {
+                                          handleSelectChange("categoryId", category.categoryId.toString());
+                                          setIsCategoryDropdownOpen(false);
+                                          setCategorySearchQuery("");
+                                        }}
+                                        className={cn(
+                                          "w-full text-left px-3 py-2 text-xs rounded-lg transition-all flex items-center justify-between",
+                                          isSelected
+                                            ? "bg-blue-600/20 text-blue-400 font-bold border-l-2 border-blue-500"
+                                            : "text-slate-400 hover:bg-slate-900 hover:text-slate-200"
+                                        )}
+                                      >
+                                        <span>{category.name}</span>
+                                        {isSelected && <Check className="w-3.5 h-3.5 text-blue-400" />}
+                                      </button>
+                                    );
+                                  })}
+                                {categories.filter((c: any) => c.name.toLowerCase().includes(categorySearchQuery.toLowerCase())).length === 0 && (
+                                  <div className="text-center py-4 text-xs text-slate-500">No categories match</div>
+                                )}
+                              </div>
+                            </div>
+                          </>
+                        )}
+                      </div>
                     </div>
                   </div>
                   <div className="space-y-2">
@@ -500,9 +551,9 @@ const CourseBuilder = () => {
 
             {/* Section 2: Details & Pricing */}
             {activeSection === "details" && (
-              <Card className="!bg-slate-900/60 backdrop-blur-xl shadow-2xl shadow-black/40 animate-in fade-in zoom-in-95 duration-300 !p-0">
-                <div className="p-6 border-b border-slate-800/80 flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-2xl flex-center bg-blue-500/10 text-blue-400 border border-blue-500/20 shadow-[0_0_15px_rgba(59,130,246,0.15)]">
+              <Card className="!bg-slate-900/40 backdrop-blur-2xl border-slate-700/50 shadow-[0_8px_30px_rgb(0,0,0,0.12)] animate-in fade-in zoom-in-95 duration-300 !p-0 overflow-hidden">
+                <div className="p-6 border-b border-white/5 flex items-center gap-4 bg-gradient-to-r from-slate-800/50 to-transparent">
+                  <div className="w-12 h-12 rounded-2xl flex-center bg-gradient-to-br from-blue-500/20 to-indigo-500/20 text-blue-400 border border-blue-500/30 shadow-[0_0_15px_rgba(59,130,246,0.2)]">
                     <BarChart className="icon-lg" />
                   </div>
                   <div>
@@ -523,7 +574,7 @@ const CourseBuilder = () => {
                         handleSelectChange("level", value)
                       }
                     >
-                      <SelectTrigger className={cn("h-10", inputClasses)}>
+                      <SelectTrigger className={cn("h-11", inputClasses)}>
                         <SelectValue placeholder="Select Level..." />
                       </SelectTrigger>
                       <SelectContent className="bg-slate-900 border-slate-800 text-slate-200">
@@ -587,9 +638,9 @@ const CourseBuilder = () => {
 
             {/* Section 3: Media */}
             {activeSection === "media" && (
-              <Card className="!bg-slate-900/60 backdrop-blur-xl shadow-2xl shadow-black/40 animate-in fade-in zoom-in-95 duration-300 !p-0">
-                <div className="p-6 border-b border-slate-800/80 flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-2xl flex-center bg-blue-500/10 text-blue-400 border border-blue-500/20 shadow-[0_0_15px_rgba(59,130,246,0.15)]">
+              <Card className="!bg-slate-900/40 backdrop-blur-2xl border-slate-700/50 shadow-[0_8px_30px_rgb(0,0,0,0.12)] animate-in fade-in zoom-in-95 duration-300 !p-0 overflow-hidden">
+                <div className="p-6 border-b border-white/5 flex items-center gap-4 bg-gradient-to-r from-slate-800/50 to-transparent">
+                  <div className="w-12 h-12 rounded-2xl flex-center bg-gradient-to-br from-blue-500/20 to-indigo-500/20 text-blue-400 border border-blue-500/30 shadow-[0_0_15px_rgba(59,130,246,0.2)]">
                     <ImageIcon className="icon-lg" />
                   </div>
                   <div>
@@ -686,9 +737,9 @@ const CourseBuilder = () => {
 
             {/* Section 4: Curriculum */}
             {activeSection === "curriculum" && isEditMode && (
-              <Card className="!bg-slate-900/60 backdrop-blur-xl shadow-2xl shadow-black/40 animate-in fade-in zoom-in-95 duration-300 !p-0">
-                <div className="p-6 border-b border-slate-800/80 flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-2xl flex-center bg-blue-500/10 text-blue-400 border border-blue-500/20 shadow-[0_0_15px_rgba(59,130,246,0.15)]">
+              <Card className="!bg-slate-900/40 backdrop-blur-2xl border-slate-700/50 shadow-[0_8px_30px_rgb(0,0,0,0.12)] animate-in fade-in zoom-in-95 duration-300 !p-0 overflow-hidden">
+                <div className="p-6 border-b border-white/5 flex items-center gap-4 bg-gradient-to-r from-slate-800/50 to-transparent">
+                  <div className="w-12 h-12 rounded-2xl flex-center bg-gradient-to-br from-blue-500/20 to-indigo-500/20 text-blue-400 border border-blue-500/30 shadow-[0_0_15px_rgba(59,130,246,0.2)]">
                     <Layers className="icon-lg" />
                   </div>
                   <div>
@@ -705,21 +756,21 @@ const CourseBuilder = () => {
                   {modules.map((module: any, index: any) => (
                     <div
                       key={module.moduleId}
-                      className="border border-slate-800 rounded-2xl overflow-hidden bg-slate-950/40 shadow-sm"
+                      className="border border-slate-700/50 rounded-2xl overflow-hidden bg-slate-900/30 shadow-[0_4px_20px_rgba(0,0,0,0.2)] transition-all hover:border-slate-600/50"
                     >
-                      <div className="bg-slate-900/80 p-5 border-b border-slate-800 flex-between">
+                      <div className="bg-slate-800/40 p-5 border-b border-slate-700/50 flex-between backdrop-blur-sm">
                         <div className="flex items-center gap-4">
-                          <div className="w-10 h-10 rounded-xl bg-slate-950 flex-center text-sm font-bold text-blue-400 border border-slate-800 shadow-inner">
+                          <div className="w-10 h-10 rounded-xl bg-slate-900 flex-center text-sm font-bold text-blue-400 border border-slate-700 shadow-inner">
                             {index + 1}
                           </div>
-                          <h3 className="font-bold text-slate-200 text-lg">
+                          <h3 className="font-bold text-slate-200 text-lg tracking-wide">
                             {module.title}
                           </h3>
                         </div>
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="text-red-400 hover:bg-red-500/20 hover:text-red-300 rounded-full"
+                          className="text-red-400 hover:bg-red-500/20 hover:text-red-300 rounded-full transition-colors duration-200"
                           onClick={() => {
                             if (
                               window.confirm(
@@ -740,10 +791,10 @@ const CourseBuilder = () => {
                           module.lessons.map((lesson: any) => (
                             <div
                               key={lesson.lessonId}
-                              className="flex-between p-4 bg-slate-900/40 border border-slate-800 rounded-xl group hover:border-blue-500/50 hover:bg-slate-800/60 hover:shadow-[0_0_20px_rgba(59,130,246,0.1)] transition-all"
+                              className="flex-between p-4 bg-slate-900/50 border border-slate-700/50 rounded-xl group hover:border-blue-500/50 hover:bg-slate-800/80 hover:shadow-[0_0_20px_rgba(59,130,246,0.15)] transition-all duration-300 cursor-pointer"
                             >
                               <div className="flex items-center gap-4">
-                                <div className="p-2 bg-slate-950 rounded-lg border border-slate-800 group-hover:border-blue-500/30 transition-colors">
+                                <div className="p-2 bg-slate-950/80 rounded-lg border border-slate-700/50 group-hover:border-blue-500/40 transition-colors shadow-inner shadow-black/40">
                                   {lesson.type === "video" ? (
                                     <PlaySquare className="w-4 h-4 text-sky-400" />
                                   ) : lesson.type === "text" ? (
@@ -763,11 +814,8 @@ const CourseBuilder = () => {
                                 size="icon"
                                 className="opacity-0 group-hover:opacity-100 transition-opacity text-red-400 hover:bg-red-500/20 hover:text-red-300 rounded-full"
                                 onClick={() => {
-                                  if (window.confirm("Delete this lesson?")) {
-                                    deleteLessonMutation.mutate(
-                                      lesson.lessonId,
-                                    );
-                                  }
+                                  setLessonToDelete(lesson.lessonId);
+                                  setShowDeleteLessonModal(true);
                                 }}
                               >
                                 <X className="icon-base" />
@@ -1034,6 +1082,25 @@ const CourseBuilder = () => {
           </div>
         </div>
       </div>
+      <ConfirmDialog
+        isOpen={showDeleteLessonModal}
+        onClose={() => {
+          setShowDeleteLessonModal(false);
+          setLessonToDelete(null);
+        }}
+        onConfirm={async () => {
+          if (lessonToDelete) {
+            await deleteLessonMutation.mutateAsync(lessonToDelete);
+            setShowDeleteLessonModal(false);
+            setLessonToDelete(null);
+          }
+        }}
+        title="Delete Lesson"
+        description="Are you sure you want to delete this lesson? This action cannot be undone."
+        confirmText="Delete"
+        isDanger={true}
+        isLoading={deleteLessonMutation.isPending}
+      />
     </div>
   );
 };

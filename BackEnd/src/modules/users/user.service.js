@@ -134,9 +134,100 @@ const searchUsers = async (query, currentUserId) => {
     return users;
 };
 
+const applyAsMentor = async (userId, bio, skills, experience) => {
+    // Check if user is already a mentor
+    const userObj = await prisma.user.findUnique({
+        where: { userId },
+        include: { role: true }
+    });
+    if (userObj && userObj.role?.roleName === "mentor") {
+        throw new Error("You are already a mentor");
+    }
+
+    // Check for existing pending application
+    const existing = await prisma.mentorApplication.findFirst({
+        where: { userId, status: "PENDING" }
+    });
+    if (existing) {
+        throw new Error("You already have a pending mentor application");
+    }
+
+    return await prisma.mentorApplication.create({
+        data: {
+            userId,
+            bio,
+            skills,
+            experience,
+            status: "PENDING"
+        }
+    });
+};
+
+const getMentorApplications = async () => {
+    return await prisma.mentorApplication.findMany({
+        orderBy: { createdAt: "desc" },
+        include: {
+            user: {
+                select: {
+                    userId: true,
+                    fullName: true,
+                    email: true,
+                    profileUrl: true
+                }
+            }
+        }
+    });
+};
+
+const updateMentorApplicationStatus = async (id, status) => {
+    const application = await prisma.mentorApplication.findUnique({
+        where: { id: parseInt(id) },
+        include: { user: true }
+    });
+    if (!application) throw new Error("Application not found");
+
+    if (status === "APPROVED") {
+        const mentorRole = await prisma.role.findUnique({
+            where: { roleName: "mentor" }
+        });
+        if (!mentorRole) throw new Error("Mentor role not configured in database");
+
+        // Update user role to mentor (2)
+        await prisma.user.update({
+            where: { userId: application.userId },
+            data: { roleId: mentorRole.roleId }
+        });
+    }
+
+    return await prisma.mentorApplication.update({
+        where: { id: parseInt(id) },
+        data: { status },
+        include: {
+            user: {
+                select: {
+                    userId: true,
+                    fullName: true,
+                    email: true
+                }
+            }
+        }
+    });
+};
+
+const getMyMentorApplication = async (userId) => {
+    return await prisma.mentorApplication.findFirst({
+        where: { userId },
+        orderBy: { createdAt: "desc" }
+    });
+};
+
 module.exports = {
     getMentors,
     getMentorDetails,
     getActivity,
-    searchUsers
+    searchUsers,
+    applyAsMentor,
+    getMentorApplications,
+    updateMentorApplicationStatus,
+    getMyMentorApplication
 };

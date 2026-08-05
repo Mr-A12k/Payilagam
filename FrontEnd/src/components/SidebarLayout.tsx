@@ -45,6 +45,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Avatar as AvatarComponent, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import NotificationPopover from "./NotificationPopover";
 import { useTheme } from "@/context/ThemeContext";
 
 const SidebarLayout = () => {
@@ -142,10 +144,10 @@ const SidebarLayout = () => {
         className={cn(
           "fixed inset-y-0 left-0 z-50 flex flex-col transition-all duration-300 lg:static lg:translate-x-0 shadow-2xl lg:shadow-none border-r",
           mobileMenuOpen ? "translate-x-0" : "-translate-x-full",
-          isCollapsed ? "w-[80px]" : "w-[220px]",
+          isCollapsed ? "w-[76px]" : "w-[220px]",
         )}
         style={{
-          backgroundColor: "var(--sidebar-bg)",
+          backgroundColor: isCollapsed ? "rgba(15,23,42,0.95)" : "var(--sidebar-bg)",
           borderColor: "var(--sidebar-border)",
           color: "var(--text-primary)",
         }}
@@ -159,11 +161,11 @@ const SidebarLayout = () => {
           style={{ borderColor: "var(--border-subtle)" }}
         >
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 shrink-0 flex items-center justify-center">
+            <div className={cn("shrink-0 flex items-center justify-center", isCollapsed ? "w-9 h-9 bg-slate-900/60 border border-slate-800/80 rounded-xl hover:rotate-12 hover:scale-105 shadow-inner shadow-black/30 transition-all duration-500" : "w-8 h-8")}>
               <img
                 src="https://payilagam.com/wp-content/uploads/2016/09/payilagam-logo.png"
                 alt="Payilagam Logo"
-                className="w-full h-full object-contain"
+                className={cn("object-contain", isCollapsed ? "w-5.5 h-5.5" : "w-full h-full")}
                 onError={(e: any) => {
                   e.target.onerror = null; // prevent infinite loop
                   (e.target as HTMLTextAreaElement).style.display = "none";
@@ -227,19 +229,28 @@ const SidebarLayout = () => {
                 to={link.path}
                 onClick={() => setMobileMenuOpen(false)}
                 className={cn(
-                  "flex items-center rounded-lg transition-all duration-300 ease-out group relative",
-                  isCollapsed ? "justify-center p-3 h-12" : "px-3 py-2.5 gap-3",
-                  isActive
-                    ? "bg-[var(--sidebar-bg-active)] text-[var(--sidebar-text-active)] shadow-[inset_0_1px_1px_rgba(255,255,255,0.05)]"
-                    : "text-[var(--sidebar-text)] hover:bg-[var(--sidebar-bg-hover)] hover:text-[var(--text-primary)]",
+                  "flex items-center transition-all duration-300 ease-out group relative",
+                  isCollapsed 
+                    ? "justify-center w-11 h-11 rounded-xl mx-auto border" 
+                    : "px-3 py-2.5 gap-3 rounded-lg",
+                  isCollapsed
+                    ? isActive
+                      ? "bg-gradient-to-tr from-blue-600/15 via-blue-600/5 to-transparent text-blue-400 border-blue-500/25 shadow-[0_0_15px_rgba(59,130,246,0.1)] hover:scale-105"
+                      : "text-slate-400 hover:text-slate-100 hover:bg-slate-800/40 hover:border-slate-800/40 border-transparent hover:scale-105"
+                    : isActive
+                      ? "bg-[var(--sidebar-bg-active)] text-[var(--sidebar-text-active)] shadow-[inset_0_1px_1px_rgba(255,255,255,0.05)]"
+                      : "text-[var(--sidebar-text)] hover:bg-[var(--sidebar-bg-hover)] hover:text-[var(--text-primary)]",
                 )}
               >
-                {isActive && (
+                {isActive && !isCollapsed && (
                   <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 rounded-r-full shadow-[0_0_10px_var(--accent-primary)] bg-[var(--accent-primary)]" />
+                )}
+                {isActive && isCollapsed && (
+                  <div className="absolute -right-[12px] top-1/2 -translate-y-1/2 w-1.5 h-6 rounded-l-full bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.6)]" />
                 )}
 
                 <Icon
-                  className={cn("icon-base", isActive && "scale-110")}
+                  className={cn("icon-base shrink-0", isActive && "scale-115 transition-transform")}
                   style={{
                     color: isActive ? "var(--accent-primary)" : "inherit",
                   }}
@@ -275,16 +286,13 @@ const SidebarLayout = () => {
 
         {/* Expand Toggle (when collapsed) */}
         {isCollapsed && (
-          <div
-            className="p-0 flex justify-center border-t"
-            style={{ borderColor: "var(--border-subtle)" }}
-          >
+          <div className="py-2.5 flex justify-center border-t border-slate-900">
             <Button
               variant="ghost"
               onClick={() => setIsCollapsed(false)}
-              className="w-full"
+              className="w-10 h-10 rounded-full bg-blue-600/10 hover:bg-blue-600/20 border border-blue-500/25 text-blue-400 flex items-center justify-center shadow-lg transition-transform hover:scale-105 active:scale-95 duration-200"
             >
-              <ChevronRight className="icon-base" />
+              <ChevronRight className="w-5 h-5 animate-pulse" />
             </Button>
           </div>
         )}
@@ -292,16 +300,16 @@ const SidebarLayout = () => {
         {/* Footer Actions */}
         <div
           className={cn(
-            "p-4 border-t flex flex-col gap-2",
-            isCollapsed && "items-center px-2",
+            "p-4 border-t flex flex-col gap-2.5",
+            isCollapsed && "items-center px-2 py-4",
           )}
           style={{ borderColor: "var(--border-subtle)" }}
         >
           {isCollapsed ? (
             <CursorTooltip content="Help Center">
-              <Button variant="ghost" size="icon">
-                <HelpCircle className="icon-base" />
-              </Button>
+              <button className="w-10 h-10 rounded-xl bg-slate-900/60 hover:bg-slate-800/80 border border-slate-800/80 hover:border-slate-700 text-slate-400 hover:text-slate-100 flex items-center justify-center shadow-inner shadow-black/20 hover:scale-105 active:scale-95 transition-all duration-300">
+                <HelpCircle className="w-5 h-5" />
+              </button>
             </CursorTooltip>
           ) : (
             <button
@@ -321,14 +329,12 @@ const SidebarLayout = () => {
 
           {isCollapsed ? (
             <CursorTooltip content="Log out">
-              <Button
-                variant="ghost"
-                size="icon"
+              <button
                 onClick={() => setIsLogoutConfirmOpen(true)}
-                className="hover:!text-red-500 hover:!bg-red-500/10"
+                className="w-10 h-10 rounded-xl bg-red-950/20 hover:bg-red-500/15 border border-red-500/20 hover:border-red-500/40 text-red-400 hover:text-red-300 flex items-center justify-center hover:scale-105 active:scale-95 transition-all duration-300"
               >
-                <LogOut className="icon-base" />
-              </Button>
+                <LogOut className="w-4.5 h-4.5" />
+              </button>
             </CursorTooltip>
           ) : (
             <button
@@ -346,7 +352,7 @@ const SidebarLayout = () => {
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden relative">
         {/* Floating Header */}
-        <div className="absolute top-0 left-0 right-0 p-4 sm:p-6 z-30 pointer-events-none">
+        <div className="absolute top-0 left-0 right-0 p-2.5 sm:p-3.5 z-30 pointer-events-none">
           <header className="pointer-events-auto h-14 premium-header rounded-2xl flex items-center justify-between px-4 sm:px-6 transition-all">
             <div className="flex items-center gap-4">
               <Button
@@ -429,18 +435,7 @@ const SidebarLayout = () => {
                 )}
               </Button>
 
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => toast("No new notifications")}
-                className="hover:!text-blue-500 hover:!bg-blue-500/10 relative"
-              >
-                <Bell className="icon-md" />
-                <span
-                  className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border-2"
-                  style={{ borderColor: "var(--bg-surface)" }}
-                ></span>
-              </Button>
+              <NotificationPopover />
 
               <div
                 className="h-6 w-px hidden sm:block"
@@ -547,8 +542,8 @@ const SidebarLayout = () => {
         </div>
 
         {/* Page Content Container */}
-        <main className="flex-1 overflow-hidden pt-24 px-2 sm:px-4 pb-4">
-          <div className="h-[calc(100dvh-120px)] overflow-y-auto relative custom-scrollbar rounded-2xl bg-[var(--bg-base)]">
+        <main className="flex-1 overflow-hidden pt-20 px-2 sm:px-3 pb-2.5">
+          <div className="h-[calc(100dvh-98px)] overflow-y-auto relative custom-scrollbar rounded-2xl bg-[var(--bg-base)] border border-slate-900/60 shadow-[inset_0_1px_1px_rgba(255,255,255,0.02)]">
             <Outlet />
           </div>
         </main>

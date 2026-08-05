@@ -6,7 +6,16 @@
  */
 const express = require('express');
 const router = express.Router();
-const { getMentors, getMentorDetails, getActivity, searchUsers } = require('./user.controller');
+const { 
+    getMentors, 
+    getMentorDetails, 
+    getActivity, 
+    searchUsers, 
+    applyAsMentor, 
+    getMentorApplications, 
+    updateMentorApplicationStatus,
+    getMyMentorApplication
+} = require('./user.controller');
 const { authenticate } = require('../../middlewares/authMiddleware');
 
 // Optional auth for public mentor viewing
@@ -83,5 +92,11 @@ router.get('/mentors', optionalAuth, getMentors);
  *         description: Mentor details
  */
 router.get('/mentors/:id', optionalAuth, getMentorDetails);
+
+// Mentor Application Routes
+router.post('/apply-mentor', authenticate, applyAsMentor);
+router.get('/mentor-applications', authenticate, getMentorApplications);
+router.put('/mentor-applications/:id/status', authenticate, updateMentorApplicationStatus);
+router.get('/my-mentor-application', authenticate, getMyMentorApplication);
 
 module.exports = router;

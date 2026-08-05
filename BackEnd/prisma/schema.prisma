@@ -89,6 +89,8 @@ model User {
   // Password Reset
   passwordResetOtp PasswordResetOTP?
 
+  mentorApplications MentorApplication[]
+
   @@map("users")
 }
 
@@ -764,4 +766,18 @@ model ContactSubmission {
   updatedAt DateTime @updatedAt @map("updated_at")
 
   @@map("contact_submissions")
+}
+
+model MentorApplication {
+  id          Int      @id @default(autoincrement())
+  userId      Int      @map("user_id")
+  user        User     @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  bio         String   @db.Text
+  skills      String   @db.Text // Comma separated or description of skills
+  experience  String   @db.Text
+  status      String   @default("PENDING") // PENDING, APPROVED, REJECTED
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@map("mentor_applications")
 }

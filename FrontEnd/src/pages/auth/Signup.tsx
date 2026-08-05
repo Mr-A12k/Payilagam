@@ -253,19 +253,19 @@ const Signup = () => {
                       </div>
                       <span className="text-xs font-medium text-slate-400 group-hover:text-slate-300 transition-colors leading-relaxed">
                         I agree to the{" "}
-                        <a
-                          href="#"
+                        <Link
+                          to="/terms"
                           className="text-blue-400 hover:text-blue-300 underline decoration-blue-500/30 underline-offset-2"
                         >
                           Terms of Service
-                        </a>{" "}
+                        </Link>{" "}
                         and{" "}
-                        <a
-                          href="#"
+                        <Link
+                          to="/terms"
                           className="text-blue-400 hover:text-blue-300 underline decoration-blue-500/30 underline-offset-2"
                         >
                           Privacy Policy
-                        </a>
+                        </Link>
                       </span>
                     </label>
                   </div>

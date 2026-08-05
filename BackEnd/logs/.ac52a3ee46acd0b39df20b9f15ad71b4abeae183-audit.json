@@ -9,6 +9,11 @@
             "date": 1785858384328,
             "name": "D:\\TaskPro\\BackEnd\\logs\\error-2026-08-04.log",
             "hash": "76fa862e8a0781cb97d26f760e069baa547047ea1862456f8181286b7fc00084"
+        },
+        {
+            "date": 1785894391679,
+            "name": "D:\\TaskPro\\BackEnd\\logs\\error-2026-08-05.log",
+            "hash": "cc9f305363f782c2de8b0e80bcdf40913ab9eb90d53c9f8a1256253225a8b381"
         }
     ],
     "hashType": "sha256"

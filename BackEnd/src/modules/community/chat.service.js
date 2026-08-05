@@ -226,6 +226,70 @@ const markMessagesAsRead = async (messageIds) => {
   });
 };
 
+const createWorkspace = async (name, description, ownerId) => {
+  return await prisma.workspace.create({
+    data: {
+      name,
+      description,
+      ownerId,
+      channels: {
+        create: [
+          { name: "general", description: "General discussion channel" },
+          { name: "announcements", description: "Important announcements" }
+        ]
+      },
+      members: {
+        create: {
+          userId: ownerId
+        }
+      }
+    },
+    include: {
+      channels: true,
+      members: true
+    }
+  });
+};
+
+const updateWorkspace = async (workspaceId, name, description, userId, role) => {
+  const workspace = await prisma.workspace.findUnique({
+    where: { workspaceId }
+  });
+  if (!workspace) throw new Error("Workspace not found");
+  if (workspace.ownerId !== userId && role !== "admin") {
+    throw new Error("You are not authorized to edit this group");
+  }
+
+  return await prisma.workspace.update({
+    where: { workspaceId },
+    data: { name, description },
+    include: { channels: true }
+  });
+};
+
+const addWorkspaceMember = async (workspaceId, userId) => {
+  const workspace = await prisma.workspace.findUnique({
+    where: { workspaceId }
+  });
+  if (!workspace) throw new Error("Workspace not found");
+
+  const targetUser = await prisma.user.findUnique({
+    where: { userId }
+  });
+  if (!targetUser) throw new Error("User not found");
+
+  const existing = await prisma.workspaceMember.findUnique({
+    where: {
+      workspaceId_userId: { workspaceId, userId }
+    }
+  });
+  if (existing) return existing;
+
+  return await prisma.workspaceMember.create({
+    data: { workspaceId, userId }
+  });
+};
+
 module.exports = {
   getOrCreateConversation,
   getConversations,
@@ -235,4 +299,7 @@ module.exports = {
   getChannelMessages,
   sendChannelMessage,
   markMessagesAsRead,
+  createWorkspace,
+  updateWorkspace,
+  addWorkspaceMember,
 };
