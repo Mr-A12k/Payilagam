@@ -1,0 +1,7 @@
+{
+  "typescript.tsserver.experimental.enableProjectDiagnostics": true,
+  "typescript.tsdk": "FrontEnd/node_modules/typescript/lib",
+  "typescript.validate.enable": true,
+  "typescript.preferences.includePackageJsonAutoImports": "auto",
+  "javascript.validate.enable": true
+}

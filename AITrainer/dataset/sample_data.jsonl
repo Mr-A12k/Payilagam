@@ -1,0 +1,10 @@
+{"text": "Q: How do you declare an integer variable in Java?\nA: You declare an integer in Java using the 'int' keyword, followed by the variable name. For example: int myNumber = 5;"}
+{"text": "Q: Write a Python function to add two numbers.\nA: def add(a, b):\n    return a + b\n"}
+{"text": "Q: What is a string in C++?\nA: In C++, a string is an object that represents a sequence of characters. It is part of the Standard Template Library (STL)."}
+{"text": "Q: Explain a for loop in JavaScript.\nA: A for loop repeats a block of code a specific number of times. Example: for (let i = 0; i < 5; i++) { console.log(i); }"}
+{"text": "Q: How do you print text to the console in Python?\nA: You use the print() function. For example: print('Hello, World!')"}
+{"text": "Q: What is recursion?\nA: Recursion is a programming technique where a function calls itself to solve smaller instances of the same problem, until it reaches a base case."}
+{"text": "Q: Write a Java method to check if a number is even.\nA: public boolean isEven(int n) {\n    return n % 2 == 0;\n}"}
+{"text": "Q: What does CSS stand for?\nA: CSS stands for Cascading Style Sheets. It is used for describing the presentation of a document written in HTML."}
+{"text": "Q: How do you create an array in JavaScript?\nA: You can create an array using square brackets. For example: let fruits = ['apple', 'banana', 'cherry'];"}
+{"text": "Q: What is an interface in Java?\nA: An interface in Java is a completely abstract class that is used to group related methods with empty bodies."}

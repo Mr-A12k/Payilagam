@@ -1,0 +1,80 @@
+[2026-08-04 21:34:37] ERROR: GET /chat - Not Found - /chat 
+Error: Not Found - /chat
+    at notFound (D:\TaskPro\BackEnd\src\middlewares\errorMiddleware.js:8:17)
+    at Layer.handleRequest (D:\TaskPro\BackEnd\node_modules\router\lib\layer.js:152:17)
+    at trimPrefix (D:\TaskPro\BackEnd\node_modules\router\index.js:342:13)
+    at D:\TaskPro\BackEnd\node_modules\router\index.js:297:9
+    at processParams (D:\TaskPro\BackEnd\node_modules\router\index.js:582:12)
+    at next (D:\TaskPro\BackEnd\node_modules\router\index.js:291:5)
+    at read (D:\TaskPro\BackEnd\node_modules\body-parser\lib\read.js:53:5)
+    at jsonParser (D:\TaskPro\BackEnd\node_modules\body-parser\lib\types\json.js:60:5)
+    at Layer.handleRequest (D:\TaskPro\BackEnd\node_modules\router\lib\layer.js:152:17)
+    at trimPrefix (D:\TaskPro\BackEnd\node_modules\router\index.js:342:13)
+[2026-08-04 21:34:49] ERROR: POST /chat - Not Found - /chat 
+Error: Not Found - /chat
+    at notFound (D:\TaskPro\BackEnd\src\middlewares\errorMiddleware.js:8:17)
+    at Layer.handleRequest (D:\TaskPro\BackEnd\node_modules\router\lib\layer.js:152:17)
+    at trimPrefix (D:\TaskPro\BackEnd\node_modules\router\index.js:342:13)
+    at D:\TaskPro\BackEnd\node_modules\router\index.js:297:9
+    at processParams (D:\TaskPro\BackEnd\node_modules\router\index.js:582:12)
+    at next (D:\TaskPro\BackEnd\node_modules\router\index.js:291:5)
+    at read (D:\TaskPro\BackEnd\node_modules\body-parser\lib\read.js:62:5)
+    at jsonParser (D:\TaskPro\BackEnd\node_modules\body-parser\lib\types\json.js:60:5)
+    at Layer.handleRequest (D:\TaskPro\BackEnd\node_modules\router\lib\layer.js:152:17)
+    at trimPrefix (D:\TaskPro\BackEnd\node_modules\router\index.js:342:13)
+[2026-08-04 21:34:51] ERROR: POST /chat - Not Found - /chat 
+Error: Not Found - /chat
+    at notFound (D:\TaskPro\BackEnd\src\middlewares\errorMiddleware.js:8:17)
+    at Layer.handleRequest (D:\TaskPro\BackEnd\node_modules\router\lib\layer.js:152:17)
+    at trimPrefix (D:\TaskPro\BackEnd\node_modules\router\index.js:342:13)
+    at D:\TaskPro\BackEnd\node_modules\router\index.js:297:9
+    at processParams (D:\TaskPro\BackEnd\node_modules\router\index.js:582:12)
+    at next (D:\TaskPro\BackEnd\node_modules\router\index.js:291:5)
+    at read (D:\TaskPro\BackEnd\node_modules\body-parser\lib\read.js:62:5)
+    at jsonParser (D:\TaskPro\BackEnd\node_modules\body-parser\lib\types\json.js:60:5)
+    at Layer.handleRequest (D:\TaskPro\BackEnd\node_modules\router\lib\layer.js:152:17)
+    at trimPrefix (D:\TaskPro\BackEnd\node_modules\router\index.js:342:13)
+[2026-08-04 21:37:02] ERROR: GET /admin/users/1 - Not Found - /admin/users/1 
+Error: Not Found - /admin/users/1
+    at notFound (D:\TaskPro\BackEnd\src\middlewares\errorMiddleware.js:8:17)
+    at Layer.handleRequest (D:\TaskPro\BackEnd\node_modules\router\lib\layer.js:152:17)
+    at trimPrefix (D:\TaskPro\BackEnd\node_modules\router\index.js:342:13)
+    at D:\TaskPro\BackEnd\node_modules\router\index.js:297:9
+    at processParams (D:\TaskPro\BackEnd\node_modules\router\index.js:582:12)
+    at next (D:\TaskPro\BackEnd\node_modules\router\index.js:291:5)
+    at read (D:\TaskPro\BackEnd\node_modules\body-parser\lib\read.js:53:5)
+    at jsonParser (D:\TaskPro\BackEnd\node_modules\body-parser\lib\types\json.js:60:5)
+    at Layer.handleRequest (D:\TaskPro\BackEnd\node_modules\router\lib\layer.js:152:17)
+    at trimPrefix (D:\TaskPro\BackEnd\node_modules\router\index.js:342:13)
+[2026-08-04 22:14:55] ERROR: POST /api/auth/login - Invalid email or password 
+Error: Invalid email or password
+    at Object.loginUser (D:\TaskPro\BackEnd\src\modules\auth\auth.service.js:145:11)
+    at async D:\TaskPro\BackEnd\src\modules\auth\auth.controller.js:15:18
+[2026-08-04 22:14:58] ERROR: POST /api/auth/login - Invalid email or password 
+Error: Invalid email or password
+    at Object.loginUser (D:\TaskPro\BackEnd\src\modules\auth\auth.service.js:145:11)
+    at async D:\TaskPro\BackEnd\src\modules\auth\auth.controller.js:15:18
+[2026-08-04 22:15:01] ERROR: POST /api/auth/login - Invalid email or password 
+Error: Invalid email or password
+    at Object.loginUser (D:\TaskPro\BackEnd\src\modules\auth\auth.service.js:145:11)
+    at async D:\TaskPro\BackEnd\src\modules\auth\auth.controller.js:15:18
+[2026-08-04 22:17:56] ERROR: POST /api/auth/login - Invalid email or password 
+Error: Invalid email or password
+    at Object.loginUser (D:\TaskPro\BackEnd\src\modules\auth\auth.service.js:145:11)
+    at async D:\TaskPro\BackEnd\src\modules\auth\auth.controller.js:15:18
+[2026-08-04 22:18:01] ERROR: POST /api/auth/login - Invalid email or password 
+Error: Invalid email or password
+    at Object.loginUser (D:\TaskPro\BackEnd\src\modules\auth\auth.service.js:145:11)
+    at async D:\TaskPro\BackEnd\src\modules\auth\auth.controller.js:15:18
+[2026-08-04 22:18:46] ERROR: POST /api/auth/login - Invalid email or password 
+Error: Invalid email or password
+    at Object.loginUser (D:\TaskPro\BackEnd\src\modules\auth\auth.service.js:145:11)
+    at async D:\TaskPro\BackEnd\src\modules\auth\auth.controller.js:15:18
+[2026-08-04 22:19:57] ERROR: POST /api/auth/login - Invalid email or password 
+Error: Invalid email or password
+    at Object.loginUser (D:\TaskPro\BackEnd\src\modules\auth\auth.service.js:145:11)
+    at async D:\TaskPro\BackEnd\src\modules\auth\auth.controller.js:15:18
+[2026-08-04 22:21:17] ERROR: POST /api/auth/login - Invalid email or password 
+Error: Invalid email or password
+    at Object.loginUser (D:\TaskPro\BackEnd\src\modules\auth\auth.service.js:145:11)
+    at async D:\TaskPro\BackEnd\src\modules\auth\auth.controller.js:15:18

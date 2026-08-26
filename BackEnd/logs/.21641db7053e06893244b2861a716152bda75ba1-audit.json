@@ -1,0 +1,25 @@
+{
+    "keep": {
+        "days": true,
+        "amount": 14
+    },
+    "auditLog": "D:\\TaskPro\\BackEnd\\logs\\.21641db7053e06893244b2861a716152bda75ba1-audit.json",
+    "files": [
+        {
+            "date": 1785858384333,
+            "name": "D:\\TaskPro\\BackEnd\\logs\\combined-2026-08-04.log",
+            "hash": "dc58611ca028fefa5c2ea7afddcf2c91bd34759c9c4b46d37e1add3f001c8e64"
+        },
+        {
+            "date": 1785894391686,
+            "name": "D:\\TaskPro\\BackEnd\\logs\\combined-2026-08-05.log",
+            "hash": "a0640bea50a2e718426f23d851aacff52146a318c972d038eddd7f642fa4b930"
+        },
+        {
+            "date": 1785982305608,
+            "name": "D:\\TaskPro\\BackEnd\\logs\\combined-2026-08-06.log",
+            "hash": "eee40632b32741d59a5ac802db3342489c4a55db96cbbb649edb65a22d33b8a4"
+        }
+    ],
+    "hashType": "sha256"
+}
