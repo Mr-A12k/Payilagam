@@ -24,11 +24,11 @@ import {
 import {
   Dialog,
   DialogContent,
-  DialogHeader,
+  // DialogHeader,
   DialogTitle,
   DialogTrigger,
   Input,
-  Label,
+  // Label,
   Button,
 } from "@/components/ui";
 

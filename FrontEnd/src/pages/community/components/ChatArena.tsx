@@ -3,7 +3,7 @@ import {
   Hash, Users, PhoneCall, Video, Search, Info,
   MoreHorizontal, Pencil, Trash2, CheckCheck, Check, Sparkles,
 } from "lucide-react";
-import { Avatar, ConfirmDialog } from "@/components/ui";
+import {  ConfirmDialog } from "@/components/ui";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem,
   DropdownMenuSeparator, DropdownMenuTrigger,

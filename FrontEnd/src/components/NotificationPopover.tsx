@@ -1,8 +1,8 @@
-import React, { useState, useRef, useEffect } from "react";
+import  { useState, useRef, useEffect } from "react";
 import { Bell, BellOff, CheckCircle2, MessageSquare } from "lucide-react";
 import { useSocketContext } from "@/context/SocketContext";
 import { Link } from "react-router-dom";
-import { Button } from "./ui/Button";
+// import { Button } from "./ui/Button";
 
 const NotificationPopover = () => {
   const [isOpen, setIsOpen] = useState(false);

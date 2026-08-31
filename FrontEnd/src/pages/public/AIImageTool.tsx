@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { Upload, Image as ImageIcon, Shield, Eraser, CheckCircle2, AlertTriangle, Download, Loader2 } from 'lucide-react';
+import { Upload, Image as ImageIcon, Shield, Eraser, CheckCircle2, AlertTriangle, Loader2 } from 'lucide-react';
 import { Card } from '@/components/ui';
 import toast from "react-hot-toast";
 

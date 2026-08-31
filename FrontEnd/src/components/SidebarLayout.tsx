@@ -21,7 +21,7 @@ import {
   GraduationCap,
   Users,
   Menu,
-  Bell,
+  // Bell,
   Search,
   Plus,
   MessageCircle,
@@ -45,7 +45,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Avatar as AvatarComponent, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+// import { Avatar as AvatarComponent, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import NotificationPopover from "./NotificationPopover";
 import { useTheme } from "@/context/ThemeContext";
 
