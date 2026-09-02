@@ -5,9 +5,9 @@ const options = {
   definition: {
     openapi: "3.0.0",
     info: {
-      title: "Payilagam API",
+      title: "Karkalam API",
       version: "1.0.0",
-      description: "API documentation for the TaskPro Backend.",
+      description: "API documentation for the Karkalam (கற்களம்) Backend.",
     },
     servers: [
       {

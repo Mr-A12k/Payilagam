@@ -14,9 +14,24 @@ const getOnlineUserIds = () => {
 };
 
 const initializeSocket = (server) => {
+  const allowedOrigins = (process.env.FRONTEND_URL || "http://localhost:5173,http://localhost:3000")
+    .split(",")
+    .map((url) => url.trim().replace(/\/$/, ""));
+
   io = new Server(server, {
     cors: {
-      origin: process.env.FRONTEND_URL || "http://localhost:5173",
+      origin: (origin, callback) => {
+        if (!origin) return callback(null, true);
+        const cleanOrigin = origin.replace(/\/$/, "");
+        if (
+          allowedOrigins.includes("*") ||
+          allowedOrigins.includes(cleanOrigin) ||
+          (allowedOrigins.some((url) => url.includes(".vercel.app")) && cleanOrigin.endsWith(".vercel.app"))
+        ) {
+          return callback(null, true);
+        }
+        return callback(null, true);
+      },
       methods: ["GET", "POST"],
       credentials: true,
     },

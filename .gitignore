@@ -1,9 +1,14 @@
 # Dependencies
 node_modules/
+**/node_modules/
 
-# Environment variables
-.env
-.env.*
+# Environment variables (matches root and any subfolder)
+**/.env
+**/.env.*
+**/.env.local
+**/.env.development
+**/.env.production
+!**/.env.example
 
 # Prisma
 prisma/dev.db
@@ -11,12 +16,15 @@ prisma/dev.db-journal
 
 # Logs
 logs/
+**/logs/
 *.log
 npm-debug.log*
 
 # Build output
 dist/
+**/dist/
 build/
+**/build/
 
 # OS files
 .DS_Store

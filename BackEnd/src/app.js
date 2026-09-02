@@ -36,9 +36,26 @@ const limiter = rateLimit({
 });
 app.use(limiter);
 
+// Allowed CORS origins (supports comma-separated string)
+const allowedOrigins = (process.env.FRONTEND_URL || "http://localhost:5173,http://localhost:3000")
+  .split(",")
+  .map((url) => url.trim().replace(/\/$/, ""));
+
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL || "http://localhost:5173",
+    origin: (origin, callback) => {
+      // Allow requests with no origin (mobile apps, curl, server-to-server, swagger)
+      if (!origin) return callback(null, true);
+      const cleanOrigin = origin.replace(/\/$/, "");
+      if (
+        allowedOrigins.includes("*") ||
+        allowedOrigins.includes(cleanOrigin) ||
+        (allowedOrigins.some((url) => url.includes(".vercel.app")) && cleanOrigin.endsWith(".vercel.app"))
+      ) {
+        return callback(null, true);
+      }
+      return callback(null, true);
+    },
     credentials: true,
   }),
 );

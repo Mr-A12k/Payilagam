@@ -15,7 +15,7 @@ import {
   HeartHandshake,
   TerminalSquare,
 } from "lucide-react";
-import PayilagamLogo from "@/components/ui/PayilagamLogo";
+import KarkalamLogo from "@/components/ui/KarkalamLogo";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 // import { Input } from "@/components/ui/Input";
@@ -51,8 +51,8 @@ const Home = () => {
             <span>Redefining Tech Education. Open Source.</span>
           </div>
 
-          <h1 className="text-5xl md:text-7xl lg:text-8xl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-b from-white via-slate-200 to-slate-500 mb-6 drop-shadow-sm">
-            Payilagam
+          <h1 className="text-5xl md:text-7xl lg:text-8xl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-b from-white via-cyan-200 to-blue-500 mb-6 drop-shadow-sm">
+            Karkalam
           </h1>
 
           <p className="max-w-3xl text-xl md:text-3xl font-medium text-slate-300 mb-6 leading-tight">
@@ -308,12 +308,12 @@ const Home = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12 mb-16">
             <div className="lg:col-span-2">
               <div className="flex items-center gap-3 text-white mb-6">
-                <PayilagamLogo
+                <KarkalamLogo
                   size={40}
                   className="drop-shadow-[0_0_8px_rgba(59,130,246,0.5)] shrink-0"
                 />
-                <span className="font-extrabold text-2xl tracking-tight">
-                  Payilagam
+                <span className="font-extrabold text-2xl tracking-tight bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
+                  Karkalam
                 </span>
               </div>
               <p className="text-slate-400 text-sm leading-relaxed mb-8 max-w-sm">
@@ -472,7 +472,7 @@ const Home = () => {
 
           <div className="border-t border-slate-800/50 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
             <p className="text-slate-500 text-sm">
-              © {new Date().getFullYear()} Payilagam. Open-source learning for
+              © {new Date().getFullYear()} Karkalam. Open-source learning for
               students.
             </p>
             <div className="flex gap-6 text-sm text-slate-500">

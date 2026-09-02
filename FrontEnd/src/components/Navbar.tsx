@@ -14,7 +14,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { X, ChevronDown, ChevronRight } from "lucide-react";
 import { Button, Avatar } from "@/components/ui";
-import PayilagamLogo from "@/components/ui/PayilagamLogo";
+import KarkalamLogo from "@/components/ui/KarkalamLogo";
 import NotificationPopover from "./NotificationPopover";
 import { useSelector } from "react-redux";
 
@@ -189,14 +189,14 @@ const Navbar = () => {
           <Link
             to="/"
             className="flex items-center gap-2.5 group shrink-0"
-            aria-label="Payilagam Home"
+            aria-label="Karkalam Home"
           >
-            <PayilagamLogo
+            <KarkalamLogo
               size={36}
               className="transition-transform duration-200 group-hover:scale-105 drop-shadow-[0_0_8px_rgba(14,165,233,0.5)]"
             />
             <span className="font-bold text-xl tracking-tight text-slate-200 group-hover:text-sky-300 transition-colors duration-200">
-              Payilagam
+              Karkalam
             </span>
           </Link>
 
@@ -356,14 +356,14 @@ const Navbar = () => {
             to="/"
             className="flex items-center gap-2 group"
             onClick={closeMobile}
-            aria-label="Payilagam Home"
+            aria-label="Karkalam Home"
           >
-            <PayilagamLogo
+            <KarkalamLogo
               size={30}
               className="drop-shadow-[0_0_8px_rgba(14,165,233,0.5)] group-hover:scale-105 transition-transform"
             />
             <span className="font-bold text-lg text-slate-200 group-hover:text-sky-300 transition-colors">
-              Payilagam
+              Karkalam
             </span>
           </Link>
           <button

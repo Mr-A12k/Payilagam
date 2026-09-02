@@ -18,7 +18,6 @@ import {
   Settings,
   HelpCircle,
   LogOut,
-  GraduationCap,
   Users,
   Menu,
   // Bell,
@@ -35,6 +34,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Avatar, Button } from "@/components/ui";
+import KarkalamLogo from "@/components/ui/KarkalamLogo";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { CursorTooltip } from "@/components/ui/CursorTooltip";
 import {
@@ -161,30 +161,14 @@ const SidebarLayout = () => {
           style={{ borderColor: "var(--border-subtle)" }}
         >
           <div className="flex items-center gap-3">
-            <div className={cn("shrink-0 flex items-center justify-center", isCollapsed ? "w-9 h-9 bg-slate-900/60 border border-slate-800/80 rounded-xl hover:rotate-12 hover:scale-105 shadow-inner shadow-black/30 transition-all duration-500" : "w-8 h-8")}>
-              <img
-                src="https://payilagam.com/wp-content/uploads/2016/09/payilagam-logo.png"
-                alt="Payilagam Logo"
-                className={cn("object-contain", isCollapsed ? "w-5.5 h-5.5" : "w-full h-full")}
-                onError={(e: any) => {
-                  e.target.onerror = null; // prevent infinite loop
-                  (e.target as HTMLTextAreaElement).style.display = "none";
-                  e.target.nextSibling.style.display = "flex";
-                }}
-              />
-              <div
-                style={{ display: "none" }}
-                className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 items-center justify-center shadow-lg shadow-blue-500/20 shrink-0"
-              >
-                <GraduationCap className="w-5 h-5 text-white" />
-              </div>
+            <div className={cn("shrink-0 flex items-center justify-center transition-transform hover:scale-105", isCollapsed ? "w-9 h-9" : "w-8 h-8")}>
+              <KarkalamLogo size={isCollapsed ? 32 : 30} />
             </div>
             {!isCollapsed && (
               <span
-                className="font-bold text-[15px] tracking-tight"
-                style={{ color: "var(--text-heading)" }}
+                className="font-bold text-[16px] tracking-tight bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent"
               >
-                Payilagam
+                Karkalam
               </span>
             )}
           </div>
