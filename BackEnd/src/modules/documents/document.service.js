@@ -1,7 +1,6 @@
-const { PrismaClient } = require("@prisma/client");
-const prisma = new PrismaClient();
+const prisma = require('../../config/prisma');
 const fs = require("fs");
-const pdfParse = require("pdf-parse");
+const { PDFParse } = require("pdf-parse");
 const { RecursiveCharacterTextSplitter } = require("@langchain/textsplitters");
 const { RedisVectorStore } = require("@langchain/redis");
 const { createClient } = require("redis");
@@ -16,13 +15,30 @@ const embeddings = new OllamaEmbeddings({
   model: "nomic-embed-text",
   baseUrl: process.env.OLLAMA_BASE_URL || "http://localhost:11434",
 });
+const redisClient = () => {
+  const client = createClient({ url: REDIS_URL, socket: { connectTimeout: 2000, reconnectStrategy: false } });
+  client.on('error', error => console.error('Document index connection failed:', error.message));
+  return client;
+};
 
 exports.uploadDocument = async (uploaderId, file, title, topic) => {
+  if (typeof title !== 'string' || !title.trim()) {
+    throw Object.assign(new Error('Title is required.'), { statusCode: 400 });
+  }
+  const parser = new PDFParse({ data: await fs.promises.readFile(file.path) });
+  try {
+    const info = await parser.getInfo();
+    if (!info.total) throw new Error('No PDF pages');
+  } catch {
+    throw Object.assign(new Error('Please upload a valid, readable PDF.'), { statusCode: 400 });
+  } finally {
+    await parser.destroy();
+  }
   // 1. Create DB Record
   const fileUrl = `/uploads/documents/${file.filename}`;
   const newDoc = await prisma.eduDocument.create({
     data: {
-      title,
+      title: title.trim(),
       topic,
       fileUrl,
       sizeBytes: file.size,
@@ -40,13 +56,15 @@ exports.uploadDocument = async (uploaderId, file, title, topic) => {
 };
 
 exports.processDocument = async (docId, filePath, topic) => {
+  const client = redisClient();
   try {
-    const client = createClient({ url: REDIS_URL });
-    await client.connect();
     // 1. Extract Text
     const dataBuffer = fs.readFileSync(filePath);
-    const data = await pdfParse(dataBuffer);
+    const parser = new PDFParse({ data: dataBuffer });
+    let data;
+    try { data = await parser.getText(); } finally { await parser.destroy(); }
     const text = data.text;
+    await client.connect();
 
     // 2. Split Text
     const splitter = new RecursiveCharacterTextSplitter({
@@ -77,7 +95,6 @@ exports.processDocument = async (docId, filePath, topic) => {
       });
     }
 
-    await client.disconnect();
 
     // 5. Mark as processed
     await prisma.eduDocument.update({
@@ -89,6 +106,8 @@ exports.processDocument = async (docId, filePath, topic) => {
   } catch (error) {
     console.error(`Error processing document ${docId}:`, error);
     throw error;
+  } finally {
+    if (client.isOpen) client.destroy();
   }
 };
 
@@ -103,11 +122,15 @@ exports.getAllDocuments = async () => {
   });
 };
 
-exports.deleteDocument = async (docId) => {
+exports.deleteDocument = async (docId, actor) => {
+  if (!/^\d+$/.test(String(docId)) || Number(docId) > 2147483647) throw Object.assign(new Error('Invalid document ID'), { statusCode: 400 });
   const doc = await prisma.eduDocument.findUnique({
     where: { id: parseInt(docId) },
   });
-  if (!doc) throw new Error("Document not found");
+  if (!doc) throw Object.assign(new Error("Document not found"), { statusCode: 404 });
+  if (!actor || (!['admin', 'mentor'].includes(actor.role) && Number(actor.userId) !== doc.uploaderId)) {
+    throw Object.assign(new Error('You can only delete your own documents.'), { statusCode: 403 });
+  }
 
   // Remove from DB
   await prisma.eduDocument.delete({ where: { id: parseInt(docId) } });
@@ -119,8 +142,8 @@ exports.deleteDocument = async (docId) => {
   }
 
   // Attempt to remove from Redis if configured
+  const client = redisClient();
   try {
-    const client = createClient({ url: REDIS_URL });
     await client.connect();
 
     // Find all keys starting with the prefix for this docId
@@ -131,9 +154,10 @@ exports.deleteDocument = async (docId) => {
         `Deleted ${keys.length} vector chunks for document ${docId} from Redis`,
       );
     }
-    await client.disconnect();
   } catch (error) {
     console.error("Failed to delete vectors from Redis:", error);
+  } finally {
+    if (client.isOpen) client.destroy();
   }
 
   return true;

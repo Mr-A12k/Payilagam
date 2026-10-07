@@ -12,7 +12,8 @@ const register = catchAsync(async (request, response) => {
 const login = catchAsync(async (request, response) => {
   const { email, userId, userName, identifier, password } = request.body;
   const loginId = identifier || email || userId || userName;
-  const result = await authService.loginUser(loginId, password);
+  if (typeof loginId !== 'string' && typeof loginId !== 'number') return error(response, 'Login identifier is required', 400);
+  const result = await authService.loginUser(String(loginId).trim(), password);
   return success(response, result, "Login successful");
 });
 
@@ -50,9 +51,7 @@ const deleteAvatar = catchAsync(async (request, response) => {
 
   if (userProfile.profileUrl) {
     const filename = path.basename(userProfile.profileUrl);
-    const storagePath = process.env.RESOURCE_STORAGE_PATH
-      ? path.join(process.env.RESOURCE_STORAGE_PATH, "avatars")
-      : path.join(__dirname, "../../resources/avatars");
+    const storagePath = path.join(require('../../config/storage').resourceStoragePath, "avatars");
 
     const filePath = path.join(storagePath, filename);
     if (fs.existsSync(filePath)) {

@@ -6,14 +6,24 @@
     "auditLog": "D:\\TaskPro\\BackEnd\\logs\\.ac52a3ee46acd0b39df20b9f15ad71b4abeae183-audit.json",
     "files": [
         {
-            "date": 1785858384328,
-            "name": "D:\\TaskPro\\BackEnd\\logs\\error-2026-08-04.log",
-            "hash": "76fa862e8a0781cb97d26f760e069baa547047ea1862456f8181286b7fc00084"
+            "date": 1790844820511,
+            "name": "D:\\TaskPro\\BackEnd\\logs\\error-2026-10-01.log",
+            "hash": "b84e7805ed38288e5eda2c2339133528340be6337110cf205829f3bd830bd9b4"
         },
         {
-            "date": 1785894391679,
-            "name": "D:\\TaskPro\\BackEnd\\logs\\error-2026-08-05.log",
-            "hash": "cc9f305363f782c2de8b0e80bcdf40913ab9eb90d53c9f8a1256253225a8b381"
+            "date": 1790906234679,
+            "name": "D:\\TaskPro\\BackEnd\\logs\\error-2026-10-02.log",
+            "hash": "f4e0e3fb9180c03105b00d65f0465611a65ed25f6a2f291f27cf8f237d5537cf"
+        },
+        {
+            "date": 1790997977787,
+            "name": "D:\\TaskPro\\BackEnd\\logs\\error-2026-10-03.log",
+            "hash": "71817dd15c5d37c4590675d584e1f822e6db138735122706dda91fc9770f9376"
+        },
+        {
+            "date": 1791385618045,
+            "name": "D:\\TaskPro\\BackEnd\\logs\\error-2026-10-07.log",
+            "hash": "c9c3c30b0993e7a4ad998ba31a8e323acd8c6a6e025f13b2a8116ed79e0c475c"
         }
     ],
     "hashType": "sha256"

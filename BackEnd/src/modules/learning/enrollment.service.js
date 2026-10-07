@@ -1,4 +1,5 @@
 const prisma = require("../../config/prisma");
+const { services, fail } = require('./validation');
 const {
   getPaginationParams,
   getPaginationMeta,
@@ -104,10 +105,13 @@ const unenrollStudent = async (studentId, courseIdentifier) => {
     throw new Error("Enrollment not found");
   }
 
-  await prisma.enrollment.delete({
+  await prisma.$transaction(async (tx) => {
+  await tx.lessonProgress.deleteMany({ where: { studentId: Number(studentId), lesson: { module: { courseId: course.courseId } } } });
+  await tx.enrollment.delete({
     where: {
       enrollmentId: enrollment.enrollmentId,
     },
+  });
   });
 
   return { message: "Successfully unenrolled from the course" };
@@ -159,11 +163,14 @@ const getStudentEnrollments = async (studentId, query) => {
 /**
  * Get paginated list of students enrolled in a course (for mentor/admin)
  */
-const getCourseEnrollments = async (courseIdentifier, query) => {
+const getCourseEnrollments = async (courseIdentifier, query, user) => {
   const course = await prisma.course.findUnique({
     where: resolveCourseWhere(courseIdentifier),
   });
   if (!course) throw new Error("Course not found");
+  if (!user || user.role !== 'admin' && course.mentorId !== user.userId) {
+    throw Object.assign(new Error('You can only view students in your own courses'), { statusCode: 403 });
+  }
   const courseId = course.courseId;
 
   const { page, limit, skip, take } = getPaginationParams(query);
@@ -223,12 +230,13 @@ const checkEnrollment = async (studentId, courseIdentifier) => {
 /**
  * Get enrollment statistics for a course
  */
-const getEnrollmentStats = async (courseIdentifier) => {
+const getEnrollmentStats = async (courseIdentifier, user) => {
   const course = await prisma.course.findUnique({
     where: resolveCourseWhere(courseIdentifier),
   });
   if (!course) throw new Error("Course not found");
   const cid = course.courseId;
+  if (!user || user.role !== 'admin' && course.mentorId !== user.userId) fail('Not authorized to view enrollment stats', 403);
 
   const [total, completed, active, dropped] = await Promise.all([
     prisma.enrollment.count({ where: { courseId: cid } }),
@@ -240,11 +248,11 @@ const getEnrollmentStats = async (courseIdentifier) => {
   return { courseId: cid, total, completed, active, dropped };
 };
 
-module.exports = {
+module.exports = services({
   enrollStudent,
   unenrollStudent,
   getStudentEnrollments,
   getCourseEnrollments,
   checkEnrollment,
   getEnrollmentStats,
-};
+});

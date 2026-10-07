@@ -1,0 +1,88 @@
+require('dotenv').config();
+const assert = require('node:assert/strict');
+const prisma = require('../src/config/prisma');
+const jwt = require('jsonwebtoken');
+const prefix = `qa-network-${Date.now()}`;
+const users = {};
+const tokens = {};
+let passed = 0;
+async function request(who, method, path, body, expected = 200) {
+  const response = await fetch('http://localhost:5005/api' + path, { method, headers: { ...(tokens[who] ? { Authorization: `Bearer ${tokens[who]}` } : {}), ...(body ? { 'Content-Type': 'application/json' } : {}) }, body: body ? JSON.stringify(body) : undefined });
+  const result = await response.json();
+  assert.equal(response.status, expected, `${method} ${path}: ${result.message}`);
+  passed++;
+  console.log(`PASS ${method} ${path} (${expected})`);
+  return result.data;
+}
+async function run() {
+  const role = await prisma.role.findUnique({ where: { roleName: 'student' } });
+  for (const name of ['a', 'b', 'c']) {
+    users[name] = await prisma.user.create({ data: { userName: `${prefix}-${name}`, fullName: `QA Network ${name}`, email: `${prefix}-${name}@example.com`, mobile: `${prefix}-${name}`, password: await require('bcryptjs').hash('QA-test-password', 10), roleId: role.roleId } });
+    tokens[name] = jwt.sign({ userId: users[name].userId }, process.env.JWT_SECRET, { expiresIn: '10m' });
+  }
+  const target = { targetId: users.b.userId };
+  for (const path of ['/follows/followers', '/follows/following', '/follows/requests/pending', '/follows/requests/sent']) await request(null, 'GET', path, undefined, 401);
+  await request(null, 'POST', '/follows/request', target, 401);
+  for (const targetId of [undefined, 'abc', '1abc', -1, 0, 1.5, 2147483648]) await request('a', 'POST', '/follows/request', { targetId }, 400);
+  await request('a', 'POST', '/follows/request', { targetId: users.a.userId }, 400);
+  await request('a', 'POST', '/follows/request', { targetId: 99999999 }, 404);
+  let pending = await request('a', 'POST', '/follows/request', target);
+  await request('a', 'POST', '/follows/request', target, 409);
+  assert.equal((await request('b', 'GET', '/follows/requests/pending'))[0].id, pending.id);
+  assert.equal((await request('a', 'GET', '/follows/requests/sent'))[0].id, pending.id);
+  await request('c', 'PUT', `/follows/request/${pending.id}`, { status: 'approved' }, 403);
+  await request('b', 'PUT', `/follows/request/${pending.id}`, { status: 'invalid' }, 400);
+  await request('b', 'PUT', '/follows/request/abc', { status: 'approved' }, 400);
+  await request('b', 'PUT', '/follows/request/99999999', { status: 'approved' }, 404);
+  await request('b', 'PUT', `/follows/request/${pending.id}`, { status: 'rejected' });
+  assert.equal((await request('a', 'GET', '/follows/following')).length, 0);
+  pending = await request('a', 'POST', '/follows/request', target);
+  await request('b', 'PUT', `/follows/request/${pending.id}`, { status: 'approved' });
+  assert.equal((await request('a', 'GET', '/follows/following'))[0].following.userId, users.b.userId);
+  assert.equal((await request('b', 'GET', '/follows/followers'))[0].follower.userId, users.a.userId);
+  await request('b', 'PUT', `/follows/request/${pending.id}`, { status: 'rejected' }, 409);
+  await request('b', 'PUT', `/follows/request/${pending.id}`, { status: 'approved' }, 409);
+  await request('a', 'POST', '/follows/request', target, 409);
+  await request('a', 'DELETE', `/follows/following/${users.b.userId}`);
+  assert.equal((await request('b', 'GET', '/follows/followers')).length, 0);
+  pending = await request('a', 'POST', '/follows/request', target);
+  await request('c', 'DELETE', `/follows/request/${pending.id}`, undefined, 403);
+  await request('b', 'DELETE', `/follows/request/${pending.id}`, undefined, 403);
+  await request('a', 'DELETE', `/follows/request/${pending.id}`);
+  assert.equal((await request('b', 'GET', '/follows/requests/pending')).length, 0);
+  await request('a', 'DELETE', `/follows/request/${pending.id}`, undefined, 404);
+  pending = await request('a', 'POST', '/follows/request', target);
+  assert.equal((await request('a', 'POST', '/follows/toggle', target)).following, true);
+  assert.equal((await request('b', 'GET', '/follows/requests/pending')).length, 0);
+  await request('a', 'DELETE', `/follows/request/${pending.id}`, undefined, 409);
+  assert.equal((await request('a', 'POST', '/follows/toggle', target)).following, false);
+  pending = await request('a', 'POST', '/follows/request', target);
+  await request('b', 'PUT', `/follows/request/${pending.id}`, { status: 'approved' });
+  await request('c', 'DELETE', `/follows/followers/${users.a.userId}`);
+  assert.equal((await request('b', 'GET', '/follows/followers')).length, 1);
+  await request('b', 'DELETE', `/follows/followers/${users.a.userId}`);
+  assert.equal((await request('a', 'GET', '/follows/following')).length, 0);
+  await request('a', 'DELETE', '/follows/following/abc', undefined, 400);
+  const racing = await request('a', 'POST', '/follows/request', target);
+  const responses = await Promise.all(['approved', 'rejected'].map(status => fetch(`http://localhost:5005/api/follows/request/${racing.id}`, { method: 'PUT', headers: { Authorization: `Bearer ${tokens.b}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ status }) })));
+  assert.deepEqual(responses.map(response => response.status).sort(), [200, 409]);
+  passed += 2;
+  console.log('PASS concurrent approval/rejection has one winner');
+  const reviewed = await prisma.followRequest.findUnique({ where: { id: racing.id } });
+  const count = await prisma.follow.count({ where: { followerId: users.a.userId, followingId: users.b.userId } });
+  assert.equal(count, reviewed.status === 'approved' ? 1 : 0);
+  const results = await request('a', 'GET', `/users/search?q=${prefix}`);
+  assert.ok(results.some(user => user.userId === users.b.userId));
+  assert.ok(!results.some(user => user.userId === users.a.userId));
+  await request('a', 'POST', '/follows/toggle', { targetId: 'abc' }, 400);
+  await request('a', 'POST', '/follows/toggle', { targetId: users.a.userId }, 400);
+  await prisma.user.update({ where: { userId: users.c.userId }, data: { isActive: false } });
+  await request('a', 'POST', '/follows/request', { targetId: users.c.userId }, 404);
+  await request('a', 'POST', '/follows/toggle', { targetId: users.c.userId }, 404);
+  await request('c', 'GET', '/follows/followers', undefined, 403);
+  console.log(`Network lifecycle: ${passed} checks passed`);
+}
+run().catch(error => { console.error(error.message); process.exitCode = 1; }).finally(async () => {
+  await prisma.user.deleteMany({ where: { userName: { startsWith: prefix } } });
+  await prisma.$disconnect();
+});

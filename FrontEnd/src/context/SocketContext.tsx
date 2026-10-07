@@ -11,7 +11,10 @@ import { io, Socket } from "socket.io-client";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
 import toast from "react-hot-toast";
-import { executeHttpDeleteRequest, executeHttpGetRequest } from "@/api/commonServices";
+import {
+  executeHttpDeleteRequest,
+  executeHttpGetRequest,
+} from "@/api/commonServices";
 
 const SOCKET_URL =
   import.meta.env.VITE_API_URL?.replace("/api", "") || "http://localhost:5005";
@@ -52,9 +55,9 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({
   const [onlineUsers, setOnlineUsers] = useState<number[]>([]);
   const [notifications, setNotifications] = useState<any[]>([]);
   const [isMuted, setIsMuted] = useState<boolean>(
-    localStorage.getItem("notificationsMuted") === "true"
+    localStorage.getItem("notificationsMuted") === "true",
   );
-  
+
   const token = useSelector((state: RootState) => state.auth.token);
   const receivedMessageIds = useRef(new Set<string>());
 
@@ -63,9 +66,9 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({
       const next = !prev;
       localStorage.setItem("notificationsMuted", String(next));
       if (next) {
-         toast("Notifications muted", { icon: "🔕" });
+        toast("Notifications muted", { icon: "🔕" });
       } else {
-         toast.success("Notifications enabled", { icon: "🔔" });
+        toast.success("Notifications enabled", { icon: "🔔" });
       }
       return next;
     });
@@ -159,26 +162,31 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({
       }
 
       const title = messageData.sender?.fullName
-          ? `New message from ${messageData.sender.fullName}`
-          : "New Message";
+        ? `New message from ${messageData.sender.fullName}`
+        : "New Message";
 
       // If not muted, show a toast notification in the UI
       if (!isMuted) {
-         toast(
-           (t) => (
-             <div className="flex flex-col cursor-pointer" onClick={() => {
+        toast(
+          (t) => (
+            <div
+              className="flex flex-col cursor-pointer"
+              onClick={() => {
                 toast.dismiss(t.id);
                 const targetPath = messageData.channelId
                   ? `/chat?channelId=${messageData.channelId}`
                   : `/chat?conversationId=${messageData.conversationId}`;
                 window.location.href = targetPath;
-             }}>
-                <span className="font-bold">{title}</span>
-                <span className="text-sm truncate max-w-[200px]">{messageData.content}</span>
-             </div>
-           ),
-           { icon: '💬', duration: 4000 }
-         );
+              }}
+            >
+              <span className="font-bold">{title}</span>
+              <span className="text-sm truncate max-w-[200px]">
+                {messageData.content}
+              </span>
+            </div>
+          ),
+          { icon: "💬", duration: 4000 },
+        );
       }
 
       // Send a desktop notification if permitted and not muted
@@ -235,9 +243,19 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({
   );
 
   return (
-    <SocketContext.Provider value={{ socket, isConnected, onlineUsers, emitEvent, notifications, clearNotifications, isMuted, toggleMute }}>
+    <SocketContext.Provider
+      value={{
+        socket,
+        isConnected,
+        onlineUsers,
+        emitEvent,
+        notifications,
+        clearNotifications,
+        isMuted,
+        toggleMute,
+      }}
+    >
       {children}
     </SocketContext.Provider>
   );
 };
-

@@ -19,12 +19,12 @@ const storage = multer.diskStorage({
 
 const fileFilter = (request, file, callback) => {
   if (
-    file.mimetype === "application/pdf" ||
-    file.originalname.endsWith(".pdf")
+    file.mimetype === "application/pdf" &&
+    path.extname(file.originalname).toLowerCase() === '.pdf'
   ) {
     callback(null, true);
   } else {
-    callback(new Error("Not a PDF! Please upload a PDF document."), false);
+    callback(Object.assign(new Error("Not a PDF! Please upload a PDF document."), { statusCode: 400 }), false);
   }
 };
 
@@ -32,6 +32,8 @@ const documentUpload = multer({
   storage: storage,
   limits: {
     fileSize: 50 * 1024 * 1024, // 50 MB limit for documents
+    files: 1,
+    fields: 3,
   },
   fileFilter: fileFilter,
 });

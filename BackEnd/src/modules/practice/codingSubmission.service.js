@@ -1,12 +1,26 @@
 const prisma = require('../../config/prisma');
 const { getPaginationMeta } = require('../../utils/pagination');
 const { executeCode } = require('./codeExecution.service');
+const { parseId, failure } = require('./practiceValidation');
+const validateExecution = (problem, language, code) => {
+    if (typeof code !== 'string' || !code.trim()) throw failure('Code cannot be empty');
+    if (typeof language !== 'string' || !language.trim()) throw failure('Language is required');
+    const supported = problem.supportedLanguages
+        ? JSON.parse(problem.supportedLanguages)
+        : ['javascript', 'python', 'java', 'cpp'];
+    if (!supported.includes(language)) throw failure(`Language '${language}' is not supported for this problem. Supported: ${supported.join(', ')}`);
+};
+const visibleOutput = output => {
+    if (!output) return output;
+    const results = JSON.parse(output);
+    return JSON.stringify(results.map(result => result.isHidden ? { testCaseId: result.testCaseId, passed: result.passed, isHidden: true, executionTime: result.executionTime, memoryUsed: result.memoryUsed } : result));
+};
 
 /**
  * Submit code for a problem - runs against ALL test cases and saves the result
  */
 const submitCode = async (studentId, problemId, language, code) => {
-    const id = parseInt(problemId);
+    const id = parseId(problemId);
 
     const problem = await prisma.codingProblem.findUnique({
         where: { problemId: id },
@@ -14,33 +28,18 @@ const submitCode = async (studentId, problemId, language, code) => {
     });
 
     if (!problem) {
-        throw new Error('Problem not found');
+        throw failure('Problem not found', 404);
     }
 
     if (!problem.isActive) {
-        throw new Error('This problem is no longer available');
+        throw failure('This problem is no longer available');
     }
 
     if (problem.testCases.length === 0) {
-        throw new Error('No test cases defined for this problem');
+        throw failure('No test cases defined for this problem');
     }
 
-    if (!code || !code.trim()) {
-        throw new Error('Code cannot be empty');
-    }
-
-    if (!language) {
-        throw new Error('Language is required');
-    }
-
-    // Check if language is supported
-    const supported = problem.supportedLanguages
-        ? JSON.parse(problem.supportedLanguages)
-        : ['javascript', 'python', 'java', 'cpp'];
-
-    if (!supported.includes(language)) {
-        throw new Error(`Language '${language}' is not supported for this problem. Supported: ${supported.join(', ')}`);
-    }
+    validateExecution(problem, language, code);
 
     // Execute code against ALL test cases
     const executionResult = await executeCode(code, language, problem.testCases);
@@ -82,7 +81,7 @@ const submitCode = async (studentId, problemId, language, code) => {
     });
 
     return {
-        submission,
+        submission: { ...submission, output: visibleOutput(submission.output) },
         executionResult: {
             ...executionResult,
             results: visibleResults,
@@ -94,7 +93,7 @@ const submitCode = async (studentId, problemId, language, code) => {
  * Run code against sample (non-hidden) test cases only - does NOT save
  */
 const runCode = async (studentId, problemId, language, code) => {
-    const id = parseInt(problemId);
+    const id = parseId(problemId);
 
     const problem = await prisma.codingProblem.findUnique({
         where: { problemId: id },
@@ -107,24 +106,18 @@ const runCode = async (studentId, problemId, language, code) => {
     });
 
     if (!problem) {
-        throw new Error('Problem not found');
+        throw failure('Problem not found', 404);
     }
 
     if (!problem.isActive) {
-        throw new Error('This problem is no longer available');
+        throw failure('This problem is no longer available');
     }
 
     if (problem.testCases.length === 0) {
-        throw new Error('No sample test cases available');
+        throw failure('No sample test cases available');
     }
 
-    if (!code || !code.trim()) {
-        throw new Error('Code cannot be empty');
-    }
-
-    if (!language) {
-        throw new Error('Language is required');
-    }
+    validateExecution(problem, language, code);
 
     // Execute against sample test cases only
     const executionResult = await executeCode(code, language, problem.testCases);
@@ -188,7 +181,7 @@ const getSubmissionById = async (submissionId) => {
     });
 
     if (!submission) {
-        throw new Error('Submission not found');
+        throw Object.assign(new Error('Submission not found'), { statusCode: 404 });
     }
 
     return submission;
@@ -198,11 +191,11 @@ const getSubmissionById = async (submissionId) => {
  * Get leaderboard for a problem - fastest accepted solutions
  */
 const getLeaderboard = async (problemId) => {
-    const id = parseInt(problemId);
+    const id = parseId(problemId);
 
     const problem = await prisma.codingProblem.findUnique({ where: { problemId: id } });
     if (!problem) {
-        throw new Error('Problem not found');
+        throw failure('Problem not found', 404);
     }
 
     // Get the best (fastest) accepted submission per student
@@ -315,6 +308,7 @@ const getUserStats = async (userId) => {
 };
 
 module.exports = {
+    visibleOutput,
     submitCode,
     runCode,
     getSubmissionsByProblem,

@@ -12,9 +12,9 @@ const ChatSidebar = ({
 }: any) => {
   return (
     <div
-      className="w-[30%] min-w-[300px] max-w-[400px] flex flex-col shrink-0 border-r z-20"
+      className="w-full min-w-0 md:w-64 min-h-0 flex flex-col shrink-0 border-r z-20"
       style={{
-        background: "var(--bg-surface-1)",
+        background: "var(--bg-surface)",
         borderColor: "var(--border-default)",
       }}
     >
@@ -38,7 +38,7 @@ const ChatSidebar = ({
         className="px-3 py-2 flex items-center gap-2 border-b"
         style={{
           borderColor: "var(--border-default)",
-          background: "var(--bg-surface-1)",
+          background: "var(--bg-surface)",
         }}
       >
         <div className="relative flex-1 group">

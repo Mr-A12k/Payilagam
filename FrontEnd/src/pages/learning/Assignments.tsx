@@ -1,69 +1,39 @@
-/**
- * @fileoverview Assignments page for Payilagam .
- * Tabbed view (Pending / Completed) with an empty-state placeholder.
- * Assignments from enrolled courses will appear here once instructors
- * create them.
- */
-import { ClipboardList } from "lucide-react";
-import { useState } from "react";
-import { Card } from "@/components/ui";
+import { useQuery } from "@tanstack/react-query";
+import { ArrowRight, CalendarClock, RotateCcw } from "lucide-react";
+import { Link } from "react-router-dom";
+import { Button } from "@/components/ui";
+import { executeHttpGetRequest } from "@/api/commonServices";
+import { WorkspacePage, PageHeader, LoadingState, EmptyState } from "@/components/workspace/Workspace";
+import "./LearningWorkspace.css";
+import { useSelector } from "react-redux";
 
 const Assignments = () => {
-  const [activeTab, setActiveTab] = useState("pending");
-
+  const student = useSelector((state: any) => state.auth.user?.role === "student");
+  const { data, isLoading, isError, refetch } = useQuery({
+    queryKey: ["assignments", "upcoming"],
+    queryFn: () => executeHttpGetRequest("/assignments/upcoming"),
+    enabled: student,
+  });
+  const assignments = data?.data?.data ?? [];
   return (
-    <div className="min-h-screen bg-slate-950 p-6 lg:p-8">
-      <div className="max-w-7xl mx-auto">
-        <div className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-6">
-          <div>
-            <h1 className="text-3xl font-bold text-slate-100 mb-2">
-              Assignments
-            </h1>
-            <p className="text-slate-400">
-              View and manage your pending and completed assignments.
-            </p>
-          </div>
-          
-          <div className="flex p-1 bg-slate-900/80 backdrop-blur border border-slate-800 rounded-xl w-fit">
-            <button 
-              onClick={() => setActiveTab("pending")}
-              className={`px-6 py-2.5 text-sm font-semibold rounded-lg transition-all ${
-                activeTab === "pending" 
-                  ? "bg-slate-800 text-blue-400 shadow-sm border border-slate-700" 
-                  : "text-slate-400 hover:text-slate-300 hover:bg-slate-800/50"
-              }`}
-            >
-              Pending
-            </button>
-            <button 
-              onClick={() => setActiveTab("completed")}
-              className={`px-6 py-2.5 text-sm font-semibold rounded-lg transition-all ${
-                activeTab === "completed" 
-                  ? "bg-slate-800 text-blue-400 shadow-sm border border-slate-700" 
-                  : "text-slate-400 hover:text-slate-300 hover:bg-slate-800/50"
-              }`}
-            >
-              Completed
-            </button>
-          </div>
-        </div>
-
-        <Card className="p-16 text-center">
-          <div className="w-20 h-20 bg-blue-500/10 border border-blue-500/20 text-blue-400 rounded-2xl flex-center mx-auto mb-6 shadow-[0_0_30px_rgba(59,130,246,0.15)]">
-            <ClipboardList className="w-10 h-10 shrink-0 transition-transform duration-200" />
-          </div>
-          <h2 className="text-2xl font-bold text-slate-100 mb-3 tracking-tight">
-            No {activeTab} assignments
-          </h2>
-          <p className="text-slate-400 max-w-md mx-auto text-lg">
-            You're all caught up! When instructors assign work for your enrolled
-            courses, they will appear here.
-          </p>
-        </Card>
-      </div>
-    </div>
+    <WorkspacePage className="learning-workspace">
+      <PageHeader title="Upcoming Assignments" description="Course assignments and submission deadlines." actions={!isLoading && !isError ? <span className="text-sm text-[var(--text-muted)]">{assignments.length} upcoming</span> : undefined} />
+      {!student ? <EmptyState title="Student assignments" description="Upcoming deadlines are available for student accounts." action={<Button asChild variant="outline"><Link to="/courses">Browse courses</Link></Button>} /> : isLoading ? <LoadingState label="Loading assignments..." /> : isError ? <div role="alert" className="learning-error"><p>Unable to load assignments.</p><Button variant="secondary" onClick={() => refetch()}><RotateCcw className="h-4 w-4" />Retry</Button></div> : assignments.length === 0 ? (
+        <EmptyState title="No upcoming assignments" description="New assignments from your courses will appear here." action={<Button asChild variant="outline"><Link to="/learning">My learning<ArrowRight className="h-4 w-4" /></Link></Button>} />
+      ) : <ul className="assignment-list">
+        {assignments.map((assignment: any) => {
+          const dueDate = assignment.dueDate ? new Date(assignment.dueDate) : null;
+          const validDate = dueDate && !Number.isNaN(dueDate.getTime());
+          const overdue = validDate && dueDate.getTime() < Date.now();
+          return <li key={assignment.assignmentId} className="assignment-row">
+            <div className="assignment-title"><h2>{assignment.title}</h2><p>{assignment.course?.courseName || "Course not provided"}</p></div>
+            <div className="assignment-deadline"><CalendarClock aria-hidden="true" className="h-4 w-4" /><div><span className={overdue ? "text-[var(--status-danger)]" : ""}>{overdue ? "Overdue" : "Due date"}</span><p>{validDate ? <time dateTime={dueDate.toISOString()}>{dueDate.toLocaleString()}</time> : "Not scheduled"}</p></div></div>
+            <Button asChild variant="outline" size="sm"><Link to={`/courses/${assignment.courseId}${assignment.type === "quiz" ? "#course-quizzes" : ""}`}>{assignment.type === "quiz" ? "Open quiz tasks" : "View course"}<ArrowRight className="h-4 w-4" /></Link></Button>
+          </li>;
+        })}
+      </ul>}
+    </WorkspacePage>
   );
 };
 
 export default Assignments;
-

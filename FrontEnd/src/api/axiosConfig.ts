@@ -89,10 +89,12 @@ api.interceptors.response.use(
       }
 
       // Display the toast for every API failure so the user knows the valid reason
-      toast.error(errorMessage);
+      toast.error(errorMessage, { id: `api-error-${response.status}` });
     } else if (axiosError.request) {
       // Network error or no response
-      toast.error("Network error: Unable to reach the server");
+      toast.error("Network error: Unable to reach the server", {
+        id: "api-network-error",
+      });
     } else {
       toast.error(axiosError.message || "An unexpected error occurred");
     }

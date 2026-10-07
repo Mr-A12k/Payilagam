@@ -2,17 +2,37 @@ const catchAsync = require("../../utils/catchAsync");
 const courseService = require("./course.service");
 const { success, error, paginated } = require("../../utils/responseHelper");
 
+const validateCourseBody = (body, creating = false) => {
+  const invalid = (message) => { const issue = new Error(message); issue.statusCode = 400; throw issue; };
+  for (const field of ["courseName", "courseCode"]) {
+    if (creating || body[field] !== undefined) {
+      if (typeof body[field] !== "string" || !body[field].trim()) invalid(`${field} is required`);
+      body[field] = body[field].trim();
+    }
+  }
+  for (const field of ["price", "duration", "categoryId"]) {
+    if (body[field] === undefined) continue;
+    if (field === "categoryId" && (body[field] === "" || body[field] === null)) { body[field] = null; continue; }
+    const value = Number(body[field]);
+    if (!Number.isFinite(value) || value < 0 || (field !== "price" && !Number.isInteger(value)) || (field === "categoryId" && value === 0)) invalid(`Invalid ${field}`);
+    body[field] = value;
+  }
+  if (body.level !== undefined) {
+    body.level = String(body.level).toLowerCase();
+    if (!["beginner", "intermediate", "advanced"].includes(body.level)) invalid("Invalid difficulty level");
+  }
+  if (body.status !== undefined) {
+    body.status = String(body.status).toLowerCase();
+    if (!["draft", "published"].includes(body.status)) invalid("Invalid publication status");
+  }
+  if (body.removeThumbnail === "true" || body.removeThumbnail === true) body.thumbnail = null;
+};
+
 const create = catchAsync(async (request, response) => {
+  validateCourseBody(request.body, true);
   if (request.file) {
     request.body.thumbnail = `/uploads/${request.file.filename}`;
   }
-
-  // Convert strings from FormData back to numbers
-  if (request.body.price) request.body.price = parseFloat(request.body.price);
-  if (request.body.duration)
-    request.body.duration = parseInt(request.body.duration, 10);
-  if (request.body.categoryId)
-    request.body.categoryId = parseInt(request.body.categoryId, 10);
 
   const course = await courseService.createCourse(
     request.user.userId,
@@ -43,6 +63,7 @@ const getById = catchAsync(async (request, response) => {
 });
 
 const update = catchAsync(async (request, response) => {
+  validateCourseBody(request.body);
   const identifier = request.params.uniqueId;
   if (!identifier) {
     return error(response, "Invalid course identifier", 400);
@@ -52,14 +73,6 @@ const update = catchAsync(async (request, response) => {
   if (request.file) {
     request.body.thumbnail = `/uploads/${request.file.filename}`;
   }
-
-  // Convert strings from FormData back to numbers
-  if (request.body.price !== undefined)
-    request.body.price = parseFloat(request.body.price);
-  if (request.body.duration !== undefined)
-    request.body.duration = parseInt(request.body.duration, 10);
-  if (request.body.categoryId !== undefined)
-    request.body.categoryId = parseInt(request.body.categoryId, 10);
 
   const course = await courseService.updateCourse(
     identifier,

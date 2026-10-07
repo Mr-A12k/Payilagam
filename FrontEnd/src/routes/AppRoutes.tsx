@@ -3,54 +3,59 @@ import { useSelector } from "react-redux";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import SidebarLayout from "@/components/SidebarLayout";
 import PublicLayout from "@/components/PublicLayout";
-import NotFound from "@/pages/public/NotFound";
-import ComingSoon from "@/pages/public/ComingSoon";
+import { loadPage } from "./loadPage";
+import RouteBoundary from "@/components/RouteBoundary";
+const NotFound = loadPage(() => import("@/pages/public/NotFound"));
+const ComingSoon = loadPage(() => import("@/pages/public/ComingSoon"));
 
 // Public Pages
-import Home from "@/pages/public/Home";
-import Login from "@/pages/auth/Login";
-import Signup from "@/pages/auth/Signup";
-import ForgotPassword from "@/pages/auth/ForgotPassword";
-import ChangePassword from "@/pages/auth/ChangePassword";
-import AIImageTool from "@/pages/public/AIImageTool";
-import Labs from "@/pages/practice/Labs";
-import Mentors from "@/pages/community/Mentors";
-import MentorDetail from "@/pages/community/MentorDetail";
-import Enterprise from "@/pages/public/Enterprise";
-import Universities from "@/pages/public/Universities";
-import Government from "@/pages/public/Government";
-import FreeResources from "@/pages/public/FreeResources";
-import About from "@/pages/public/About";
-import Contact from "@/pages/public/Contact";
-import Terms from "@/pages/public/Terms";
+const Home = loadPage(() => import("@/pages/public/Home"));
+const Login = loadPage(() => import("@/pages/auth/Login"));
+const Signup = loadPage(() => import("@/pages/auth/Signup"));
+const ForgotPassword = loadPage(() => import("@/pages/auth/ForgotPassword"));
+const ChangePassword = loadPage(() => import("@/pages/auth/ChangePassword"));
+const AIImageTool = loadPage(() => import("@/pages/public/AIImageTool"));
+const Labs = loadPage(() => import("@/pages/practice/Labs"));
+const Mentors = loadPage(() => import("@/pages/community/Mentors"));
+const MentorDetail = loadPage(() => import("@/pages/community/MentorDetail"));
+const Enterprise = loadPage(() => import("@/pages/public/Enterprise"));
+const Universities = loadPage(() => import("@/pages/public/Universities"));
+const Government = loadPage(() => import("@/pages/public/Government"));
+const FreeResources = loadPage(() => import("@/pages/public/FreeResources"));
+const About = loadPage(() => import("@/pages/public/About"));
+const Contact = loadPage(() => import("@/pages/public/Contact"));
+const Terms = loadPage(() => import("@/pages/public/Terms"));
 
 // Student Pages
-import Dashboard from "@/pages/dashboards/Dashboard";
-import CourseCatalog from "@/pages/courses/CourseCatalog";
-import CourseDetail from "@/pages/courses/CourseDetail";
-import LearningArena from "@/pages/learning/LearningArena";
+const Dashboard = loadPage(() => import("@/pages/dashboards/Dashboard"));
+const CourseCatalog = loadPage(() => import("@/pages/courses/CourseCatalog"));
+const CourseDetail = loadPage(() => import("@/pages/courses/CourseDetail"));
+const LearningArena = loadPage(() => import("@/pages/learning/LearningArena"));
 
 // Mentor/Admin Pages
-import MentorDashboard from "@/pages/dashboards/MentorDashboard";
-import AdminDashboard from "@/pages/dashboards/AdminDashboard";
-import UserManagement from "@/pages/admin/UserManagement";
-import ReportsManagement from "@/pages/admin/ReportsManagement";
-import AdminNotifications from "@/pages/admin/AdminNotifications";
-import CourseBuilder from "@/pages/courses/CourseBuilder";
+const MentorDashboard = loadPage(() => import("@/pages/dashboards/MentorDashboard"));
+const MentorStudents = loadPage(() => import("@/pages/dashboards/MentorStudents"));
+const AdminDashboard = loadPage(() => import("@/pages/dashboards/AdminDashboard"));
+const UserManagement = loadPage(() => import("@/pages/admin/UserManagement"));
+const MentorApplications = loadPage(() => import("@/pages/admin/MentorApplications"));
+const ReportsManagement = loadPage(() => import("@/pages/admin/ReportsManagement"));
+const AdminNotifications = loadPage(() => import("@/pages/admin/AdminNotifications"));
+const AdminSettings = loadPage(() => import("@/pages/admin/AdminSettings"));
+const CourseBuilder = loadPage(() => import("@/pages/courses/CourseBuilder"));
 
-// Coding Practice Pages
-import ProblemSet from "@/pages/practice/ProblemSet";
-import CodingArena from "@/pages/practice/CodingArena";
+const ProblemSet = loadPage(() => import("@/pages/practice/ProblemSet"));
+const CodingArena = loadPage(() => import("@/pages/practice/CodingArena"));
+const CodingLab = loadPage(() => import("@/pages/practice/CodingLab"));
 
 // Missing Pages
-import Learning from "@/pages/learning/Learning";
-import Analytics from "@/pages/learning/Analytics";
-import Assignments from "@/pages/learning/Assignments";
-import Settings from "@/pages/settings/Settings";
-import Chat from "@/pages/community/Chat";
-import Network from "@/pages/community/Network";
-import AIAssistant from "@/pages/ai/AIAssistant";
-import DocumentRepository from "@/pages/documents/DocumentRepository";
+const Learning = loadPage(() => import("@/pages/learning/Learning"));
+const Analytics = loadPage(() => import("@/pages/learning/Analytics"));
+const Assignments = loadPage(() => import("@/pages/learning/Assignments"));
+const Settings = loadPage(() => import("@/pages/settings/Settings"));
+const Chat = loadPage(() => import("@/pages/community/Chat"));
+const Network = loadPage(() => import("@/pages/community/Network"));
+const AIAssistant = loadPage(() => import("@/pages/ai/AIAssistant"));
+const DocumentRepository = loadPage(() => import("@/pages/documents/DocumentRepository"));
 
 // const DynamicLayout = ({ children }) => {
 //   const { user } = useSelector((state: any) => state.auth);
@@ -61,7 +66,7 @@ const AppRoutes = () => {
   const { user } = useSelector((state: any) => state.auth);
 
   return (
-    <Routes>
+    <RouteBoundary><Routes>
       {/* Auth Routes (Always use Public Layout) */}
       <Route element={<PublicLayout />}>
         <Route path="/login" element={<Login />} />
@@ -77,7 +82,7 @@ const AppRoutes = () => {
         <Route path="/courses" element={<CourseCatalog />} />
         <Route path="/courses/:uniqueId" element={<CourseDetail />} />
         <Route path="/labs" element={<Labs />} />
-        <Route path="/labs/code" element={<Labs />} />
+        <Route path="/labs/code" element={<CodingLab />} />
         <Route path="/coming-soon" element={<ComingSoon />} />
         <Route path="/mentors" element={<Mentors />} />
         <Route path="/mentors/:id" element={<MentorDetail />} />
@@ -108,15 +113,17 @@ const AppRoutes = () => {
         <Route path="/mentor" element={<ProtectedRoute allowedRoles={[2, 1]}><MentorDashboard /></ProtectedRoute>} />
         <Route path="/mentor/course/create" element={<ProtectedRoute allowedRoles={[2, 1]}><CourseBuilder /></ProtectedRoute>} />
         <Route path="/mentor/course/edit/:id" element={<ProtectedRoute allowedRoles={[2, 1]}><CourseBuilder /></ProtectedRoute>} />
-        <Route path="/mentor/students" element={<ProtectedRoute allowedRoles={[2, 1]}><UserManagement /></ProtectedRoute>} />
+        <Route path="/mentor/students" element={<ProtectedRoute allowedRoles={[2, 1]}><MentorStudents /></ProtectedRoute>} />
         <Route path="/mentor/analytics" element={<ProtectedRoute allowedRoles={[2, 1]}><Analytics /></ProtectedRoute>} />
 
         {/* Admin Protected Routes (Access: Admin=1) */}
         <Route path="/admin" element={<ProtectedRoute allowedRoles={[1]}><AdminDashboard /></ProtectedRoute>} />
         <Route path="/admin/users" element={<ProtectedRoute allowedRoles={[1]}><UserManagement /></ProtectedRoute>} />
+        <Route path="/admin/mentor-applications" element={<ProtectedRoute allowedRoles={[1]}><MentorApplications /></ProtectedRoute>} />
         <Route path="/admin/reports" element={<ProtectedRoute allowedRoles={[1]}><ReportsManagement /></ProtectedRoute>} />
         <Route path="/admin/notifications" element={<ProtectedRoute allowedRoles={[1]}><AdminNotifications /></ProtectedRoute>} />
         <Route path="/admin/analytics" element={<ProtectedRoute allowedRoles={[1]}><Analytics /></ProtectedRoute>} />
+        <Route path="/admin/settings" element={<ProtectedRoute allowedRoles={[1]}><AdminSettings /></ProtectedRoute>} />
       </Route>
 
       {/* Full screen routes (No Sidebar, No Header) */}
@@ -125,7 +132,7 @@ const AppRoutes = () => {
 
       {/* 404 Fallback */}
       <Route path="*" element={<NotFound />} />
-    </Routes>
+    </Routes></RouteBoundary>
   );
 };
 

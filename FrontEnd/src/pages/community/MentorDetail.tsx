@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { useBackNavigation } from "@/hooks/useBackNavigation";
 import { useSelector } from "react-redux";
 import {
   executeHttpGetRequest,
@@ -13,16 +14,18 @@ import {
   UserMinus,
   MessageSquare,
   BookOpen,
-  Star,
   Loader2,
   PlayCircle,
+  ArrowLeft,
 } from "lucide-react";
-import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
+import "./CommunityPages.css";
+import { LoadingState } from "@/components/workspace/Workspace";
 
 const MentorDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const goBack = useBackNavigation("/mentors");
   const { user } = useSelector((state: any) => state.auth);
 
   const [mentor, setMentor] = useState<any>(null);
@@ -30,11 +33,14 @@ const MentorDetail = () => {
   const [isFollowing, setIsFollowing] = useState(false);
   const [followLoading, setFollowLoading] = useState(false);
   const [chatLoading, setChatLoading] = useState(false);
+  const [loadError, setLoadError] = useState(false);
 
   const fetchMentorDetails = React.useCallback(async () => {
     try {
       setIsLoading(true);
+      setLoadError(false);
       const response = await executeHttpGetRequest(API_PATHS.USERS.MENTOR(id!));
+      if (!response.data.success || !response.data.data) throw new Error("Mentor unavailable");
       if (response.data.success) {
         setMentor(response.data.data);
         setIsFollowing(response.data.data.isFollowing);
@@ -42,7 +48,7 @@ const MentorDetail = () => {
     } catch (error) {
       console.error(error);
       toast.error("Failed to load mentor profile");
-      navigate("/mentors");
+      setLoadError(true);
     } finally {
       setIsLoading(false);
     }
@@ -71,8 +77,8 @@ const MentorDetail = () => {
           _count: {
             ...prev._count,
             followers: response.data.data.following
-              ? prev._count.followers + 1
-              : prev._count.followers - 1,
+              ? (prev._count?.followers || 0) + 1
+              : Math.max(0, (prev._count?.followers || 0) - 1),
           },
         }));
         toast.success(response.data.message);
@@ -113,31 +119,30 @@ const MentorDetail = () => {
 
   if (isLoading) {
     return (
-      <div className="flex-center min-h-[calc(100vh-4rem)] bg-slate-950">
-        <Loader2 className="w-10 h-10 text-blue-500 animate-spin" />
-      </div>
+      <LoadingState label="Loading mentor profile..." />
     );
   }
 
-  if (!mentor) return null;
+  if (loadError || !mentor) return <div className="community-page community-state" role="alert"><Users /><h2>Mentor profile unavailable</h2><div className="flex gap-2"><button className="community-button" onClick={fetchMentorDetails}>Retry</button><button className="community-button" onClick={goBack}><ArrowLeft />Go back</button></div></div>;
 
-  let parsedSkills = [];
+  let parsedSkills: string[] = [];
   try {
-    if (mentor.skills) parsedSkills = JSON.parse(mentor.skills);
+    const skills = typeof mentor.skills === "string" ? JSON.parse(mentor.skills) : mentor.skills;
+    parsedSkills = Array.isArray(skills) ? skills.filter((skill: unknown) => typeof skill === "string") : [];
   } catch (error) {
     console.error(error);
     parsedSkills = [];
   }
 
   return (
-    <div className="min-h-screen bg-slate-950 pb-20">
+    <div className="mentor-detail-page min-w-0 bg-[var(--bg-base)] pb-8 [overflow-wrap:anywhere]">
       {/* Hero Section */}
-      <div className="relative bg-slate-900 border-b border-slate-800">
-        <div className="absolute inset-0 bg-gradient-to-r from-blue-600/10 to-purple-600/10 pointer-events-none" />
-        <div className="max-w-6xl mx-auto px-6 py-12 relative z-10">
-          <div className="flex flex-col md:flex-row gap-8 items-start md:items-center">
+      <div className="relative bg-[var(--bg-surface)] border-b border-[var(--border-default)]">
+        <div className="max-w-6xl mx-auto p-4 sm:p-6">
+          <button onClick={goBack} className="inline-flex items-center gap-2 text-sm text-[var(--text-secondary)] mb-5 hover:text-[var(--text-primary)]"><ArrowLeft className="w-4 h-4" /> Go back</button>
+          <div className="flex flex-wrap gap-5 items-start sm:items-center">
             {/* Avatar */}
-            <div className="w-32 h-32 rounded-2xl bg-gradient-to-br from-blue-500/20 to-purple-500/20 border border-blue-500/30 flex-center text-4xl font-bold text-blue-400 shrink-0 overflow-hidden shadow-xl shadow-blue-500/10">
+            <div className="w-20 h-20 rounded-lg bg-[var(--bg-surface-2)] flex-center text-2xl font-semibold text-[var(--text-secondary)] shrink-0 overflow-hidden">
               {mentor.profileUrl ? (
                 <img
                   src={mentor.profileUrl}
@@ -145,38 +150,38 @@ const MentorDetail = () => {
                   className="w-full h-full object-cover"
                 />
               ) : (
-                mentor.fullName.charAt(0).toUpperCase()
+                mentor.fullName?.[0]?.toUpperCase() || "M"
               )}
             </div>
 
             {/* Info */}
-            <div className="flex-1">
-              <h1 className="text-3xl md:text-4xl font-bold text-white mb-2">
+            <div className="min-w-0 flex-1 basis-48">
+              <h1 className="text-2xl font-semibold text-[var(--text-primary)] mb-2">
                 {mentor.fullName}
               </h1>
-              <p className="text-lg text-blue-400 font-medium mb-4">
+              <p className="text-sm text-[var(--text-secondary)] mb-3">
                 @{mentor.userName} • Mentor
               </p>
 
-              <div className="flex flex-wrap items-center gap-6 text-sm text-slate-400">
+              <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-[var(--text-muted)]">
                 <div className="flex items-center gap-2">
-                  <Users className="w-4 h-4 text-slate-500" />
-                  <span className="text-white font-bold">
-                    {mentor._count.followers}
+                  <Users className="w-4 h-4 text-[var(--text-muted)]" />
+                  <span className="text-[var(--text-primary)] font-bold">
+                    {mentor._count?.followers || 0}
                   </span>{" "}
                   Followers
                 </div>
                 <div className="flex items-center gap-2">
-                  <BookOpen className="w-4 h-4 text-slate-500" />
-                  <span className="text-white font-bold">
-                    {mentor._count.coursesTaught}
+                  <BookOpen className="w-4 h-4 text-[var(--text-muted)]" />
+                  <span className="text-[var(--text-primary)] font-bold">
+                    {mentor._count?.coursesTaught || 0}
                   </span>{" "}
                   Courses
                 </div>
                 <div className="flex items-center gap-2">
-                  <PlayCircle className="w-4 h-4 text-slate-500" />
-                  <span className="text-white font-bold">
-                    {mentor._count.enrollments}
+                  <PlayCircle className="w-4 h-4 text-[var(--text-muted)]" />
+                  <span className="text-[var(--text-primary)] font-bold">
+                    {mentor._count?.enrollments || 0}
                   </span>{" "}
                   Students
                 </div>
@@ -184,16 +189,18 @@ const MentorDetail = () => {
             </div>
 
             {/* Actions */}
-            <div className="flex flex-col gap-3 w-full md:w-auto shrink-0">
+            <div className="flex flex-col sm:flex-row lg:flex-col gap-2 w-full lg:w-40 shrink-0">
               <Button
                 onClick={handleToggleFollow}
+                aria-pressed={isFollowing}
+                aria-label={followLoading ? "Updating follow status" : isFollowing ? "Unfollow mentor" : "Follow mentor"}
                 disabled={
                   followLoading || (user && user.userId === mentor.userId)
                 }
-                className={`w-full md:w-48 py-3 rounded-xl font-bold flex-center gap-2 transition-all shadow-lg ${
+                className={`w-full py-2 rounded-lg font-medium flex-center gap-2 transition-colors ${
                   isFollowing
-                    ? "bg-slate-800 text-white hover:bg-slate-700 border border-slate-700"
-                    : "bg-blue-600 text-white hover:bg-blue-500 hover:-translate-y-0.5 shadow-blue-500/25"
+                    ? "bg-[var(--bg-surface-2)] text-[var(--text-primary)] hover:bg-[var(--bg-surface-2)] border border-[var(--border-default)]"
+                    : "bg-[var(--bg-surface-3)] text-[var(--text-primary)] hover:bg-[var(--bg-surface-3)]  "
                 }`}
               >
                 {followLoading ? (
@@ -211,16 +218,17 @@ const MentorDetail = () => {
 
               <Button
                 onClick={handleMessage}
+                aria-label={chatLoading ? "Starting conversation" : "Message mentor"}
                 disabled={
                   chatLoading || (user && user.userId === mentor.userId)
                 }
-                className="w-full md:w-48 py-3 rounded-xl font-bold flex-center gap-2 bg-slate-800 text-white hover:bg-slate-700 border border-slate-700 transition-all shadow-lg"
+                className="w-full py-2 rounded-lg font-medium flex-center gap-2 bg-[var(--bg-surface-2)] text-[var(--text-primary)] border border-[var(--border-default)]"
               >
                 {chatLoading ? (
                   <Loader2 className="w-4 h-4 animate-spin" />
                 ) : (
                   <>
-                    <MessageSquare className="w-4 h-4 text-slate-400" /> Message
+                    <MessageSquare className="w-4 h-4 text-[var(--text-muted)]" /> Message
                   </>
                 )}
               </Button>
@@ -229,96 +237,96 @@ const MentorDetail = () => {
         </div>
       </div>
 
-      <div className="max-w-6xl mx-auto px-6 py-12 grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="max-w-6xl mx-auto p-4 sm:p-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Left Column: About & Skills */}
-        <div className="space-y-6">
-          <Card className="bg-slate-900 border-slate-800">
-            <h3 className="text-lg font-bold text-white mb-4">About Me</h3>
-            <p className="text-slate-400 text-sm leading-relaxed whitespace-pre-wrap">
+        <div className="min-w-0 space-y-6">
+          <section>
+            <h3 className="text-lg font-bold text-[var(--text-primary)] mb-4">About Me</h3>
+            <p className="text-[var(--text-muted)] text-sm leading-relaxed whitespace-pre-wrap">
               {mentor.bio || "This mentor hasn't written a bio yet."}
             </p>
-          </Card>
+          </section>
 
           {mentor.experience && (
-            <Card className="bg-slate-900 border-slate-800">
-              <h3 className="text-lg font-bold text-white mb-4">
+            <section>
+              <h3 className="text-lg font-bold text-[var(--text-primary)] mb-4">
                 Professional Experience
               </h3>
-              <p className="text-slate-400 text-sm leading-relaxed whitespace-pre-wrap">
+              <p className="text-[var(--text-muted)] text-sm leading-relaxed whitespace-pre-wrap">
                 {mentor.experience}
               </p>
-            </Card>
+            </section>
           )}
 
-          <Card className="bg-slate-900 border-slate-800">
-            <h3 className="text-lg font-bold text-white mb-4">Expertise</h3>
+          <section>
+            <h3 className="text-lg font-bold text-[var(--text-primary)] mb-4">Expertise</h3>
             {parsedSkills.length > 0 ? (
               <div className="flex flex-wrap gap-2">
                 {parsedSkills.map((skill: any, index: any) => (
                   <span
                     key={index}
-                    className="bg-slate-950 text-blue-400 px-3 py-1.5 rounded-lg text-xs font-semibold border border-blue-500/20 shadow-inner shadow-blue-500/5"
+                    className="bg-[var(--bg-base)] text-[var(--text-secondary)] px-3 py-1.5 rounded-lg text-xs font-semibold border border-[var(--border-default)]"
                   >
                     {skill}
                   </span>
                 ))}
               </div>
             ) : (
-              <p className="text-slate-500 text-sm">No skills listed.</p>
+              <p className="text-[var(--text-muted)] text-sm">No skills listed.</p>
             )}
-          </Card>
+          </section>
         </div>
 
         {/* Right Column: Courses */}
-        <div className="lg:col-span-2 space-y-6">
-          <h2 className="text-xl font-bold text-white mb-6">
+        <div className="min-w-0 lg:col-span-2 space-y-4">
+          <h2 className="text-xl font-bold text-[var(--text-primary)] mb-6">
             Courses by {mentor.fullName}
           </h2>
 
-          {mentor.coursesTaught.length === 0 ? (
-            <Card className="bg-slate-900 border-slate-800 text-center py-12">
-              <BookOpen className="w-12 h-12 text-slate-700 mx-auto mb-4" />
-              <p className="text-slate-400">No published courses yet.</p>
-            </Card>
+          {!mentor.coursesTaught?.length ? (
+            <div className="text-center py-12">
+              <BookOpen className="w-6 h-6 text-[var(--text-muted)] mx-auto mb-4" />
+              <p className="text-[var(--text-muted)]">No published courses yet.</p>
+            </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               {mentor.coursesTaught.map((course: any) => (
                 <div
                   key={course.courseId}
+                  role="link"
+                  tabIndex={0}
+                  onKeyDown={(e) => { if (e.key === 'Enter') navigate(`/courses/${course.uniqueId}`); }}
                   onClick={() => navigate(`/courses/${course.uniqueId}`)}
-                  className="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden cursor-pointer group hover:border-blue-500/50 transition-colors shadow-lg"
+                  className="bg-[var(--bg-surface)] border border-[var(--border-default)] rounded-lg overflow-hidden cursor-pointer group hover:border-[var(--border-default)] transition-colors"
                 >
-                  <div className="h-40 bg-slate-800 relative overflow-hidden">
+                  <div className="h-40 bg-[var(--bg-surface-2)] relative overflow-hidden">
                     {course.thumbnail ? (
                       <img
                         src={course.thumbnail}
+                        loading="lazy"
                         alt={course.courseName}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        className="w-full h-full object-cover transition-transform duration-500"
                       />
                     ) : (
-                      <div className="absolute inset-0 flex-center bg-gradient-to-br from-slate-800 to-slate-900 text-slate-700">
-                        <BookOpen className="w-12 h-12" />
+                      <div className="absolute inset-0 flex-center bg-[var(--bg-surface-2)] text-[var(--text-muted)]">
+                        <BookOpen className="w-6 h-6" />
                       </div>
                     )}
-                    <div className="absolute top-3 left-3 bg-slate-950/80 backdrop-blur-md px-2.5 py-1 rounded-md text-[10px] font-bold text-blue-400 uppercase tracking-wider border border-white/10">
+                    <div className="absolute top-3 left-3 bg-[var(--bg-base)] px-2.5 py-1 rounded-md text-[10px] font-bold text-[var(--text-secondary)] uppercase tracking-normal border border-[var(--border-default)]">
                       {course.level}
                     </div>
                   </div>
                   <div className="p-5">
-                    <h3 className="text-lg font-bold text-white mb-2 line-clamp-2 group-hover:text-blue-400 transition-colors">
+                    <h3 className="text-lg font-bold text-[var(--text-primary)] mb-2 line-clamp-2 group-hover:text-[var(--text-secondary)] transition-colors">
                       {course.courseName}
                     </h3>
-                    <p className="text-sm text-slate-400 line-clamp-2 mb-4">
+                    <p className="text-sm text-[var(--text-muted)] line-clamp-2 mb-4">
                       {course.description}
                     </p>
-                    <div className="flex items-center gap-4 border-t border-slate-800/50 pt-4">
-                      <div className="flex items-center gap-1.5 text-xs text-slate-400 font-medium">
-                        <Users className="w-3.5 h-3.5 text-slate-500" />
-                        {course._count.enrollments} Students
-                      </div>
-                      <div className="flex items-center gap-1.5 text-xs text-slate-400 font-medium">
-                        <Star className="w-3.5 h-3.5 text-amber-400 fill-amber-400/20" />
-                        4.8
+                    <div className="flex items-center gap-4 border-t border-[var(--border-default)] pt-4">
+                      <div className="flex items-center gap-1.5 text-xs text-[var(--text-muted)] font-medium">
+                        <Users className="w-3.5 h-3.5 text-[var(--text-muted)]" />
+                        {course._count?.enrollments || 0} Students
                       </div>
                     </div>
                   </div>

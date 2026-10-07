@@ -1,4 +1,5 @@
 import { Link, useNavigate } from "react-router-dom";
+import { useBackNavigation } from "@/hooks/useBackNavigation";
 import { Button } from "@/components/ui";
 import PayilagamLogo from "@/components/ui/PayilagamLogo";
 import EmptyState from "@/components/ui/EmptyState";
@@ -9,14 +10,15 @@ import { ArrowLeft, Home } from "lucide-react";
  */
 const NotFound = () => {
   const navigate = useNavigate();
+  const goBack = useBackNavigation("/");
 
   return (
-    <div className="min-h-screen bg-slate-950 flex flex-col font-inter selection:bg-blue-500/30">
+    <div className="min-h-screen bg-[var(--bg-base)] text-[var(--text-primary)] flex flex-col font-inter selection:bg-blue-500/30">
       {/* Header */}
       <header className="absolute top-0 w-full p-6 z-10 flex items-center justify-between">
         <Link to="/" className="flex items-center gap-3 group">
           <PayilagamLogo size={32} className="drop-shadow-[0_0_8px_rgba(59,130,246,0.5)] group-hover:scale-110 transition-transform" />
-          <span className="font-extrabold text-xl text-white tracking-tight">Payilagam</span>
+          <span className="font-extrabold text-xl text-[var(--text-heading)] tracking-tight">Payilagam</span>
         </Link>
       </header>
 
@@ -28,10 +30,10 @@ const NotFound = () => {
 
         <div className="max-w-2xl w-full relative z-10">
           <div className="text-center mb-8">
-            <h1 className="text-[120px] md:text-[180px] font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-b from-slate-100 via-slate-400 to-slate-800 drop-shadow-sm leading-none select-none">
+            <h1 className="text-[120px] md:text-[180px] font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-b from-[var(--text-heading)] to-[var(--text-muted)] drop-shadow-sm leading-none select-none opacity-40">
               404
             </h1>
-            <p className="text-2xl md:text-3xl font-bold text-slate-200 mt-4 tracking-tight">
+            <p className="text-2xl md:text-3xl font-bold text-[var(--text-heading)] mt-4 tracking-tight">
               Lost in the digital void
             </p>
           </div>
@@ -44,15 +46,15 @@ const NotFound = () => {
 
           <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
             <Button 
-              onClick={() => navigate(-1)}
+              onClick={goBack}
               variant="outline"
-              className="w-full sm:w-auto h-12 px-8 border-slate-700 bg-slate-900 hover:bg-slate-800 text-slate-300 gap-2 rounded-xl"
+              className="w-full sm:w-auto h-12 px-8 border-[var(--border-default)] bg-[var(--bg-surface)] hover:bg-[var(--bg-hover)] text-[var(--text-primary)] gap-2 rounded-xl shadow-sm"
             >
               <ArrowLeft className="w-4 h-4" /> Go Back
             </Button>
             <Button 
               onClick={() => navigate("/")}
-              className="w-full sm:w-auto h-12 px-8 bg-blue-600 hover:bg-blue-500 text-white shadow-lg shadow-blue-900/20 gap-2 rounded-xl"
+              className="w-full sm:w-auto h-12 px-8 bg-[var(--action-bg)] hover:bg-[var(--action-hover)] text-white shadow-md gap-2 rounded-xl"
             >
               <Home className="w-4 h-4" /> Back to Home
             </Button>

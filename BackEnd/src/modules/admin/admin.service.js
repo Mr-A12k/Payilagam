@@ -2,6 +2,32 @@ const prisma = require("../../config/prisma");
 const bcrypt = require("bcryptjs");
 const os = require("os");
 
+const userError = (message, statusCode = 400) => Object.assign(new Error(message), { statusCode });
+const userIdValue = value => {
+  if (!/^\d+$/.test(String(value)) || Number(value) < 1) throw userError('Invalid user ID');
+  return Number(value);
+};
+const validateUserData = async (data, creating = false, userId) => {
+  for (const field of ['fullName', 'email', 'mobile', ...(creating ? ['userName'] : [])]) {
+    if (creating || data[field] !== undefined) {
+      if (typeof data[field] !== 'string' || !data[field].trim()) throw userError(`${field} is required`);
+      data[field] = data[field].trim();
+    }
+  }
+  if (data.email !== undefined) {
+    data.email = data.email.toLowerCase();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) throw userError('Invalid email address');
+  }
+  if (data.isActive !== undefined && typeof data.isActive !== 'boolean') throw userError('isActive must be a boolean');
+  if (data.password !== undefined && (typeof data.password !== 'string' || data.password.length < 6)) throw userError('Password must be at least 6 characters');
+  if (data.roleId !== undefined) {
+    data.roleId = Number(data.roleId);
+    if (!Number.isInteger(data.roleId) || !await prisma.role.findUnique({ where: { roleId: data.roleId } })) throw userError('Invalid role');
+  }
+  const identities = ['email', 'mobile', 'userName'].filter(field => data[field] !== undefined).map(field => ({ [field]: data[field] }));
+  if (identities.length && await prisma.user.findFirst({ where: { OR: identities, ...(userId ? { userId: { not: userId } } : {}) } })) throw userError('Email, username, or mobile already registered', 409);
+};
+
 // ─────────────────────────────────────────────────────────────
 // DASHBOARD STATS
 // ─────────────────────────────────────────────────────────────
@@ -229,6 +255,7 @@ const getUserById = async (userId) => {
 };
 
 const createUser = async (data) => {
+  await validateUserData(data, true);
   const { userName, fullName, email, mobile, password, roleId } = data;
 
   const existingUser = await prisma.user.findFirst({
@@ -246,8 +273,7 @@ const createUser = async (data) => {
       throw new Error("Mobile number already registered");
   }
 
-  // Default password to TaskPro@2026 if not provided
-  const userPassword = password || "TaskPro@2026";
+  const userPassword = password || "Payilagam@123";
   const hashedPassword = await bcrypt.hash(userPassword, 10);
 
   const user = await prisma.user.create({
@@ -268,6 +294,9 @@ const createUser = async (data) => {
 };
 
 const updateUser = async (userId, data) => {
+  userId = userIdValue(userId);
+  if (!await prisma.user.findUnique({ where: { userId } })) throw userError('User not found', 404);
+  await validateUserData(data, false, userId);
   const { fullName, email, mobile, roleId, isActive, bio } = data;
 
   const user = await prisma.user.update({
@@ -288,12 +317,13 @@ const updateUser = async (userId, data) => {
 };
 
 const deleteUser = async (userId) => {
+  userId = userIdValue(userId);
   const user = await prisma.user.findUnique({
     where: { userId: parseInt(userId) },
   });
 
   if (!user) {
-    throw new Error("User not found");
+    throw userError("User not found", 404);
   }
 
   // Soft delete by deactivating

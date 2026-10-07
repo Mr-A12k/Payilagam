@@ -8,7 +8,7 @@ const sendFollowRequest = catchAsync(async (request, response) => {
 
   const followRequest = await followService.sendFollowRequest(
     requesterId,
-    parseInt(targetId),
+    targetId,
   );
   return success(response, followRequest, "Follow request sent successfully");
 });
@@ -20,7 +20,7 @@ const getPendingRequests = catchAsync(async (request, response) => {
 });
 
 const respondToRequest = catchAsync(async (request, response) => {
-  const requestId = parseInt(request.params.id);
+  const requestId = request.params.id;
   const { status } = request.body; // 'approved' or 'rejected'
   const targetId = request.user.userId;
 
@@ -50,7 +50,7 @@ const toggleFollow = catchAsync(async (request, response) => {
 
   const result = await followService.toggleFollow(
     requesterId,
-    parseInt(targetId),
+    targetId,
   );
   return success(
     response,

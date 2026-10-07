@@ -19,7 +19,7 @@ import {
 } from "lucide-react";
 import toast from "react-hot-toast";
 import api from "@/api/axiosConfig";
-import { Button } from "@/components/ui";
+import { Button, Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui";
 
 /* ────────────────────────────────────────────────────────────────────
  *  DATA
@@ -147,10 +147,10 @@ const Contact = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 font-sans overflow-x-hidden">
+    <div className="min-h-screen bg-[var(--bg-base)] text-[var(--text-primary)] font-sans overflow-x-hidden">
       {/* ── Hero Section ───────────────────────────────────────────── */}
       <section
-        className="relative flex min-h-[50vh] items-center justify-center overflow-hidden bg-gradient-to-br from-slate-900 to-slate-950 text-white"
+        className="relative flex min-h-[50vh] items-center justify-center overflow-hidden bg-gradient-to-br from-blue-950 via-slate-900 to-indigo-950 text-white"
         aria-label="Contact hero"
       >
         {/* Decorative gradient orbs */}
@@ -163,10 +163,10 @@ const Contact = () => {
             <Sparkles className="h-4 w-4 text-blue-400" />
             We're Here to Help
           </div>
-          <h1 className="text-5xl font-bold leading-tight tracking-tight sm:text-6xl lg:text-7xl text-slate-100">
+          <h1 className="text-5xl font-bold leading-tight tracking-tight sm:text-6xl lg:text-7xl text-white">
             Get In Touch
           </h1>
-          <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-slate-400 sm:text-xl">
+          <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-slate-300 sm:text-xl">
             We'd love to hear from you. Reach out and let's start a
             conversation.
           </p>
@@ -174,17 +174,16 @@ const Contact = () => {
       </section>
 
       {/* ── Contact Form + Info ─────────────────────────────────────── */}
-      <section className="bg-slate-950 py-24 relative" aria-label="Contact form and information">
-        <div className="absolute inset-0 bg-slate-900/50"></div>
+      <section className="bg-[var(--bg-base)] py-24 relative" aria-label="Contact form and information">
         <div className="relative z-10 mx-auto max-w-7xl px-5 sm:px-8 lg:px-12">
           <div className="grid grid-cols-1 gap-16 lg:grid-cols-5">
             {/* ── Form (left — 3 cols) ──────────────────────────────── */}
             <div className="lg:col-span-3">
               <div className="mb-8">
-                <h2 className="text-3xl font-bold tracking-tight text-slate-100">
+                <h2 className="text-3xl font-bold tracking-tight text-[var(--text-heading)]">
                   Send Us a Message
                 </h2>
-                <p className="mt-2 text-slate-400">
+                <p className="mt-2 text-[var(--text-secondary)]">
                   Fill out the form below and we'll get back to you within 24
                   hours.
                 </p>
@@ -195,7 +194,7 @@ const Contact = () => {
                 <div>
                   <label
                     htmlFor="name"
-                    className="mb-2 block text-sm font-semibold text-slate-300"
+                    className="mb-2 block text-sm font-semibold text-[var(--text-secondary)]"
                   >
                     Full Name
                   </label>
@@ -207,7 +206,7 @@ const Contact = () => {
                     value={form.name}
                     onChange={handleChange}
                     placeholder="John Doe"
-                    className="w-full rounded-xl border border-slate-800 bg-slate-900/50 px-4 py-3 text-sm text-slate-200 outline-none transition-all placeholder:text-slate-500 focus:border-blue-500 focus:bg-slate-900 focus:ring-4 focus:ring-blue-500/20"
+                    className="w-full rounded-xl border border-[var(--border-default)] bg-[var(--bg-surface)] px-4 py-3 text-sm text-[var(--text-primary)] outline-none transition-all placeholder:text-[var(--text-muted)] focus:border-[var(--accent-primary)] focus:ring-4 focus:ring-blue-500/10 shadow-sm"
                   />
                 </div>
 
@@ -215,7 +214,7 @@ const Contact = () => {
                 <div>
                   <label
                     htmlFor="email"
-                    className="mb-2 block text-sm font-semibold text-slate-300"
+                    className="mb-2 block text-sm font-semibold text-[var(--text-secondary)]"
                   >
                     Email
                   </label>
@@ -227,7 +226,7 @@ const Contact = () => {
                     value={form.email}
                     onChange={handleChange}
                     placeholder="john@example.com"
-                    className="w-full rounded-xl border border-slate-800 bg-slate-900/50 px-4 py-3 text-sm text-slate-200 outline-none transition-all placeholder:text-slate-500 focus:border-blue-500 focus:bg-slate-900 focus:ring-4 focus:ring-blue-500/20"
+                    className="w-full rounded-xl border border-[var(--border-default)] bg-[var(--bg-surface)] px-4 py-3 text-sm text-[var(--text-primary)] outline-none transition-all placeholder:text-[var(--text-muted)] focus:border-[var(--accent-primary)] focus:ring-4 focus:ring-blue-500/10 shadow-sm"
                   />
                 </div>
 
@@ -235,35 +234,21 @@ const Contact = () => {
                 <div>
                   <label
                     htmlFor="subject"
-                    className="mb-2 block text-sm font-semibold text-slate-300"
+                    className="mb-2 block text-sm font-semibold text-[var(--text-secondary)]"
                   >
                     Subject
                   </label>
-                  <select
-                    id="subject"
-                    name="subject"
-                    required
-                    value={form.subject}
-                    onChange={handleChange}
-                    className="w-full appearance-none rounded-xl border border-slate-800 bg-slate-900/50 px-4 py-3 text-sm text-slate-200 outline-none transition-all focus:border-blue-500 focus:bg-slate-900 focus:ring-4 focus:ring-blue-500/20 [&>option]:bg-slate-900"
-                  >
-                    {subjectOptions.map((opt: any) => (
-                      <option
-                        key={opt.value}
-                        value={opt.value}
-                        disabled={opt.value === ""}
-                      >
-                        {opt.label}
-                      </option>
-                    ))}
-                  </select>
+                  <Select name="subject" required value={form.subject} onValueChange={(subject: string) => setForm(previous => ({ ...previous, subject }))}>
+                    <SelectTrigger id="subject"><SelectValue placeholder="Select a subject" /></SelectTrigger>
+                    <SelectContent>{subjectOptions.filter(opt => opt.value).map(opt => <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>)}</SelectContent>
+                  </Select>
                 </div>
 
                 {/* Message */}
                 <div>
                   <label
                     htmlFor="message"
-                    className="mb-2 block text-sm font-semibold text-slate-300"
+                    className="mb-2 block text-sm font-semibold text-[var(--text-secondary)]"
                   >
                     Message
                   </label>
@@ -275,7 +260,7 @@ const Contact = () => {
                     value={form.message}
                     onChange={handleChange}
                     placeholder="Tell us how we can help…"
-                    className="w-full resize-none rounded-xl border border-slate-800 bg-slate-900/50 px-4 py-3 text-sm text-slate-200 outline-none transition-all placeholder:text-slate-500 focus:border-blue-500 focus:bg-slate-900 focus:ring-4 focus:ring-blue-500/20"
+                    className="w-full resize-none rounded-xl border border-[var(--border-default)] bg-[var(--bg-surface)] px-4 py-3 text-sm text-[var(--text-primary)] outline-none transition-all placeholder:text-[var(--text-muted)] focus:border-[var(--accent-primary)] focus:ring-4 focus:ring-blue-500/10 shadow-sm"
                   />
                 </div>
 
@@ -284,7 +269,7 @@ const Contact = () => {
                   type="submit"
                   size="lg"
                   disabled={isSubmitting}
-                  className="h-12 w-full rounded-xl bg-blue-500 px-8 font-bold text-white shadow-lg shadow-blue-900/25 hover:bg-blue-600 sm:w-auto"
+                  className="h-12 w-full rounded-xl bg-[var(--action-bg)] hover:bg-[var(--action-hover)] px-8 font-bold text-white shadow-lg shadow-blue-500/20 sm:w-auto"
                 >
                   {isSubmitting ? (
                     <>
@@ -304,10 +289,10 @@ const Contact = () => {
             {/* ── Contact Info (right — 2 cols) ────────────────────── */}
             <div className="lg:col-span-2">
               <div className="mb-8">
-                <h2 className="text-3xl font-bold tracking-tight text-slate-100">
+                <h2 className="text-3xl font-bold tracking-tight text-[var(--text-heading)]">
                   Contact Info
                 </h2>
-                <p className="mt-2 text-slate-400">
+                <p className="mt-2 text-[var(--text-secondary)]">
                   Prefer a different channel? Reach out directly.
                 </p>
               </div>
@@ -323,7 +308,7 @@ const Contact = () => {
                     <Wrapper
                       key={item.title}
                       {...wrapperProps}
-                      className="group flex items-start gap-4 rounded-2xl border border-slate-800 bg-slate-900 p-5 transition-all duration-300 hover:border-slate-700 hover:shadow-lg hover:shadow-blue-900/10"
+                      className="group flex items-start gap-4 rounded-2xl border border-[var(--border-default)] bg-[var(--bg-surface)] p-5 transition-all duration-300 hover:border-[var(--accent-primary)] hover:shadow-lg shadow-sm"
                     >
                       <div
                         className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl ${item.bg} transition-transform duration-300 group-hover:scale-110`}
@@ -331,10 +316,10 @@ const Contact = () => {
                         <item.icon className={`h-5 w-5 ${item.color}`} />
                       </div>
                       <div>
-                        <h3 className="text-sm font-bold text-slate-200">
+                        <h3 className="text-sm font-bold text-[var(--text-heading)]">
                           {item.title}
                         </h3>
-                        <p className="mt-0.5 text-sm text-slate-400">
+                        <p className="mt-0.5 text-sm text-[var(--text-secondary)]">
                           {item.value}
                         </p>
                       </div>
@@ -344,13 +329,13 @@ const Contact = () => {
               </div>
 
               {/* Quick Response badge */}
-              <div className="mt-8 flex items-start gap-3 rounded-2xl border border-slate-800 bg-slate-900/50 p-5">
-                <MessageSquare className="mt-0.5 h-5 w-5 shrink-0 text-blue-400" />
+              <div className="mt-8 flex items-start gap-3 rounded-2xl border border-[var(--border-default)] bg-[var(--bg-surface-2)] p-5">
+                <MessageSquare className="mt-0.5 h-5 w-5 shrink-0 text-[var(--accent-primary)]" />
                 <div>
-                  <h3 className="text-sm font-bold text-slate-200">
+                  <h3 className="text-sm font-bold text-[var(--text-heading)]">
                     Quick Response
                   </h3>
-                  <p className="mt-0.5 text-sm text-slate-400">
+                  <p className="mt-0.5 text-sm text-[var(--text-secondary)]">
                     We typically respond within 24 hours during business days.
                   </p>
                 </div>
@@ -361,26 +346,25 @@ const Contact = () => {
       </section>
 
       {/* ── Map Section ────────────────────────────────────────────── */}
-      <section className="border-y border-slate-800 bg-slate-950 py-16" aria-label="Location map">
+      <section className="border-y border-[var(--border-default)] bg-[var(--bg-surface-2)] py-16" aria-label="Location map">
         <div className="mx-auto max-w-7xl px-5 sm:px-8 lg:px-12">
-          <div className="overflow-hidden rounded-2xl border border-slate-800 bg-slate-900 shadow-lg shadow-blue-900/5">
-            <div className="flex min-h-[320px] flex-col items-center justify-center p-12 text-center bg-gradient-to-br from-slate-900 to-slate-950 relative overflow-hidden">
-              <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-5"></div>
-              <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-blue-500/10 border border-blue-500/20 z-10">
-                <MapPin className="h-8 w-8 text-blue-400" />
+          <div className="overflow-hidden rounded-2xl border border-[var(--border-default)] bg-[var(--bg-surface)] shadow-md">
+            <div className="flex min-h-[320px] flex-col items-center justify-center p-12 text-center relative overflow-hidden">
+              <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-[var(--accent-primary-subtle)] border border-[var(--accent-primary-border)] z-10">
+                <MapPin className="h-8 w-8 text-[var(--accent-primary)]" />
               </div>
-              <h3 className="text-xl font-bold text-slate-100 z-10">
+              <h3 className="text-xl font-bold text-[var(--text-heading)] z-10">
                 Chennai, India
               </h3>
-              <p className="mt-2 max-w-md text-sm text-slate-400 z-10">
+              <p className="mt-2 max-w-md text-sm text-[var(--text-secondary)] z-10">
                 Our headquarters is located in the heart of Chennai, Tamil
                 Nadu — one of India's leading tech hubs.
               </p>
               <a
-                href="https://maps.google.com/?questionText =Chennai,Tamil+Nadu,India"
+                href="https://maps.google.com/?questionText=Chennai,Tamil+Nadu,India"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="mt-6 inline-flex items-center gap-2 rounded-full border border-slate-700 bg-slate-800 px-5 py-2 text-sm font-semibold text-slate-200 transition-all hover:bg-slate-700 hover:text-white hover:shadow-md z-10"
+                className="mt-6 inline-flex items-center gap-2 rounded-full border border-[var(--border-default)] bg-[var(--bg-surface)] px-5 py-2 text-sm font-semibold text-[var(--text-primary)] transition-all hover:bg-[var(--bg-hover)] hover:border-[var(--accent-primary)] hover:shadow-md z-10"
               >
                 <MapPin className="h-4 w-4" />
                 Open in Google Maps
@@ -391,14 +375,13 @@ const Contact = () => {
       </section>
 
       {/* ── FAQ Section ────────────────────────────────────────────── */}
-      <section className="bg-slate-950 py-24 relative" aria-label="Frequently asked questions">
-        <div className="absolute inset-0 bg-slate-900/30"></div>
+      <section className="bg-[var(--bg-base)] py-24 relative" aria-label="Frequently asked questions">
         <div className="relative z-10 mx-auto max-w-3xl px-5 sm:px-8 lg:px-12">
           <div className="mb-12 text-center">
-            <h2 className="text-4xl font-bold tracking-tight text-slate-100">
+            <h2 className="text-4xl font-bold tracking-tight text-[var(--text-heading)]">
               Frequently Asked Questions
             </h2>
-            <p className="mt-4 text-lg text-slate-400">
+            <p className="mt-4 text-lg text-[var(--text-secondary)]">
               Quick answers to the questions we get asked the most.
             </p>
           </div>
@@ -412,8 +395,8 @@ const Contact = () => {
                   key={index}
                   className={`overflow-hidden rounded-2xl border transition-all duration-300 ${
                     isOpen
-                      ? "border-slate-700 bg-slate-900 shadow-md shadow-blue-900/10"
-                      : "border-slate-800 bg-slate-900/50 hover:border-slate-700 hover:bg-slate-900"
+                      ? "border-[var(--accent-primary)] bg-[var(--bg-surface)] shadow-md"
+                      : "border-[var(--border-default)] bg-[var(--bg-surface)] hover:border-[var(--accent-primary)]"
                   }`}
                 >
                   <button
@@ -422,12 +405,12 @@ const Contact = () => {
                     className="flex w-full items-center justify-between px-6 py-5 text-left"
                     aria-expanded={isOpen}
                   >
-                    <span className="pr-4 text-sm font-bold text-slate-200 sm:text-base">
+                    <span className="pr-4 text-sm font-bold text-[var(--text-heading)] sm:text-base">
                       {faq.question}
                     </span>
                     <ChevronDown
-                      className={`h-5 w-5 shrink-0 text-slate-500 transition-transform duration-300 ${
-                        isOpen ? "rotate-180 text-blue-400" : ""
+                      className={`h-5 w-5 shrink-0 text-[var(--text-muted)] transition-transform duration-300 ${
+                        isOpen ? "rotate-180 text-[var(--accent-primary)]" : ""
                       }`}
                     />
                   </button>
@@ -437,7 +420,7 @@ const Contact = () => {
                       isOpen ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
                     }`}
                   >
-                    <div className="px-6 pb-5 text-sm leading-relaxed text-slate-400">
+                    <div className="px-6 pb-5 text-sm leading-relaxed text-[var(--text-secondary)]">
                       {faq.answer}
                     </div>
                   </div>
@@ -448,11 +431,11 @@ const Contact = () => {
 
           {/* CTA under FAQ */}
           <div className="mt-12 text-center">
-            <p className="text-slate-400">
+            <p className="text-[var(--text-muted)]">
               Still have questions?{" "}
               <Link
                 to="/about"
-                className="font-semibold text-blue-400 hover:text-blue-300"
+                className="font-semibold text-[var(--accent-primary)] hover:underline"
               >
                 Learn more about us
               </Link>{" "}

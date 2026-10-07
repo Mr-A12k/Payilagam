@@ -1,4 +1,6 @@
 const prisma = require("../../config/prisma");
+const AppError = require('../../utils/AppError');
+const { text } = require('./validation');
 
 const createDiscussion = async (authorId, data) => {
   const { title, content, problemId } = data;
@@ -9,7 +11,7 @@ const createDiscussion = async (authorId, data) => {
       where: { problemId: parseInt(problemId) },
     });
     if (!problem) {
-      throw new Error("Coding problem not found");
+      throw new AppError("Coding problem not found", 404);
     }
   }
 
@@ -146,7 +148,7 @@ const getDiscussionById = async (discussionId) => {
   });
 
   if (!discussion) {
-    throw new Error("Discussion not found");
+    throw new AppError("Discussion not found", 404);
   }
 
   return discussion;
@@ -158,11 +160,11 @@ const updateDiscussion = async (discussionId, authorId, data) => {
   });
 
   if (!discussion) {
-    throw new Error("Discussion not found");
+    throw new AppError("Discussion not found", 404);
   }
 
   if (discussion.authorId !== authorId) {
-    throw new Error("You can only edit your own discussions");
+    throw new AppError("You can only edit your own discussions", 403);
   }
 
   return prisma.discussion.update({
@@ -190,11 +192,11 @@ const deleteDiscussion = async (discussionId, userId, userRole) => {
   });
 
   if (!discussion) {
-    throw new Error("Discussion not found");
+    throw new AppError("Discussion not found", 404);
   }
 
   if (discussion.authorId !== userId && userRole !== "admin") {
-    throw new Error("You can only delete your own discussions");
+    throw new AppError("You can only delete your own discussions", 403);
   }
 
   await prisma.discussion.delete({
@@ -210,11 +212,11 @@ const toggleResolved = async (discussionId, userId) => {
   });
 
   if (!discussion) {
-    throw new Error("Discussion not found");
+    throw new AppError("Discussion not found", 404);
   }
 
   if (discussion.authorId !== userId) {
-    throw new Error("Only the author can mark discussions as resolved");
+    throw new AppError("Only the author can mark discussions as resolved", 403);
   }
 
   return prisma.discussion.update({
@@ -229,7 +231,7 @@ const upvoteDiscussion = async (discussionId) => {
   });
 
   if (!discussion) {
-    throw new Error("Discussion not found");
+    throw new AppError("Discussion not found", 404);
   }
 
   return prisma.discussion.update({
@@ -241,13 +243,14 @@ const upvoteDiscussion = async (discussionId) => {
 // Reply functions
 const createReply = async (discussionId, authorId, data) => {
   const { content, parentReplyId } = data;
+  text(content);
 
   const discussion = await prisma.discussion.findUnique({
     where: { discussionId: parseInt(discussionId) },
   });
 
   if (!discussion) {
-    throw new Error("Discussion not found");
+    throw new AppError("Discussion not found", 404);
   }
 
   if (parentReplyId) {
@@ -255,7 +258,7 @@ const createReply = async (discussionId, authorId, data) => {
       where: { replyId: parseInt(parentReplyId) },
     });
     if (!parentReply || parentReply.discussionId !== parseInt(discussionId)) {
-      throw new Error("Parent reply not found in this discussion");
+      throw new AppError("Parent reply not found in this discussion", 400);
     }
   }
 
@@ -280,16 +283,17 @@ const createReply = async (discussionId, authorId, data) => {
 };
 
 const updateReply = async (replyId, authorId, content) => {
+  text(content);
   const reply = await prisma.discussionReply.findUnique({
     where: { replyId: parseInt(replyId) },
   });
 
   if (!reply) {
-    throw new Error("Reply not found");
+    throw new AppError("Reply not found", 404);
   }
 
   if (reply.authorId !== authorId) {
-    throw new Error("You can only edit your own replies");
+    throw new AppError("You can only edit your own replies", 403);
   }
 
   return prisma.discussionReply.update({
@@ -314,11 +318,11 @@ const deleteReply = async (replyId, userId, userRole) => {
   });
 
   if (!reply) {
-    throw new Error("Reply not found");
+    throw new AppError("Reply not found", 404);
   }
 
   if (reply.authorId !== userId && userRole !== "admin") {
-    throw new Error("You can only delete your own replies");
+    throw new AppError("You can only delete your own replies", 403);
   }
 
   await prisma.discussionReply.delete({
@@ -334,7 +338,7 @@ const upvoteReply = async (replyId) => {
   });
 
   if (!reply) {
-    throw new Error("Reply not found");
+    throw new AppError("Reply not found", 404);
   }
 
   return prisma.discussionReply.update({

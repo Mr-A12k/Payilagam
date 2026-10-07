@@ -18,6 +18,11 @@ const initTransporter = async () => {
             },
         });
     } else {
+        if (process.env.NODE_ENV === 'production') {
+            const error = new Error('Email service is not configured');
+            error.statusCode = 503;
+            throw error;
+        }
         // Fallback to Ethereal Email for development if no SMTP vars exist
         console.log('📧 No SMTP credentials found in .env, generating Ethereal test account...');
         const testAccount = await nodemailer.createTestAccount();

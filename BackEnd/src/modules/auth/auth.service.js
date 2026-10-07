@@ -2,6 +2,7 @@ const prisma = require("../../config/prisma");
 const bcrypt = require("bcryptjs");
 const crypto = require("crypto");
 const generateToken = require("../../utils/generateTokens");
+const authError = (message, statusCode = 400) => Object.assign(new Error(message), { statusCode });
 
 const getPageAccess = (roleName) => {
   switch (roleName) {
@@ -19,44 +20,53 @@ const getPageAccess = (roleName) => {
 const signupOtpCache = new Map();
 
 const requestSignupOtp = async (email) => {
+  if (typeof email !== 'string' || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) throw authError('Invalid email address');
+  email = email.trim().toLowerCase();
   // Check if email already registered
   const existingUser = await prisma.user.findFirst({
     where: { email },
   });
   if (existingUser) {
-    throw new Error("Email already registered");
+    throw authError("Email already registered", 409);
   }
 
-  // Generate a hardcoded OTP for now
-  const otp = "0000";
-  // Expire in 30 seconds
-  const expiresAt = Date.now() + 30 * 1000;
-
-  signupOtpCache.set(email, { otp, expiresAt });
+  const otp = crypto.randomInt(100000, 1000000).toString();
+  const expiresAt = Date.now() + 5 * 60 * 1000;
+  await require('../../utils/email').sendMail(email, 'Your Payilagam verification code', `Your verification code is ${otp}. It expires in five minutes.`);
+  signupOtpCache.set(email, { otp, expiresAt, attempts: 0 });
 
   return { success: true, message: "OTP sent successfully. Please check your email." };
 };
 
 const registerUser = async (userData) => {
+  if (typeof userData.email === 'string') userData.email = userData.email.trim().toLowerCase();
+  const studentRole = await prisma.role.findUnique({ where: { roleName: 'student' } });
+  if (!studentRole) throw authError('Student role is not configured', 503);
+  if (userData.roleId !== undefined && Number(userData.roleId) !== studentRole.roleId) throw authError('Public registration is only available for student accounts', 403);
+  for (const field of ['userName', 'fullName', 'mobile']) {
+    if (typeof userData[field] !== 'string' || !userData[field].trim()) throw authError(`${field} is required`);
+    userData[field] = userData[field].trim();
+  }
   const { userName, fullName, email, mobile, password, roleId, otp } = userData;
 
   // Validate OTP
   const cachedData = signupOtpCache.get(email);
   if (!cachedData) {
-    throw new Error("OTP not requested or expired");
+    throw authError("OTP not requested or expired");
   }
   
   if (Date.now() > cachedData.expiresAt) {
     signupOtpCache.delete(email);
-    throw new Error("OTP has expired. Please request a new one.");
+    throw authError("OTP has expired. Please request a new one.");
   }
   
   if (cachedData.otp !== otp) {
-    throw new Error("Invalid OTP provided");
+    cachedData.attempts++;
+    if (cachedData.attempts >= 5) signupOtpCache.delete(email);
+    throw authError("Invalid OTP provided");
   }
   
   // Clean up cache on success
-  signupOtpCache.delete(email);
 
   // Check if user already exists
   const existingUser = await prisma.user.findFirst({
@@ -67,15 +77,15 @@ const registerUser = async (userData) => {
 
   if (existingUser) {
     if (existingUser.email === email)
-      throw new Error("Email already registered");
+      throw authError("Email already registered", 409);
     if (existingUser.userName === userName)
-      throw new Error("Username already taken");
+      throw authError("Username already taken", 409);
     if (existingUser.mobile === mobile)
-      throw new Error("Mobile number already registered");
+      throw authError("Mobile number already registered", 409);
   }
 
   // Default to student role (roleId: 3) if not provided
-  const assignedRoleId = roleId || 3;
+  const assignedRoleId = studentRole.roleId;
 
   // Verify role exists
   const role = await prisma.role.findUnique({
@@ -103,6 +113,7 @@ const registerUser = async (userData) => {
   });
 
   const token = generateToken(user.userId, user.role.roleName);
+  signupOtpCache.delete(email);
 
   return {
     token,
@@ -142,17 +153,17 @@ const loginUser = async (identifier, password) => {
   });
 
   if (!user) {
-    throw new Error("Invalid email or password");
+    throw authError("Invalid email or password", 401);
   }
 
   if (!user.isActive) {
-    throw new Error("Account has been deactivated. Contact admin.");
+    throw Object.assign(new Error("Account has been deactivated. Contact admin."), { statusCode: 403 });
   }
 
   const isMatch = await bcrypt.compare(password, user.password);
 
   if (!isMatch) {
-    throw new Error("Invalid email or password");
+    throw authError("Invalid email or password", 401);
   }
 
   const token = generateToken(user.userId, user.role.roleName);
@@ -223,6 +234,11 @@ const getProfile = async (userId) => {
 };
 
 const updateProfile = async (userId, updateData) => {
+  if (updateData.fullName !== undefined && (typeof updateData.fullName !== 'string' || !updateData.fullName.trim())) throw authError('Full name is required');
+  if (updateData.email !== undefined) {
+    if (typeof updateData.email !== 'string' || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(updateData.email.trim())) throw authError('Invalid email address');
+    updateData.email = updateData.email.trim().toLowerCase();
+  }
   const {
     fullName,
     bio,
@@ -239,12 +255,12 @@ const updateProfile = async (userId, updateData) => {
       where: { email, userId: { not: userId } },
     });
     if (existingEmail) {
-      throw new Error("Email is already in use by another account");
+      throw authError("Email is already in use by another account", 409);
     }
   }
 
   // Validate theme value
-  const validThemes = ["dark", "light"];
+  const validThemes = ["dark", "light", "ocean", "rose", "graphite", "forest", "ember"];
   const resolvedTheme =
     theme && validThemes.includes(theme) ? theme : undefined;
 
@@ -279,6 +295,7 @@ const updateProfile = async (userId, updateData) => {
 };
 
 const changePassword = async (userId, currentPassword, newPassword) => {
+  if (typeof currentPassword !== 'string' || typeof newPassword !== 'string' || newPassword.length < 8) throw authError('Current password and a new password of at least 8 characters are required');
   const user = await prisma.user.findUnique({
     where: { userId },
   });
@@ -289,7 +306,7 @@ const changePassword = async (userId, currentPassword, newPassword) => {
 
   const isMatch = await bcrypt.compare(currentPassword, user.password);
   if (!isMatch) {
-    throw new Error("Current password is incorrect");
+    throw authError("Current password is incorrect");
   }
 
   const hashedPassword = await bcrypt.hash(newPassword, 10);
@@ -332,22 +349,23 @@ const requestPasswordReset = async (email) => {
 
 // Verify OTP and reset password
 const verifyPasswordReset = async (email, otp, newPassword) => {
+  if (typeof email !== 'string' || typeof otp !== 'string' || typeof newPassword !== 'string' || newPassword.length < 8) throw authError('Email, OTP, and a password of at least 8 characters are required');
   const user = await prisma.user.findUnique({ where: { email } });
   if (!user) {
-    throw new Error("Invalid OTP or email");
+    throw authError("Invalid OTP or email");
   }
   const otpRecord = await prisma.passwordResetOTP.findUnique({
     where: { userId: user.userId },
   });
   if (!otpRecord) {
-    throw new Error("Invalid OTP or email");
+    throw authError("Invalid OTP or email");
   }
   if (otpRecord.expiresAt < new Date()) {
-    throw new Error("OTP has expired");
+    throw authError("OTP has expired");
   }
   const isValid = await bcrypt.compare(otp, otpRecord.otpHash);
   if (!isValid) {
-    throw new Error("Invalid OTP");
+    throw authError("Invalid OTP");
   }
   // Update password
   const hashedPassword = await bcrypt.hash(newPassword, 10);

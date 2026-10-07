@@ -5,6 +5,8 @@ const {
   getSortParams,
 } = require("../../utils/pagination");
 
+const courseError = (message, statusCode) => Object.assign(new Error(message), { statusCode });
+
 /**
  * Create a new course
  */
@@ -24,7 +26,7 @@ const createCourse = async (mentorId, data) => {
   // Check for duplicate course code
   const existing = await prisma.course.findUnique({ where: { courseCode } });
   if (existing) {
-    throw new Error("Course with this code already exists");
+    throw courseError("Course with this code already exists", 409);
   }
 
   // Validate categoryId if provided
@@ -33,7 +35,7 @@ const createCourse = async (mentorId, data) => {
       where: { categoryId },
     });
     if (!category) {
-      throw new Error("Category not found");
+      throw courseError("Category not found", 400);
     }
   }
 
@@ -47,7 +49,7 @@ const createCourse = async (mentorId, data) => {
       level: level || "beginner",
       status: status || "draft",
       categoryId: categoryId || null,
-      duration: duration || null,
+      duration: duration ?? null,
       mentorId,
     },
     include: {
@@ -217,7 +219,7 @@ const getCourseById = async (id, user = null) => {
   });
 
   if (!course) {
-    throw new Error("Course not found");
+    throw courseError("Course not found", 404);
   }
 
   // Calculate average rating
@@ -254,12 +256,12 @@ const updateCourse = async (courseId, mentorId, data) => {
   });
 
   if (!existing) {
-    throw new Error("Course not found");
+    throw courseError("Course not found", 404);
   }
 
   // Check ownership (mentorId will be null for admin bypass)
   if (mentorId && existing.mentorId !== mentorId) {
-    throw new Error("You are not authorized to update this course");
+    throw courseError("You are not authorized to update this course", 403);
   }
 
   // If courseCode is being changed, check for duplicates
@@ -268,7 +270,7 @@ const updateCourse = async (courseId, mentorId, data) => {
       where: { courseCode: data.courseCode },
     });
     if (duplicate) {
-      throw new Error("Course with this code already exists");
+      throw courseError("Course with this code already exists", 409);
     }
   }
 
@@ -278,7 +280,7 @@ const updateCourse = async (courseId, mentorId, data) => {
       where: { categoryId: data.categoryId },
     });
     if (!category) {
-      throw new Error("Category not found");
+      throw courseError("Category not found", 400);
     }
   }
 
@@ -321,7 +323,7 @@ const deleteCourse = async (courseId, userId, userRole) => {
   });
 
   if (!course) {
-    throw new Error("Course not found");
+    throw courseError("Course not found", 404);
   }
 
   // Only Admin can delete a course.
@@ -331,8 +333,10 @@ const deleteCourse = async (courseId, userId, userRole) => {
     );
   }
 
-  await prisma.course.delete({
-    where: { courseId: course.courseId },
+  await prisma.$transaction(async (transaction) => {
+    await transaction.enrollment.deleteMany({ where: { courseId: course.courseId } });
+    await transaction.workspace.deleteMany({ where: { courseId: course.courseId } });
+    await transaction.course.delete({ where: { courseId: course.courseId } });
   });
 
   return { message: "Course deleted successfully" };
@@ -480,8 +484,23 @@ const getPublishedCourses = async (filters) => {
     prisma.course.count({ where }),
   ]);
 
+  const ratings = courses.length ? await prisma.courseReview.groupBy({
+    by: ["courseId"],
+    where: { courseId: { in: courses.map((course) => course.courseId) } },
+    _avg: { rating: true },
+  }) : [];
+  const ratingsByCourse = new Map(ratings.map((rating) => [
+    rating.courseId,
+    rating._avg.rating == null ? null : Number(rating._avg.rating.toFixed(1)),
+  ]));
   const pagination = getPaginationMeta(total, page, limit);
-  return { courses, pagination };
+  return {
+    courses: courses.map((course) => ({
+      ...course,
+      averageRating: ratingsByCourse.get(course.courseId) ?? null,
+    })),
+    pagination,
+  };
 };
 
 /**
@@ -512,13 +531,13 @@ const getMentorStats = async (mentorId) => {
   let totalEnrollment = 0;
   let totalRevenue = 0;
 
-  courses.forEach((c) => {
+  courses.forEach((courseItem) => {
     totalEnrollment += courseItem._count.enrollments;
     totalRevenue += courseItem._count.enrollments * courseItem.price;
   });
 
   // Average Completion
-  const courseIds = courses.map((c) => courseItem.courseId);
+  const courseIds = courses.map((courseItem) => courseItem.courseId);
 
   const completionResult = await prisma.enrollment.aggregate({
     where: { courseId: { in: courseIds } },
@@ -552,11 +571,11 @@ const requestCourseDeletion = async (courseId, userId) => {
   });
 
   if (!course) {
-    throw new Error("Course not found");
+    throw courseError("Course not found", 404);
   }
 
   if (course.mentorId !== userId) {
-    throw new Error("Only the course mentor can request deletion");
+    throw courseError("Only the course mentor can request deletion", 403);
   }
 
   // Find all admins
@@ -570,11 +589,7 @@ const requestCourseDeletion = async (courseId, userId) => {
     type: "request",
     title: "Course Deletion Request",
     message: `Mentor ${course.mentor.fullName} has requested the deletion of the course "${course.courseName}" (${course.courseCode}).`,
-    metadata: JSON.stringify({
-      courseId: course.courseId,
-      uniqueId: course.uniqueId,
-      mentorId: userId,
-    }),
+    link: `/courses/${course.uniqueId}`,
   }));
 
   if (notifications.length > 0) {

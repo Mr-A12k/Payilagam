@@ -142,6 +142,8 @@ const normalizeResult = (judge0Result) => {
 
     if (statusId === 3) {
         status = 'accepted';
+    } else if (statusId === 4) {
+        status = 'wrong_answer';
     } else if (statusId === 6) {
         status = 'compilation_error';
         errorMessage = compileOutput || 'Compilation failed';
@@ -247,8 +249,11 @@ const executeAgainstAllTestCases = async (code, language, testCases) => {
         }
     }
 
-    const overallStatus = passedCount === testCases.length ? 'accepted' : 'wrong_answer';
-    const lastError = results.find(r => !r.passed && r.errorMessage);
+    const failure = ['system_error', 'runtime_error', 'time_limit']
+        .map(status => results.find(result => result.status === status))
+        .find(Boolean);
+    const overallStatus = failure?.status || (passedCount === testCases.length ? 'accepted' : 'wrong_answer');
+    const lastError = failure || results.find(r => !r.passed && r.errorMessage);
 
     return {
         status: overallStatus,

@@ -25,7 +25,7 @@ function DialogOverlay({ className, ...props }: any) {
     <DialogPrimitive.Overlay
       data-slot="dialog-overlay"
       className={cn(
-        "fixed inset-0 isolate z-50 bg-slate-900/40 backdrop-blur-sm duration-200 data-open:animate-in data-open:fade-in-0 data-closed:animate-out data-closed:fade-out-0",
+        "fixed inset-0 isolate z-50 bg-black/45 backdrop-blur-[2px] duration-200 data-open:animate-in data-open:fade-in-0 data-closed:animate-out data-closed:fade-out-0",
         className,
       )}
       {...props}
@@ -51,7 +51,7 @@ function DialogContent({
           transform: "translate(-50%, -50%)",
         }}
         className={cn(
-          "z-50 grid w-full max-w-[calc(100%-2rem)] gap-5 rounded-2xl bg-slate-900 p-6 shadow-2xl ring-1 ring-slate-900/5 duration-200 outline-none sm:max-w-md data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95",
+          "z-50 grid w-[calc(100vw-2rem)] max-w-md max-h-[calc(100dvh-2rem)] overflow-y-auto gap-5 rounded-lg border border-[var(--dialog-border)] bg-[var(--dialog-bg)] text-[var(--text-primary)] p-6 shadow-2xl duration-200 outline-none data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95",
           className,
         )}
         {...props}
@@ -97,7 +97,7 @@ function DialogFooter({
     <div
       data-slot="dialog-footer"
       className={cn(
-        "-mx-6 -mb-6 mt-2 flex flex-col-reverse gap-3 rounded-b-2xl border-t border-slate-800 bg-slate-950/80 p-4 sm:flex-row sm:justify-end",
+        "-mx-6 -mb-6 mt-2 flex flex-col-reverse gap-3 rounded-b-lg border-t border-[var(--border-subtle)] bg-[var(--bg-surface-2)] p-4 sm:flex-row sm:justify-end",
         className,
       )}
       {...props}
@@ -117,7 +117,7 @@ function DialogTitle({ className, ...props }: any) {
     <DialogPrimitive.Title
       data-slot="dialog-title"
       className={cn(
-        "text-lg font-semibold tracking-tight text-slate-100",
+        "text-base font-semibold text-[var(--text-heading)]",
         className,
       )}
       {...props}
@@ -130,7 +130,7 @@ function DialogDescription({ className, ...props }: any) {
     <DialogPrimitive.Description
       data-slot="dialog-description"
       className={cn(
-        "text-sm text-slate-500 leading-relaxed *:[a]:underline *:[a]:underline-offset-3 *:[a]:hover:text-slate-100",
+        "text-sm text-[var(--text-secondary)] leading-relaxed *:[a]:underline *:[a]:underline-offset-3 *:[a]:hover:text-[var(--text-primary)]",
         className,
       )}
       {...props}

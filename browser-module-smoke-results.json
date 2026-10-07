@@ -1,0 +1,469 @@
+[
+  {
+    "headings": [
+      "Overview",
+      "Enrollment activity",
+      "Top courses"
+    ],
+    "path": "/admin",
+    "scrollWidth": 1440,
+    "textLength": 849,
+    "width": 1440
+  },
+  {
+    "headings": [
+      "Courses",
+      "Filters",
+      "Payilagam Labs"
+    ],
+    "path": "/courses",
+    "scrollWidth": 1440,
+    "textLength": 1236,
+    "width": 1440
+  },
+  {
+    "headings": [
+      "Free Learning Materials",
+      "Latest Additions"
+    ],
+    "path": "/resources",
+    "scrollWidth": 1440,
+    "textLength": 683,
+    "width": 1440
+  },
+  {
+    "headings": [
+      "Payilagam Labs"
+    ],
+    "path": "/labs",
+    "scrollWidth": 1440,
+    "textLength": 3859,
+    "width": 1440
+  },
+  {
+    "headings": [
+      "Mentors"
+    ],
+    "path": "/mentors",
+    "scrollWidth": 1440,
+    "textLength": 390,
+    "width": 1440
+  },
+  {
+    "headings": [
+      "About Payilagam",
+      "What Drives Us",
+      "Meet Our Leadership"
+    ],
+    "path": "/about",
+    "scrollWidth": 1440,
+    "textLength": 2641,
+    "width": 1440
+  },
+  {
+    "headings": [
+      "Get In Touch",
+      "Send Us a Message",
+      "Contact Info"
+    ],
+    "path": "/contact",
+    "scrollWidth": 1440,
+    "textLength": 2464,
+    "width": 1440
+  },
+  {
+    "headings": [
+      "Terms of Service",
+      "1. Agreement to Terms",
+      "2. User License"
+    ],
+    "path": "/terms",
+    "scrollWidth": 1440,
+    "textLength": 1460,
+    "width": 1440
+  },
+  {
+    "headings": [
+      " AI Image Verifier"
+    ],
+    "path": "/ai-image",
+    "scrollWidth": 1440,
+    "textLength": 475,
+    "width": 1440
+  },
+  {
+    "headings": [
+      "Upskill Your Entire Engineering Team"
+    ],
+    "path": "/enterprise",
+    "scrollWidth": 1440,
+    "textLength": 759,
+    "width": 1440
+  },
+  {
+    "headings": [
+      "Empower Your Students with Industry-Ready Skills",
+      "Ready to transform your curriculum?"
+    ],
+    "path": "/enterprise/universities",
+    "scrollWidth": 1440,
+    "textLength": 1065,
+    "width": 1440
+  },
+  {
+    "headings": [
+      "Secure, Scalable Upskilling for Government Agencies",
+      "Modernize your workforce today."
+    ],
+    "path": "/enterprise/government",
+    "scrollWidth": 1440,
+    "textLength": 1057,
+    "width": 1440
+  },
+  {
+    "headings": [
+      "Dashboard",
+      "Continue learning",
+      "Learning activity"
+    ],
+    "path": "/dashboard",
+    "scrollWidth": 1440,
+    "textLength": 376,
+    "width": 1440
+  },
+  {
+    "headings": [
+      "My Learning",
+      "No enrolled courses"
+    ],
+    "path": "/learning",
+    "scrollWidth": 1440,
+    "textLength": 238,
+    "width": 1440
+  },
+  {
+    "headings": [
+      "Analytics"
+    ],
+    "path": "/analytics",
+    "scrollWidth": 1440,
+    "textLength": 271,
+    "width": 1440
+  },
+  {
+    "headings": [
+      "Upcoming Assignments"
+    ],
+    "path": "/assignments",
+    "scrollWidth": 1440,
+    "textLength": 274,
+    "width": 1440
+  },
+  {
+    "headings": [
+      "Coding Practice"
+    ],
+    "path": "/practice",
+    "scrollWidth": 1440,
+    "textLength": 618,
+    "width": 1440
+  },
+  {
+    "headings": [
+      "Courses"
+    ],
+    "path": "/mentor",
+    "scrollWidth": 1440,
+    "textLength": 319,
+    "width": 1440
+  },
+  {
+    "headings": [
+      "Students"
+    ],
+    "path": "/mentor/students",
+    "scrollWidth": 1440,
+    "textLength": 277,
+    "width": 1440
+  },
+  {
+    "headings": [
+      "Create New Course",
+      "Basic Information"
+    ],
+    "path": "/mentor/course/create",
+    "scrollWidth": 1440,
+    "textLength": 835,
+    "width": 1440
+  },
+  {
+    "headings": [
+      "Overview",
+      "Enrollment activity",
+      "Top courses"
+    ],
+    "path": "/admin",
+    "scrollWidth": 1440,
+    "textLength": 849,
+    "width": 1440
+  },
+  {
+    "headings": [
+      "User management"
+    ],
+    "path": "/admin/users",
+    "scrollWidth": 1440,
+    "textLength": 415,
+    "width": 1440
+  },
+  {
+    "headings": [],
+    "path": "/admin/reports",
+    "scrollWidth": 1440,
+    "textLength": 249,
+    "width": 1440
+  },
+  {
+    "headings": [
+      "Notifications"
+    ],
+    "path": "/admin/notifications",
+    "scrollWidth": 1440,
+    "textLength": 297,
+    "width": 1440
+  },
+  {
+    "headings": [
+      "Analytics"
+    ],
+    "path": "/admin/analytics",
+    "scrollWidth": 1440,
+    "textLength": 291,
+    "width": 1440
+  },
+  {
+    "headings": [
+      "Messages",
+      "Messages"
+    ],
+    "path": "/chat",
+    "scrollWidth": 1440,
+    "textLength": 360,
+    "width": 1440
+  },
+  {
+    "headings": [
+      "Network"
+    ],
+    "path": "/network",
+    "scrollWidth": 1440,
+    "textLength": 340,
+    "width": 1440
+  },
+  {
+    "headings": [
+      "Account Settings",
+      "Profile Information"
+    ],
+    "path": "/settings",
+    "scrollWidth": 1440,
+    "textLength": 640,
+    "width": 1440
+  },
+  {
+    "headings": [
+      "AI Assistant",
+      "What would you like to learn?"
+    ],
+    "path": "/ai-assistant",
+    "scrollWidth": 1440,
+    "textLength": 343,
+    "width": 1440
+  },
+  {
+    "headings": [
+      "Documents"
+    ],
+    "path": "/documents",
+    "scrollWidth": 1440,
+    "textLength": 364,
+    "width": 1440
+  },
+  {
+    "headings": [
+      "Courses",
+      "Filters",
+      "Payilagam Labs"
+    ],
+    "path": "/courses",
+    "scrollWidth": 390,
+    "textLength": 443,
+    "width": 390
+  },
+  {
+    "headings": [
+      "Overview",
+      "Enrollment activity",
+      "Top courses"
+    ],
+    "path": "/admin",
+    "scrollWidth": 390,
+    "textLength": 387,
+    "width": 390
+  },
+  {
+    "headings": [
+      "User management"
+    ],
+    "path": "/admin/users",
+    "scrollWidth": 390,
+    "textLength": 223,
+    "width": 390
+  },
+  {
+    "headings": [
+      "Documents"
+    ],
+    "path": "/documents",
+    "scrollWidth": 390,
+    "textLength": 172,
+    "width": 390
+  },
+  {
+    "headings": [
+      "Create New Course",
+      "Basic Information"
+    ],
+    "path": "/mentor/course/create",
+    "scrollWidth": 390,
+    "textLength": 564,
+    "width": 390
+  },
+  {
+    "headings": [
+      "Messages",
+      "Messages"
+    ],
+    "path": "/chat",
+    "scrollWidth": 390,
+    "textLength": 132,
+    "width": 390
+  },
+  {
+    "headings": [
+      "Network"
+    ],
+    "path": "/network",
+    "scrollWidth": 390,
+    "textLength": 148,
+    "width": 390
+  },
+  {
+    "headings": [
+      "Account Settings",
+      "Profile Information"
+    ],
+    "path": "/settings",
+    "scrollWidth": 390,
+    "textLength": 448,
+    "width": 390
+  },
+  {
+    "headings": [
+      "Coding Practice"
+    ],
+    "path": "/practice",
+    "scrollWidth": 390,
+    "textLength": 204,
+    "width": 390
+  },
+  {
+    "headings": [
+      "AI Assistant",
+      "What would you like to learn?"
+    ],
+    "path": "/ai-assistant",
+    "scrollWidth": 390,
+    "textLength": 151,
+    "width": 390
+  },
+  {
+    "headings": [
+      "Courses",
+      "Filters",
+      "Payilagam Labs"
+    ],
+    "path": "/courses",
+    "scrollWidth": 768,
+    "textLength": 460,
+    "width": 768
+  },
+  {
+    "headings": [
+      "Overview",
+      "Enrollment activity",
+      "Top courses"
+    ],
+    "path": "/admin",
+    "scrollWidth": 768,
+    "textLength": 404,
+    "width": 768
+  },
+  {
+    "headings": [
+      "User management"
+    ],
+    "path": "/admin/users",
+    "scrollWidth": 768,
+    "textLength": 240,
+    "width": 768
+  },
+  {
+    "headings": [
+      "Documents"
+    ],
+    "path": "/documents",
+    "scrollWidth": 768,
+    "textLength": 189,
+    "width": 768
+  },
+  {
+    "headings": [
+      "Create New Course",
+      "Basic Information"
+    ],
+    "path": "/mentor/course/create",
+    "scrollWidth": 768,
+    "textLength": 581,
+    "width": 768
+  },
+  {
+    "headings": [
+      "Messages",
+      "Messages"
+    ],
+    "path": "/chat",
+    "scrollWidth": 768,
+    "textLength": 185,
+    "width": 768
+  },
+  {
+    "headings": [
+      "Network"
+    ],
+    "path": "/network",
+    "scrollWidth": 768,
+    "textLength": 165,
+    "width": 768
+  },
+  {
+    "headings": [
+      "Account Settings",
+      "Profile Information"
+    ],
+    "path": "/settings",
+    "scrollWidth": 768,
+    "textLength": 465,
+    "width": 768
+  }
+]

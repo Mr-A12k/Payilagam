@@ -1,0 +1,16 @@
+[2026-09-29 22:10:24] ERROR: POST /api/auth/login - Invalid email or password 
+Error: Invalid email or password
+    at Object.loginUser (D:\TaskPro\BackEnd\src\modules\auth\auth.service.js:145:11)
+    at async D:\TaskPro\BackEnd\src\modules\auth\auth.controller.js:15:18
+[2026-09-29 22:10:25] ERROR: POST /api/auth/login - Invalid email or password 
+Error: Invalid email or password
+    at Object.loginUser (D:\TaskPro\BackEnd\src\modules\auth\auth.service.js:145:11)
+    at async D:\TaskPro\BackEnd\src\modules\auth\auth.controller.js:15:18
+[2026-09-29 22:10:25] ERROR: POST /api/auth/login - Invalid email or password 
+Error: Invalid email or password
+    at Object.loginUser (D:\TaskPro\BackEnd\src\modules\auth\auth.service.js:145:11)
+    at async D:\TaskPro\BackEnd\src\modules\auth\auth.controller.js:15:18
+[2026-09-29 22:10:26] ERROR: POST /api/auth/login - Invalid email or password 
+Error: Invalid email or password
+    at Object.loginUser (D:\TaskPro\BackEnd\src\modules\auth\auth.service.js:145:11)
+    at async D:\TaskPro\BackEnd\src\modules\auth\auth.controller.js:15:18

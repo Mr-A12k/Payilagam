@@ -12,6 +12,7 @@ const documentRoutes = require('../modules/documents/document.routes.js');
 const followRoutes = require('../modules/community/follow.routes.js');
 const codingProblemRoutes = require('../modules/practice/codingProblem.routes.js');
 const codingSubmissionRoutes = require('../modules/practice/codingSubmission.routes.js');
+const labsRoutes = require('../modules/practice/labs.routes.js');
 const courseRoutes = require('../modules/courses/course.routes.js');
 const discussionRoutes = require('../modules/community/discussion.routes.js');
 const enrollmentRoutes = require('../modules/learning/enrollment.routes.js');
@@ -26,7 +27,10 @@ const resourceRoutes = require('../modules/courses/resource.routes.js');
 const reportRoutes = require('../modules/admin/report.routes.js');
 const userRoutes = require('../modules/users/user.routes.js');
 
+const dropdownOptionRoutes = require('../modules/admin/dropdownOption.routes.js');
+
 router.use('/admin', adminRoutes);
+router.use('/dropdown-options', dropdownOptionRoutes.publicRouter);
 router.use('/ai', aiRoutes);
 router.use('/assignments', assignmentRoutes);
 router.use('/auth', authRoutes);
@@ -36,6 +40,7 @@ router.use('/contact', contactRoutes);
 router.use('/follows', followRoutes);
 router.use('/problems', codingProblemRoutes);
 router.use('/coding-submissions', codingSubmissionRoutes);
+router.use('/practice/labs', labsRoutes);
 router.use('/courses', courseRoutes);
 router.use('/documents', documentRoutes);
 router.use('/discussions', discussionRoutes);

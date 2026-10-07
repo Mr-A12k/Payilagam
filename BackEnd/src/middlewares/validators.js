@@ -120,7 +120,7 @@ const validationRules = {
     password: { required: true, type: "string", minLength: 6 },
   },
   login: {
-    email: { required: true, type: "email" },
+    email: { type: "email" },
     password: { required: true, type: "string" },
   },
   createCourse: {

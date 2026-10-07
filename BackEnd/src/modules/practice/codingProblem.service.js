@@ -55,8 +55,12 @@ const createProblem = async (creatorId, data) => {
         throw new Error('Title, description, and difficulty are required');
     }
 
-    if (!['easy', 'medium', 'hard'].includes(difficulty)) {
-        throw new Error('Difficulty must be easy, medium, or hard');
+    const validDifficulties = await prisma.dropdownOption.findMany({
+        where: { fieldGroup: 'problem_difficulty', isActive: true },
+        select: { value: true }
+    });
+    if (!validDifficulties.some(d => d.value === difficulty)) {
+        throw new Error(`Invalid difficulty. Must be one of: ${validDifficulties.map(d => d.value).join(', ')}`);
     }
 
     const baseSlug = generateSlug(title);
@@ -219,7 +223,7 @@ const getProblemById = async (problemId, userRole = 'student') => {
     });
 
     if (!problem) {
-        throw new Error('Problem not found');
+        throw Object.assign(new Error('Problem not found'), { statusCode: 404 });
     }
 
     return problem;
@@ -249,7 +253,7 @@ const getProblemBySlug = async (slug, userRole = 'student') => {
     });
 
     if (!problem) {
-        throw new Error('Problem not found');
+        throw Object.assign(new Error('Problem not found'), { statusCode: 404 });
     }
 
     return problem;
@@ -281,8 +285,14 @@ const updateProblem = async (problemId, data) => {
         tags,
     } = data;
 
-    if (difficulty && !['easy', 'medium', 'hard'].includes(difficulty)) {
-        throw new Error('Difficulty must be easy, medium, or hard');
+    if (difficulty) {
+        const validDifficulties = await prisma.dropdownOption.findMany({
+            where: { fieldGroup: 'problem_difficulty', isActive: true },
+            select: { value: true }
+        });
+        if (!validDifficulties.some(d => d.value === difficulty)) {
+            throw new Error(`Invalid difficulty. Must be one of: ${validDifficulties.map(d => d.value).join(', ')}`);
+        }
     }
 
     const updateData = {};

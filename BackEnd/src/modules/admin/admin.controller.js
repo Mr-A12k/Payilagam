@@ -102,6 +102,34 @@ const getSystemLogs = catchAsync(async (request, response) => {
   return success(response, logs, "System logs retrieved");
 });
 
+const getAllProblemTags = catchAsync(async (req, res) => {
+  const { PrismaClient } = require('@prisma/client');
+  const prisma = new PrismaClient();
+  const tags = await prisma.problemTag.findMany({
+    include: { _count: { select: { problems: true } } },
+    orderBy: { name: 'asc' },
+  });
+  return success(res, tags, "Problem tags retrieved");
+});
+
+const deleteProblemTag = catchAsync(async (req, res) => {
+  const { PrismaClient } = require('@prisma/client');
+  const prisma = new PrismaClient();
+  const tagId = parseInt(req.params.id);
+  const tag = await prisma.problemTag.findUnique({
+    where: { tagId },
+    include: { _count: { select: { problems: true } } },
+  });
+  if (!tag) {
+    return error(res, "Tag not found", 404);
+  }
+  if (tag._count.problems > 0) {
+    return error(res, "Cannot delete tag with associated problems", 400);
+  }
+  await prisma.problemTag.delete({ where: { tagId } });
+  return success(res, null, "Tag deleted");
+});
+
 module.exports = {
   getDashboard,
   getAllUsers,
@@ -116,4 +144,6 @@ module.exports = {
   getEnrollmentAnalytics,
   getCourseAnalytics,
   getSystemLogs,
+  getAllProblemTags,
+  deleteProblemTag,
 };

@@ -1,0 +1,78 @@
+[2026-10-07 20:44:37] ERROR: DELETE /api/chat/7 - Access denied 
+Error: Access denied
+    at requireParticipant (D:\TaskPro\BackEnd\src\modules\community\chat.service.js:29:27)
+    at async Object.deleteConversation (D:\TaskPro\BackEnd\src\modules\community\chat.service.js:399:3)
+    at async D:\TaskPro\BackEnd\src\modules\community\chat.controller.js:119:3
+[2026-10-07 20:46:06] ERROR: DELETE /api/chat/7 - Access denied 
+Error: Access denied
+    at requireParticipant (D:\TaskPro\BackEnd\src\modules\community\chat.service.js:29:27)
+    at async Object.deleteConversation (D:\TaskPro\BackEnd\src\modules\community\chat.service.js:399:3)
+    at async D:\TaskPro\BackEnd\src\modules\community\chat.controller.js:119:3
+[2026-10-07 20:46:55] ERROR: DELETE /api/chat/6 - Access denied 
+Error: Access denied
+    at requireParticipant (D:\TaskPro\BackEnd\src\modules\community\chat.service.js:29:27)
+    at async Object.deleteConversation (D:\TaskPro\BackEnd\src\modules\community\chat.service.js:399:3)
+    at async D:\TaskPro\BackEnd\src\modules\community\chat.controller.js:119:3
+[2026-10-07 21:08:15] ERROR: POST /api/assignments - You are not authorized to manage assignments for this course 
+Error: You are not authorized to manage assignments for this course
+    at verifyMentorOwnership (D:\TaskPro\BackEnd\src\modules\learning\assignment.service.js:33:11)
+    at async createAssignment (D:\TaskPro\BackEnd\src\modules\learning\assignment.service.js:50:3)
+    at async Object.createAssignment (D:\TaskPro\BackEnd\src\modules\learning\validation.js:18:16)
+    at async D:\TaskPro\BackEnd\src\modules\learning\assignment.controller.js:6:22
+[2026-10-07 21:08:15] ERROR: POST /api/assignments - A quiz needs 1–50 questions 
+Error: A quiz needs 1–50 questions
+    at fail (D:\TaskPro\BackEnd\src\modules\learning\validation.js:2:23)
+    at validateQuiz (D:\TaskPro\BackEnd\src\modules\learning\quiz.js:4:107)
+    at createAssignment (D:\TaskPro\BackEnd\src\modules\learning\assignment.service.js:51:34)
+    at async Object.createAssignment (D:\TaskPro\BackEnd\src\modules\learning\validation.js:18:16)
+    at async D:\TaskPro\BackEnd\src\modules\learning\assignment.controller.js:6:22
+[2026-10-07 21:08:15] ERROR: POST /api/submissions/assignment/6 - You are not enrolled in this course 
+Error: You are not enrolled in this course
+    at submitAssignment (D:\TaskPro\BackEnd\src\modules\learning\submission.service.js:31:15)
+    at async Object.submitAssignment (D:\TaskPro\BackEnd\src\modules\learning\validation.js:18:16)
+    at async D:\TaskPro\BackEnd\src\modules\learning\submission.controller.js:6:22
+[2026-10-07 21:08:15] ERROR: POST /api/submissions/assignment/6 - Answer every question 
+Error: Answer every question
+    at fail (D:\TaskPro\BackEnd\src\modules\learning\validation.js:2:23)
+    at gradeQuiz (D:\TaskPro\BackEnd\src\modules\learning\quiz.js:39:77)
+    at submitAssignment (D:\TaskPro\BackEnd\src\modules\learning\submission.service.js:41:53)
+    at async Object.submitAssignment (D:\TaskPro\BackEnd\src\modules\learning\validation.js:18:16)
+    at async D:\TaskPro\BackEnd\src\modules\learning\submission.controller.js:6:22
+[2026-10-07 21:08:15] ERROR: POST /api/submissions/assignment/6 - Answer every question 
+Error: Answer every question
+    at fail (D:\TaskPro\BackEnd\src\modules\learning\validation.js:2:23)
+    at gradeQuiz (D:\TaskPro\BackEnd\src\modules\learning\quiz.js:39:77)
+    at submitAssignment (D:\TaskPro\BackEnd\src\modules\learning\submission.service.js:41:53)
+    at async Object.submitAssignment (D:\TaskPro\BackEnd\src\modules\learning\validation.js:18:16)
+    at async D:\TaskPro\BackEnd\src\modules\learning\submission.controller.js:6:22
+[2026-10-07 21:08:15] ERROR: PUT /api/assignments/6 - Questions cannot change after students submit. Create a new quiz instead. 
+Error: Questions cannot change after students submit. Create a new quiz instead.
+    at fail (D:\TaskPro\BackEnd\src\modules\learning\validation.js:2:23)
+    at updateAssignment (D:\TaskPro\BackEnd\src\modules\learning\assignment.service.js:222:5)
+    at async Object.updateAssignment (D:\TaskPro\BackEnd\src\modules\learning\validation.js:18:16)
+    at async D:\TaskPro\BackEnd\src\modules\learning\assignment.controller.js:38:22
+[2026-10-07 21:08:15] ERROR: PUT /api/assignments/6 - Questions cannot change after students submit. Create a new quiz instead. 
+Error: Questions cannot change after students submit. Create a new quiz instead.
+    at fail (D:\TaskPro\BackEnd\src\modules\learning\validation.js:2:23)
+    at updateAssignment (D:\TaskPro\BackEnd\src\modules\learning\assignment.service.js:222:5)
+    at async Object.updateAssignment (D:\TaskPro\BackEnd\src\modules\learning\validation.js:18:16)
+    at async D:\TaskPro\BackEnd\src\modules\learning\assignment.controller.js:38:22
+[2026-10-07 21:08:15] ERROR: PUT /api/assignments/6 - Questions cannot change after students submit. Create a new quiz instead. 
+Error: Questions cannot change after students submit. Create a new quiz instead.
+    at fail (D:\TaskPro\BackEnd\src\modules\learning\validation.js:2:23)
+    at updateAssignment (D:\TaskPro\BackEnd\src\modules\learning\assignment.service.js:222:5)
+    at async Object.updateAssignment (D:\TaskPro\BackEnd\src\modules\learning\validation.js:18:16)
+    at async D:\TaskPro\BackEnd\src\modules\learning\assignment.controller.js:38:22
+[2026-10-07 22:22:22] ERROR: POST /api/practice/labs/run - Request failed with status code 401 
+AxiosError: Request failed with status code 401
+    at settle (D:\TaskPro\BackEnd\node_modules\axios\dist\node\axios.cjs:2216:12)
+    at IncomingMessage.handleStreamEnd (D:\TaskPro\BackEnd\node_modules\axios\dist\node\axios.cjs:4062:11)
+    at IncomingMessage.emit (node:events:521:24)
+    at endReadableNT (node:internal/streams/readable:1735:12)
+    at process.processTicksAndRejections (node:internal/process/task_queues:90:21)
+    at Axios.request (D:\TaskPro\BackEnd\node_modules\axios\dist\node\axios.cjs:5517:41)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async submitToJudge0 (D:\TaskPro\BackEnd\src\modules\practice\judge0.service.js:85:22)
+    at async executeInLab (D:\TaskPro\BackEnd\src\modules\practice\judge0.service.js:180:19)
+    at async Object.runLabCode (D:\TaskPro\BackEnd\src\modules\practice\labs.service.js:23:20)
+    at async D:\TaskPro\BackEnd\src\modules\practice\labs.controller.js:17:20

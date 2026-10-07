@@ -4,6 +4,7 @@
  */
 const { Server } = require("socket.io");
 const jwt = require("jsonwebtoken");
+const prisma = require("./prisma");
 
 let io;
 // Map of userId -> Set of socket.id
@@ -23,7 +24,7 @@ const initializeSocket = (server) => {
   });
 
   // Authentication middleware
-  io.use((socket, next) => {
+  io.use(async (socket, next) => {
     const token = socket.handshake.auth.token;
     if (!token) {
       return next(new Error("Authentication error: Token missing"));
@@ -31,7 +32,18 @@ const initializeSocket = (server) => {
 
     try {
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
-      socket.user = decoded; // Attach user payload to socket
+      const userId = decoded?.userId;
+      if (!Number.isSafeInteger(userId) || userId <= 0 || userId > 2147483647) {
+        return next(new Error("Authentication error: Invalid user ID"));
+      }
+      const user = await prisma.user.findUnique({
+        where: { userId },
+        select: { userId: true, isActive: true },
+      });
+      if (!user || !user.isActive) {
+        return next(new Error("Authentication error: Account unavailable"));
+      }
+      socket.user = { userId: user.userId };
       next();
     } catch (error) {
       return next(new Error("Authentication error: Invalid token"));

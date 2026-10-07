@@ -1,4 +1,5 @@
 const prisma = require("../../config/prisma");
+const { integer, text, fail, services } = require('./validation');
 const {
   getPaginationParams,
   getPaginationMeta,
@@ -9,6 +10,8 @@ const {
  */
 const createReview = async (studentId, courseId, data) => {
   const { rating, comment } = data;
+  integer(rating, 'rating');
+  text(comment, 'comment');
 
   if (!rating || rating < 1 || rating > 5) {
     throw new Error("Rating must be between 1 and 5");
@@ -24,7 +27,7 @@ const createReview = async (studentId, courseId, data) => {
     },
   });
 
-  if (!enrollment) {
+  if (!enrollment || enrollment.status === 'dropped') {
     throw new Error("You must be enrolled in this course to leave a review");
   }
 
@@ -113,7 +116,9 @@ const updateReview = async (reviewId, studentId, data) => {
   }
 
   const updateData = {};
+  text(data.comment, 'comment');
   if (data.rating !== undefined) {
+    integer(data.rating, 'rating');
     if (data.rating < 1 || data.rating > 5) {
       throw new Error("Rating must be between 1 and 5");
     }
@@ -182,10 +187,10 @@ const getCourseRating = async (courseId) => {
   };
 };
 
-module.exports = {
+module.exports = services({
   createReview,
   getReviewsByCourse,
   updateReview,
   deleteReview,
   getCourseRating,
-};
+});

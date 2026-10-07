@@ -1,4 +1,9 @@
 const prisma = require("../../config/prisma");
+const { integer, fail, services } = require('./validation');
+const verifyEnrollment = async (studentId, courseId) => {
+  const enrollment = await prisma.enrollment.findUnique({ where: { studentId_courseId: { studentId: Number(studentId), courseId } } });
+  if (!enrollment || enrollment.status === 'dropped') fail('Not enrolled in this course', 403);
+};
 
 /**
  * Recalculate the enrollment progress percentage for a student in a course.
@@ -75,7 +80,7 @@ const markLessonComplete = async (studentId, lessonId) => {
     },
   });
 
-  if (!enrollment) {
+  if (!enrollment || enrollment.status === 'dropped') {
     throw new Error("Not enrolled in this course");
   }
 
@@ -119,6 +124,7 @@ const markLessonIncomplete = async (studentId, lessonId) => {
     throw new Error("Lesson not found");
   }
 
+  await verifyEnrollment(studentId, lesson.module.courseId);
   const existing = await prisma.lessonProgress.findUnique({
     where: {
       studentId_lessonId: {
@@ -157,14 +163,17 @@ const markLessonIncomplete = async (studentId, lessonId) => {
  * Update watch time (in seconds) for a lesson
  */
 const updateWatchTime = async (studentId, lessonId, watchTime) => {
+  integer(watchTime, 'watchTime', 0);
   const lesson = await prisma.lesson.findUnique({
     where: { lessonId: parseInt(lessonId) },
+    include: { module: true },
   });
 
   if (!lesson) {
     throw new Error("Lesson not found");
   }
 
+  await verifyEnrollment(studentId, lesson.module.courseId);
   const progress = await prisma.lessonProgress.upsert({
     where: {
       studentId_lessonId: {
@@ -198,7 +207,7 @@ const getCourseProgress = async (studentId, courseId) => {
     },
   });
 
-  if (!enrollment) {
+  if (!enrollment || enrollment.status === 'dropped') {
     throw new Error("Not enrolled in this course");
   }
 
@@ -363,14 +372,14 @@ const getStudentDashboard = async (studentId) => {
     totalLessonsCompleted,
     currentStreak,
     recentCourses: enrollments,
-    upcomingDeadlines,
+    upcomingDeadlines: upcomingDeadlines.map(assignment => require('./quiz').publicAssignment(assignment)),
   };
 };
 
-module.exports = {
+module.exports = services({
   markLessonComplete,
   markLessonIncomplete,
   updateWatchTime,
   getCourseProgress,
   getStudentDashboard,
-};
+});

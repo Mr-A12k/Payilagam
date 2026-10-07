@@ -21,6 +21,7 @@ const { authenticate } = require("../../middlewares/authMiddleware");
 
 // All notification routes require authentication
 router.use(authenticate);
+router.param('id', (req, res, next, value) => { try { require('./validation').id(value); next(); } catch (error) { next(error); } });
 
 /**
  * @swagger

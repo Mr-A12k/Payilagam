@@ -6,6 +6,8 @@
  */
 const express = require("express");
 const router = express.Router();
+router.use('/course/:courseId', require('./validation').params);
+router.use('/:id', (req, res, next) => req.params.id === 'course' ? next() : require('./validation').params(req, res, next));
 
 const {
   createReview,

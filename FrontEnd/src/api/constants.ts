@@ -44,8 +44,15 @@ export const API_PATHS = {
     SLUG: (slug: string) => `/problems/slug/${slug}`,
   },
   CODING_SUBMISSIONS: {
-    RUN: (problemId: string) => `/coding-submissions/${problemId}/run`,
-    SUBMIT: (problemId: string) => `/coding-submissions/${problemId}/submit`,
+    RUN: (problemId: string) => `/coding-submissions/problem/${problemId}/run`,
+    SUBMIT: (problemId: string) =>
+      `/coding-submissions/problem/${problemId}/submit`,
+  },
+  LABS: {
+    LANGUAGES: "/practice/labs/languages",
+    RUN: "/practice/labs/run",
+    SHARE: "/practice/labs/share",
+    GET_SHARED: (slug: string) => `/practice/labs/share/${slug}`,
   },
   AI: {
     ASK: "/ai/ask",
@@ -63,6 +70,14 @@ export const API_PATHS = {
       COURSES: "/admin/analytics/courses",
       ENROLLMENTS: "/admin/analytics/enrollments",
     },
+    DROPDOWN_OPTIONS: "/admin/dropdown-options",
+    DROPDOWN_OPTION: (id: string) => `/admin/dropdown-options/${id}`,
+    DROPDOWN_OPTIONS_GROUP: (group: string) => `/admin/dropdown-options/${group}`,
+    PROBLEM_TAGS: "/admin/problem-tags",
+    PROBLEM_TAG: (id: string) => `/admin/problem-tags/${id}`,
+  },
+  DROPDOWN_OPTIONS: {
+    GROUP: (group: string) => `/dropdown-options/${group}`,
   },
   CHAT: {
     BASE: "/chat",
@@ -75,6 +90,9 @@ export const API_PATHS = {
     FOLLOWERS: "/follows/followers",
     FOLLOWING: "/follows/following",
     PENDING_REQUESTS: "/follows/requests/pending",
+    SENT_REQUESTS: "/follows/requests/sent",
+    REMOVE_FOLLOWING: (userId: string) => `/follows/following/${userId}`,
+    REMOVE_FOLLOWER: (userId: string) => `/follows/followers/${userId}`,
     REQUEST: "/follows/request",
     REQUEST_ID: (requestId: string) => `/follows/request/${requestId}`,
   },
@@ -91,7 +109,8 @@ export const API_PATHS = {
     APPLY_MENTOR: "/users/apply-mentor",
     MY_MENTOR_APPLICATION: "/users/my-mentor-application",
     MENTOR_APPLICATIONS: "/users/mentor-applications",
-    MENTOR_APPLICATION_STATUS: (id: string) => `/users/mentor-applications/${id}/status`,
+    MENTOR_APPLICATION_STATUS: (id: string) =>
+      `/users/mentor-applications/${id}/status`,
   },
   NOTIFICATIONS: {
     BASE: "/notifications",

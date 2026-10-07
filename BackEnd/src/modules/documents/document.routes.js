@@ -7,7 +7,7 @@
 const express = require("express");
 const router = express.Router();
 const documentController = require("./document.controller");
-const { authenticate, authorize } = require("../../middlewares/authMiddleware");
+const { authenticate } = require("../../middlewares/authMiddleware");
 const documentUpload = require("../../middlewares/documentUploadMiddleware");
 
 // Get all documents (accessible by students and admins)
@@ -25,7 +25,7 @@ const documentUpload = require("../../middlewares/documentUploadMiddleware");
  */
 router.get("/", authenticate, documentController.getAllDocuments);
 
-// Upload a new document (Admin only)
+// Publish to the shared library (all authenticated users)
 /**
  * @swagger
  * /:
@@ -41,12 +41,11 @@ router.get("/", authenticate, documentController.getAllDocuments);
 router.post(
   "/",
   authenticate,
-  authorize("admin", "mentor"),
   documentUpload.single("file"),
   documentController.uploadDocument,
 );
 
-// Delete a document (Admin only)
+// Ownership and privileged deletion are checked by the service.
 /**
  * @swagger
  * /{id}:
@@ -68,7 +67,6 @@ router.post(
 router.delete(
   "/:id",
   authenticate,
-  authorize("admin"),
   documentController.deleteDocument,
 );
 

@@ -1,4 +1,5 @@
 import { Button } from "./Button";
+import { Inbox } from "lucide-react";
 
 /**
  * Reusable EmptyState component for 'No Data Found' or 'Empty' scenarios.
@@ -13,54 +14,43 @@ import { Button } from "./Button";
 const EmptyState = ({
   title = "No Data Found",
   description = "There is nothing to show here at the moment.",
-  illustration = "/empty-state.png",
+  illustration,
   actionLabel,
   onAction,
 }: any) => {
   return (
-    <div className="flex flex-col items-center justify-center p-12 text-center min-h-[400px] w-full rounded-2xl border border-slate-800/60 bg-slate-950 shadow-2xl shadow-slate-900/50">
+    <div className="flex min-h-36 w-full flex-col items-center justify-center gap-4 rounded-lg border border-dashed border-[var(--border-default)] bg-[var(--bg-surface)] px-5 py-7 text-center sm:flex-row sm:justify-start sm:gap-5 sm:px-7 sm:text-left">
       {/* Illustration Area */}
-      <div className="mb-8 flex justify-center relative">
-        <div className="absolute inset-0 bg-blue-500/20 blur-[60px] rounded-full" />
+      <div
+        aria-hidden="true"
+        className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-[var(--bg-surface-2)] text-[var(--text-muted)] [&>svg]:h-6 [&>svg]:w-6"
+      >
         {typeof illustration === "string" ? (
-          <img
-            src={illustration}
-            alt="Empty State"
-            className="h-56 w-56 object-contain drop-shadow-[0_0_15px_rgba(59,130,246,0.5)] hover:scale-105 transition-transform duration-500"
-          />
+          <img src={illustration} alt="" className="h-10 w-10 object-contain" />
         ) : illustration ? (
           illustration
         ) : (
-          <div className="flex h-32 w-32 items-center justify-center rounded-full bg-blue-500/10 text-blue-200">
-            <svg
-              className="h-16 w-16"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              aria-hidden="true"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={1.5}
-                d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"
-              />
-            </svg>
-          </div>
+          <Inbox strokeWidth={1.5} />
         )}
       </div>
 
       {/* Text Content */}
-      <h3 className="mb-2 text-xl font-bold text-slate-300">{title}</h3>
-      <p className="mb-6 max-w-sm text-sm text-slate-500 leading-relaxed">
-        {description}
-      </p>
+      <div className="min-w-0 flex-1">
+        <h3 className="text-sm font-semibold leading-6 text-[var(--text-heading)]">
+          {title}
+        </h3>
+        <p className="mt-1 max-w-lg text-sm leading-6 text-[var(--text-muted)]">
+          {description}
+        </p>
+      </div>
 
       {/* Optional Action Button */}
       {actionLabel && onAction && (
         <Button
           onClick={onAction}
-          className="bg-blue-400 text-white hover:bg-blue-500 shadow-md shadow-blue-100/50 rounded-xl px-6"
+          variant="outline"
+          size="sm"
+          className="shrink-0"
         >
           {actionLabel}
         </Button>

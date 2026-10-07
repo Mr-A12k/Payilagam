@@ -21,6 +21,7 @@ const getSubmissionsByAssignment = catchAsync(async (request, response) => {
     await submissionService.getSubmissionsByAssignment(
       request.params.assignmentId,
       request.query,
+      request.user,
     );
   return paginated(
     response,
@@ -64,6 +65,7 @@ const gradeSubmission = catchAsync(async (request, response) => {
 const getSubmissionById = catchAsync(async (request, response) => {
   const submission = await submissionService.getSubmissionById(
     request.params.id,
+    request.user,
   );
   return success(response, submission, "Submission retrieved successfully");
 });

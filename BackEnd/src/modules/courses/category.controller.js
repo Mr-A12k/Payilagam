@@ -1,6 +1,10 @@
 const catchAsync = require("../../utils/catchAsync");
 const categoryService = require("./category.service");
 const { success, error } = require("../../utils/responseHelper");
+const categoryId = value => {
+  if (!/^\d+$/.test(String(value)) || Number(value) < 1 || Number(value) > 2147483647) throw Object.assign(new Error('Invalid category ID'), { statusCode: 400 });
+  return Number(value);
+};
 
 const create = catchAsync(async (request, response) => {
   const category = await categoryService.createCategory(request.body);
@@ -13,7 +17,7 @@ const getAll = catchAsync(async (request, response) => {
 });
 
 const getById = catchAsync(async (request, response) => {
-  const id = parseInt(request.params.id);
+  const id = categoryId(request.params.id);
   if (isNaN(id)) {
     return error(response, "Invalid category ID", 400);
   }
@@ -22,7 +26,7 @@ const getById = catchAsync(async (request, response) => {
 });
 
 const update = catchAsync(async (request, response) => {
-  const id = parseInt(request.params.id);
+  const id = categoryId(request.params.id);
   if (isNaN(id)) {
     return error(response, "Invalid category ID", 400);
   }
@@ -31,7 +35,7 @@ const update = catchAsync(async (request, response) => {
 });
 
 const remove = catchAsync(async (request, response) => {
-  const id = parseInt(request.params.id);
+  const id = categoryId(request.params.id);
   if (isNaN(id)) {
     return error(response, "Invalid category ID", 400);
   }

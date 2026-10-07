@@ -134,29 +134,29 @@ const ReportsManagement = () => {
         </div>
       </div>
 
-      <Card className="!p-0 shadow-lg overflow-hidden flex flex-col hover:border-blue-500/30 transition-colors duration-300">
-        <div className="overflow-x-auto custom-scrollbar">
-          <table className="w-full text-left border-collapse min-w-[800px]">
-            <thead>
-              <tr className="bg-slate-900/80 border-b border-slate-800/60">
-                <th className="py-4 px-6 font-bold text-slate-400 text-xs uppercase tracking-wider">
+      <Card className="!p-0 shadow-lg overflow-hidden flex flex-col hover:border-blue-500/30 transition-colors duration-300 table-card-wrapper">
+        <div className="table-scroll-viewport custom-scrollbar">
+          <table className="w-full text-left border-separate border-spacing-0 min-w-[800px]">
+            <thead className="sticky top-0 z-20 bg-[var(--bg-surface-2)]">
+              <tr className="border-b border-[var(--border-default)]">
+                <th className="py-4 px-6 font-bold text-[var(--text-muted)] text-xs uppercase tracking-wider border-b border-[var(--border-default)]">
                   Resource
                 </th>
-                <th className="py-4 px-6 font-bold text-slate-400 text-xs uppercase tracking-wider">
+                <th className="py-4 px-6 font-bold text-[var(--text-muted)] text-xs uppercase tracking-wider border-b border-[var(--border-default)]">
                   Reported By
                 </th>
-                <th className="py-4 px-6 font-bold text-slate-400 text-xs uppercase tracking-wider">
+                <th className="py-4 px-6 font-bold text-[var(--text-muted)] text-xs uppercase tracking-wider border-b border-[var(--border-default)]">
                   Reason
                 </th>
-                <th className="py-4 px-6 font-bold text-slate-400 text-xs uppercase tracking-wider">
+                <th className="py-4 px-6 font-bold text-[var(--text-muted)] text-xs uppercase tracking-wider border-b border-[var(--border-default)]">
                   Status
                 </th>
-                <th className="py-4 px-6 font-bold text-slate-400 text-xs uppercase tracking-wider text-right">
+                <th className="py-4 px-6 font-bold text-[var(--text-muted)] text-xs uppercase tracking-wider text-right border-b border-[var(--border-default)]">
                   Actions
                 </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-800/50">
+            <tbody className="divide-y divide-[var(--border-subtle)]">
               {reports.length > 0 ? (
                 reports.map((report: any) => (
                   <tr
@@ -240,10 +240,10 @@ const ReportsManagement = () => {
                 <tr>
                   <td
                     colSpan={5}
-                    className="py-16 text-center text-slate-500 font-medium"
+                    className="py-16 text-center text-[var(--text-muted)] font-medium"
                   >
                     <div className="flex flex-col items-center gap-3">
-                      <div className="w-16 h-16 rounded-full bg-slate-900/50 border border-slate-800 flex items-center justify-center">
+                      <div className="w-16 h-16 rounded-full bg-[var(--bg-surface-2)] border border-[var(--border-default)] flex items-center justify-center">
                         <CheckCircle className="w-8 h-8 text-blue-500/50" />
                       </div>
                       <p>No reports found. Good job!</p>
@@ -254,6 +254,10 @@ const ReportsManagement = () => {
             </tbody>
           </table>
         </div>
+        <footer className="table-card-footer px-6 py-3 flex items-center justify-between text-xs text-[var(--text-muted)]">
+          <span>{reports.length} report{reports.length === 1 ? "" : "s"} logged</span>
+          <span>Moderation & compliance queue</span>
+        </footer>
       </Card>
 
       <style>{`

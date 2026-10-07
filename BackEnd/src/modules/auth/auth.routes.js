@@ -35,9 +35,7 @@ const { authenticate } = require("../../middlewares/authMiddleware");
 const { validate, validationRules } = require("../../middlewares/validators");
 
 // Avatar Multer Config
-const avatarPath = process.env.RESOURCE_STORAGE_PATH
-  ? path.join(process.env.RESOURCE_STORAGE_PATH, "avatars")
-  : path.join(__dirname, "../../resources/avatars");
+const avatarPath = path.join(require('../../config/storage').resourceStoragePath, "avatars");
 
 if (!fs.existsSync(avatarPath)) {
   fs.mkdirSync(avatarPath, { recursive: true });
@@ -51,7 +49,10 @@ const storage = multer.diskStorage({
     callback(null, Date.now() + "-avatar" + path.extname(file.originalname));
   },
 });
-const upload = multer({ storage: storage });
+const upload = multer({ storage, limits: { fileSize: 5 * 1024 * 1024 }, fileFilter: (req, file, callback) => {
+  if (!['image/png', 'image/jpeg', 'image/webp'].includes(file.mimetype)) return callback(Object.assign(new Error('Upload a PNG, JPEG, or WebP image'), { statusCode: 400 }));
+  callback(null, true);
+} });
 
 /**
  * @swagger

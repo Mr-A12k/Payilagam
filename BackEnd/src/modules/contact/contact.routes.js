@@ -7,6 +7,7 @@
 const express = require("express");
 const router = express.Router();
 const contactController = require("./contact.controller");
+const { authenticate, authorize } = require('../../middlewares/authMiddleware');
 
 // POST /api/contact - Submit a contact form
 /**
@@ -32,6 +33,6 @@ router.post("/", contactController.submitContactForm);
  *       200:
  *         description: List of contact submissions
  */
-router.get("/", contactController.getContactSubmissions);
+router.get("/", authenticate, authorize('admin'), contactController.getContactSubmissions);
 
 module.exports = router;

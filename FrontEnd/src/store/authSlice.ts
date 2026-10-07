@@ -36,16 +36,17 @@ export const fetchProfile = createAsyncThunk(
       if (response.data.success) {
         return formatUser(response.data.data);
       }
-      return rejectWithValue("Failed to fetch profile");
+      return rejectWithValue({ message: "Failed to fetch profile", unauthorized: false });
     } catch (error) {
             // Clear stale credentials only on 401 Unauthorized
       if ((error as import('axios').AxiosError<{message?: string}>)?.response?.status === 401) {
         localStorage.removeItem("token");
         localStorage.removeItem("user");
       }
-      return rejectWithValue(
-        (error as import('axios').AxiosError<{message?: string}>)?.response?.data?.message || "Failed to fetch profile",
-      );
+      return rejectWithValue({
+        message: (error as import('axios').AxiosError<{message?: string}>)?.response?.data?.message || "Failed to fetch profile",
+        unauthorized: (error as import('axios').AxiosError)?.response?.status === 401,
+      });
     }
   },
 );
@@ -107,7 +108,7 @@ export const registerUser = createAsyncThunk(
 const initialState = {
   user: null,
   token: localStorage.getItem("token") || null,
-  loading: true, // Starts true so the UI shows a loader until fetchProfile resolves
+  loading: Boolean(localStorage.getItem("token")),
   error: null,
   requiresPasswordChange: false,
 };
@@ -121,7 +122,8 @@ const authSlice = createSlice({
       state.token = null;
       state.loading = false;
       state.error = null;
-      localStorage.clear();
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
     },
     clearError: (state: any) => {
       state.error = null;
@@ -135,6 +137,7 @@ const authSlice = createSlice({
       state.user = formatUser(user);
       state.token = token;
       state.requiresPasswordChange = false;
+      state.loading = false;
       localStorage.setItem("token", token);
       localStorage.setItem("user", JSON.stringify(state.user));
     },
@@ -149,10 +152,18 @@ const authSlice = createSlice({
         state.user = action.payload;
         state.loading = false;
       })
-      .addCase(fetchProfile.rejected, (state: any) => {
+      .addCase(fetchProfile.rejected, (state: any, action: any) => {
         state.loading = false;
-        state.user = null;
-        state.token = null;
+        if (action.payload?.unauthorized) {
+          state.user = null;
+          state.token = null;
+        } else if (!state.user && state.token) {
+          try {
+            state.user = formatUser(JSON.parse(localStorage.getItem("user") || "null"));
+          } catch {
+            state.user = null;
+          }
+        }
       })
       // Login User
       .addCase(loginUser.pending, (state: any) => {

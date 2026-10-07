@@ -6,6 +6,7 @@
  */
 const express = require("express");
 const router = express.Router();
+router.param('courseId', (request, response, next) => require('./validation').params(request, response, next));
 
 const {
   enroll,

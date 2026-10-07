@@ -17,7 +17,7 @@ const PayilagamLogo = ({ size = 36, className = "" }: any) => (
     role="img"
   >
     <defs>
-      {/* Primary blue gradient */}
+      {/* Primary Blue & Midnight Blue gradient */}
       <linearGradient
         id="payilagam-grad"
         x1="0"
@@ -26,8 +26,8 @@ const PayilagamLogo = ({ size = 36, className = "" }: any) => (
         y2="64"
         gradientUnits="userSpaceOnUse"
       >
-        <stop offset="0%" stopColor="#3b82f6" /> {/* blue-500 */}
-        <stop offset="100%" stopColor="#2563eb" /> {/* blue-600 */}
+        <stop offset="0%" stopColor="#3b82f6" />
+        <stop offset="100%" stopColor="#172554" />
       </linearGradient>
 
       {/* Subtle lighter gradient for accent shapes */}
@@ -39,8 +39,8 @@ const PayilagamLogo = ({ size = 36, className = "" }: any) => (
         y2="54"
         gradientUnits="userSpaceOnUse"
       >
-        <stop offset="0%" stopColor="#60a5fa" /> {/* blue-400 */}
-        <stop offset="100%" stopColor="#3b82f6" /> {/* blue-500 */}
+        <stop offset="0%" stopColor="#93c5fd" />
+        <stop offset="100%" stopColor="#2563eb" />
       </linearGradient>
     </defs>
 

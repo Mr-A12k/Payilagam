@@ -92,4 +92,5 @@ export {
 } from "./tooltip";
 export { default as EmptyState } from "./EmptyState";
 export { ConfirmDialog } from "./ConfirmDialog";
+export * from "../icons";
 

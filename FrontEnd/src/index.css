@@ -24,25 +24,25 @@
 
 @theme inline {
   /* ── shadcn semantic color tokens ────────────────── */
-  --color-background: oklch(1 0 0);
-  --color-foreground: oklch(0.145 0 0);
-  --color-card: oklch(1 0 0);
-  --color-card-foreground: oklch(0.145 0 0);
-  --color-popover: oklch(1 0 0);
-  --color-popover-foreground: oklch(0.145 0 0);
-  --color-primary: oklch(0.205 0 0);
-  --color-primary-foreground: oklch(0.985 0 0);
-  --color-secondary: oklch(0.97 0 0);
-  --color-secondary-foreground: oklch(0.205 0 0);
-  --color-muted: oklch(0.97 0 0);
-  --color-muted-foreground: oklch(0.556 0 0);
-  --color-accent: oklch(0.97 0 0);
-  --color-accent-foreground: oklch(0.205 0 0);
-  --color-destructive: oklch(0.577 0.245 27.325);
-  --color-destructive-foreground: oklch(0.577 0.245 27.325);
-  --color-border: oklch(0.922 0 0);
-  --color-input: oklch(0.922 0 0);
-  --color-ring: oklch(0.708 0 0);
+  --color-background: var(--bg-base);
+  --color-foreground: var(--text-primary);
+  --color-card: var(--bg-surface);
+  --color-card-foreground: var(--text-primary);
+  --color-popover: var(--bg-surface);
+  --color-popover-foreground: var(--text-primary);
+  --color-primary: var(--action-bg);
+  --color-primary-foreground: var(--action-text);
+  --color-secondary: var(--bg-surface-2);
+  --color-secondary-foreground: var(--text-primary);
+  --color-muted: var(--bg-surface-2);
+  --color-muted-foreground: var(--text-muted);
+  --color-accent: var(--bg-hover);
+  --color-accent-foreground: var(--text-primary);
+  --color-destructive: var(--danger-bg);
+  --color-destructive-foreground: var(--danger-text);
+  --color-border: var(--border-default);
+  --color-input: var(--border-input);
+  --color-ring: var(--accent-primary);
   --color-chart-1: oklch(0.646 0.222 41.116);
   --color-chart-2: oklch(0.6 0.118 184.714);
   --color-chart-3: oklch(0.398 0.07 227.392);
@@ -70,8 +70,8 @@
   --color-brand-secondary: #10b981;
   --color-brand-tertiary: #f59e0b;
   --color-brand-neutral: #64748b;
-  --color-surface: #ffffff;
-  --color-surface-hover: #fafbfc;
+  --color-surface: var(--bg-surface);
+  --color-surface-hover: var(--bg-hover);
 
   /* ── Typography ─────────────────────────────────── */
   --font-headline: "Geist", -apple-system, BlinkMacSystemFont, sans-serif;
@@ -90,57 +90,62 @@
 /* ── DARK THEME (default) ───────────────────────── */
 :root,
 [data-theme="dark"] {
-  /* Backgrounds */
-  --bg-base: #020617; /* slate-950 */
-  --bg-surface: #0f172a; /* slate-900 */
-  --bg-surface-2: #1e293b; /* slate-800 */
-  --bg-surface-3: #334155; /* slate-700 */
-  --bg-hover: #1e293b; /* slate-800 */
-  --bg-active: #0f172a; /* slate-900 */
-  --bg-input: #020617; /* slate-950 */
-  --bg-card: #0f172a; /* slate-900 */
-  --bg-card-hover: #1e293b; /* slate-800 */
-  --bg-overlay: rgba(2, 6, 23, 0.7);
-  --bg-glass: rgba(15, 23, 42, 0.8);
+  /* Backgrounds (Midnight Blue Palette) */
+  --bg-base: #0a0f1d; /* Deep Midnight Blue space */
+  --bg-surface: #0f172a; /* Midnight Slate card surface */
+  --bg-surface-2: #131f37; /* Midnight Blue headers & inner widgets */
+  --bg-surface-3: #1a2b4c; /* Active items */
+  --bg-hover: #172554; /* Midnight Blue hover */
+  --bg-active: #1e3a8a;
+  --bg-input: #0b1120;
+  --bg-card: #0f172a;
+  --bg-card-hover: #131f37;
+  --bg-overlay: rgba(10, 15, 29, 0.85);
+  --bg-glass: rgba(15, 23, 42, 0.9);
 
   /* Text */
   --text-primary: #f1f5f9; /* slate-100 */
   --text-secondary: #94a3b8; /* slate-400 */
   --text-muted: #64748b; /* slate-500 */
   --text-disabled: #475569; /* slate-600 */
-  --text-inverse: #0f172a; /* slate-900 */
+  --text-inverse: #0a0f1d;
   --text-heading: #f8fafc; /* slate-50 */
 
   /* Borders */
-  --border-default: #1e293b; /* slate-800 */
-  --border-subtle: #334155; /* slate-700 */
-  --border-strong: #475569; /* slate-600 */
-  --border-input: #1e293b; /* slate-800 */
-  --border-focus: #60a5fa; /* blue-400 */
+  --border-default: #1e293b;
+  --border-subtle: #141f36;
+  --border-strong: #2563eb;
+  --border-input: #1e293b;
+  --border-focus: #3b82f6;
 
-  /* Brand/Accent */
-  --accent-primary: #3b82f6; /* blue-500 */
-  --accent-primary-hover: #2563eb; /* blue-600 */
-  --accent-primary-subtle: rgba(59, 130, 246, 0.1);
-  --accent-primary-border: rgba(59, 130, 246, 0.2);
+  /* Brand/Accent (Vibrant Electric Blue & Midnight Accents) */
+  --accent-primary: #3b82f6; /* Electric Blue */
+  --accent-primary-hover: #2563eb;
+  --accent-primary-subtle: rgba(59, 130, 246, 0.16);
+  --accent-primary-border: rgba(59, 130, 246, 0.35);
   --accent-success: #10b981;
   --accent-warning: #f59e0b;
   --accent-danger: #ef4444;
-  --accent-info: #06b6d4;
+  --accent-info: #38bdf8;
 
-  /* Sidebar */
-  --sidebar-bg: #0f172a;
-  --sidebar-bg-hover: #1e293b;
-  --sidebar-bg-active: rgba(59, 130, 246, 0.1);
+  /* Actions (Primary Blue) */
+  --action-bg: #2563eb;
+  --action-hover: #1d4ed8;
+  --action-text: #ffffff;
+
+  /* Sidebar (Midnight Blue) */
+  --sidebar-bg: #0a0f1d;
+  --sidebar-bg-hover: #131f37;
+  --sidebar-bg-active: rgba(37, 99, 235, 0.18);
   --sidebar-text: #94a3b8;
   --sidebar-text-active: #60a5fa;
-  --sidebar-border: #1e293b;
+  --sidebar-border: #141f36;
   --sidebar-icon: #64748b;
 
-  /* Header / Navbar */
-  --header-bg: rgba(2, 6, 23, 0.85);
-  --header-border: rgba(30, 41, 59, 0.7);
-  --header-shadow: 0 1px 0 0 rgba(30, 41, 59, 0.6);
+  /* Header / Navbar (Midnight Glass) */
+  --header-bg: rgba(10, 15, 29, 0.92);
+  --header-border: rgba(30, 41, 59, 0.75);
+  --header-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
 
   /* Scrollbar */
   --scrollbar-track: transparent;
@@ -185,69 +190,75 @@
 /* ── LIGHT THEME ────────────────────────────────── */
 [data-theme="light"] {
   /* Backgrounds */
-  --bg-base: #f1f5f9; /* slate-100 - cooler deeper base */
-  --bg-surface: #ffffff; /* white */
-  --bg-surface-2: #f8fafc; /* slate-50 - headers, sidebar */
-  --bg-surface-3: #e2e8f0; /* slate-200 */
-  --bg-hover: #f1f5f9; /* slate-100 */
-  --bg-active: #e2e8f0; /* slate-200 */
-  --bg-input: #ffffff; /* white */
+  --bg-base: #f8fafc; /* Pearl slate - clean, warm, non-stark canvas */
+  --bg-surface: #ffffff; /* Crisp porcelain white cards & surfaces */
+  --bg-surface-2: #f1f5f9; /* Soft mist - sticky table headers, tab bars, inner panels */
+  --bg-surface-3: #e2e8f0; /* Slate 200 - structural containers */
+  --bg-hover: #f1f5f9; /* Light hover highlight */
+  --bg-active: #dbeafe; /* Subtle blue tint for active selections */
+  --bg-input: #ffffff; /* Crisp white input boxes */
   --bg-card: #ffffff;
   --bg-card-hover: #f8fafc;
-  --bg-overlay: rgba(255, 255, 255, 0.8);
-  --bg-glass: rgba(255, 255, 255, 0.95);
+  --bg-overlay: rgba(15, 23, 42, 0.4);
+  --bg-glass: rgba(255, 255, 255, 0.94);
 
-  /* Text */
-  --text-primary: #0f172a; /* slate-900 */
-  --text-secondary: #334155; /* slate-700 */
-  --text-muted: #64748b; /* slate-500 */
-  --text-disabled: #94a3b8; /* slate-400 */
-  --text-inverse: #ffffff; /* white */
-  --text-heading: #020617; /* slate-950 */
+  /* Text (Midnight Navy & Slate Ink Hierarchy) */
+  --text-primary: #1e293b; /* Slate 800 - crisp, high-contrast readable copy */
+  --text-secondary: #475569; /* Slate 600 - confident secondary information */
+  --text-muted: #64748b; /* Slate 500 - column titles, meta hints */
+  --text-disabled: #94a3b8; /* Slate 400 - disabled labels */
+  --text-inverse: #ffffff; /* Pure white text on blue buttons & badges */
+  --text-heading: #0f172a; /* Midnight Navy 900 - prominent headlines & branding */
 
-  /* Borders */
-  --border-default: #e2e8f0; /* slate-200 */
-  --border-subtle: #f1f5f9; /* slate-100 */
-  --border-strong: #cbd5e1; /* slate-300 */
-  --border-input: #cbd5e1; /* slate-300 */
-  --border-focus: #3b82f6; /* blue-500 */
+  /* Borders & Dividers */
+  --border-default: #e2e8f0; /* Crisp subtle borders for cards */
+  --border-subtle: #f1f5f9; /* Soft hairlines between rows */
+  --border-strong: #cbd5e1; /* Active input outlines */
+  --border-input: #cbd5e1;
+  --border-focus: #3b82f6;
 
-  /* Brand/Accent */
-  --accent-primary: #2563eb; /* blue-600 */
-  --accent-primary-hover: #1d4ed8; /* blue-700 */
+  /* Brand/Accent (Midnight Navy & Sapphire Blue) */
+  --accent-primary: #2563eb; /* Vibrant Sapphire Blue */
+  --accent-primary-hover: #1d4ed8; /* Deep Royal Blue */
   --accent-primary-subtle: rgba(37, 99, 235, 0.08);
-  --accent-primary-border: rgba(37, 99, 235, 0.2);
-  --accent-success: #059669;
-  --accent-warning: #d97706;
-  --accent-danger: #dc2626;
-  --accent-info: #0891b2;
+  --accent-primary-border: rgba(37, 99, 235, 0.25);
+  --accent-success: #10b981;
+  --accent-warning: #f59e0b;
+  --accent-danger: #ef4444;
+  --accent-info: #0284c7;
+
+  /* Actions (Primary Buttons) */
+  --action-bg: #2563eb;
+  --action-hover: #1d4ed8;
+  --action-text: #ffffff;
 
   /* Sidebar */
   --sidebar-bg: #ffffff;
   --sidebar-bg-hover: #f1f5f9;
-  --sidebar-bg-active: rgba(37, 99, 235, 0.07);
+  --sidebar-bg-active: rgba(37, 99, 235, 0.08);
   --sidebar-text: #475569;
   --sidebar-text-active: #2563eb;
   --sidebar-border: #e2e8f0;
-  --sidebar-icon: #94a3b8;
+  --sidebar-icon: #64748b;
 
-  /* Header / Navbar */
-  --header-bg: rgba(255, 255, 255, 0.92);
+  /* Header / Navbar (Frosted Porcelain Glass) */
+  --header-bg: rgba(255, 255, 255, 0.94);
   --header-border: rgba(226, 232, 240, 0.9);
-  --header-shadow: 0 1px 0 0 rgba(226, 232, 240, 0.8);
+  --header-shadow: 0 1px 3px rgba(15, 23, 42, 0.05);
 
   /* Scrollbar */
-  --scrollbar-track: #f1f5f9;
+  --scrollbar-track: #f8fafc;
   --scrollbar-thumb: #cbd5e1;
   --scrollbar-thumb-hover: #94a3b8;
 
   /* Cards */
   --card-bg: #ffffff;
   --card-border: #e2e8f0;
-  --card-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
+  --card-shadow: 0 1px 3px rgba(15, 23, 42, 0.05), 0 1px 2px rgba(15, 23, 42, 0.03);
+  --card-shadow-hover: 0 6px 18px rgba(15, 23, 42, 0.08);
 
   /* Inputs */
-  --input-bg: #f8fafc;
+  --input-bg: #ffffff;
   --input-border: #cbd5e1;
   --input-text: #0f172a;
   --input-placeholder: #94a3b8;
@@ -264,12 +275,12 @@
   /* Drawer */
   --drawer-bg: #ffffff;
   --drawer-border: #e2e8f0;
-  --drawer-overlay: rgba(15, 23, 42, 0.4);
+  --drawer-overlay: rgba(15, 23, 42, 0.45);
 
   /* Dialog */
   --dialog-bg: #ffffff;
   --dialog-border: #e2e8f0;
-  --dialog-overlay: rgba(15, 23, 42, 0.5);
+  --dialog-overlay: rgba(15, 23, 42, 0.45);
 
   /* Filters */
   --theme-filter-invert: invert(1) opacity(0.3);
@@ -686,11 +697,31 @@
   background-color: var(--bg-surface-3) !important;
 }
 
-/* Override text colors */
+/* Override text colors in light mode, while preserving button/badge text */
 [data-theme="light"] .text-slate-100,
-[data-theme="light"] .text-slate-50,
-[data-theme="light"] .text-white {
+[data-theme="light"] .text-slate-50 {
   color: #0f172a !important;
+}
+
+[data-theme="light"] p.text-white,
+[data-theme="light"] h1.text-white,
+[data-theme="light"] h2.text-white,
+[data-theme="light"] h3.text-white,
+[data-theme="light"] h4.text-white {
+  color: #0f172a !important;
+}
+
+/* Buttons and colored accent containers always preserve white text */
+[data-theme="light"] button[class*="bg-blue"],
+[data-theme="light"] .bg-blue-600,
+[data-theme="light"] .bg-blue-500,
+[data-theme="light"] [class*="bg-blue-600"] *,
+[data-theme="light"] [class*="bg-blue-500"] *,
+[data-theme="light"] .bg-emerald-600,
+[data-theme="light"] .bg-red-600,
+[data-theme="light"] [data-slot="button"][data-variant="default"],
+[data-theme="light"] .btn-primary {
+  color: #ffffff !important;
 }
 
 [data-theme="light"] .text-slate-200 {
@@ -822,5 +853,95 @@
 
 .EmojiPickerReact .epr-category-nav {
   padding: 4px 8px !important;
+}
+
+/* ══════════════════════════════════════════════
+   GLOBAL STICKY TABLE SYSTEM
+   Enforces sticky table headers, sticky footers,
+   and contained interior scrolling across all views.
+   ══════════════════════════════════════════════ */
+
+.table-card-wrapper {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--border-default);
+  border-radius: 8px;
+  background-color: var(--bg-surface);
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.table-scroll-viewport {
+  position: relative;
+  width: 100%;
+  max-height: min(65vh, 640px);
+  min-height: 220px;
+  overflow-y: auto;
+  overflow-x: auto;
+  overscroll-behavior: contain;
+}
+
+/* Custom scrollbars */
+.table-scroll-viewport::-webkit-scrollbar,
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+.table-scroll-viewport::-webkit-scrollbar-track,
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: var(--bg-surface);
+}
+.table-scroll-viewport::-webkit-scrollbar-thumb,
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: var(--border-default);
+  border-radius: 4px;
+}
+.table-scroll-viewport::-webkit-scrollbar-thumb:hover,
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
+}
+
+/* Sticky Headers: stay pinned at the top when scrolling */
+table thead th,
+.table-scroll-viewport table thead th,
+.table-sticky-header thead th,
+.catalog-table th {
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 20 !important;
+  background-color: var(--bg-surface-2) !important;
+  color: var(--text-muted);
+  box-shadow: 0 1px 0 var(--border-default);
+}
+
+[data-theme="light"] table thead th,
+[data-theme="light"] .table-scroll-viewport table thead th,
+[data-theme="light"] .catalog-table th {
+  background-color: #f1f5f9 !important;
+  color: #334155 !important;
+  box-shadow: 0 1px 0 #cbd5e1;
+}
+
+/* Sticky Footers: stay pinned at the bottom */
+table tfoot,
+table tfoot td,
+.table-card-footer,
+.table-sticky-footer {
+  position: sticky !important;
+  bottom: 0 !important;
+  z-index: 20 !important;
+  background-color: var(--bg-surface) !important;
+  color: var(--text-muted);
+  border-top: 1px solid var(--border-default);
+}
+
+[data-theme="light"] table tfoot,
+[data-theme="light"] table tfoot td,
+[data-theme="light"] .table-card-footer,
+[data-theme="light"] .table-sticky-footer {
+  background-color: #ffffff !important;
+  color: #475569 !important;
+  border-top-color: #e2e8f0;
 }
 

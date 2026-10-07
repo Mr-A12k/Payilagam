@@ -21,6 +21,8 @@ const {
   getEnrollmentAnalytics,
   getCourseAnalytics,
   getSystemLogs,
+  getAllProblemTags,
+  deleteProblemTag,
 } = require("./admin.controller");
 
 const { authenticate, authorize } = require("../../middlewares/authMiddleware");
@@ -247,5 +249,11 @@ router.get("/analytics/enrollments", getEnrollmentAnalytics);
  *         description: Course analytics data
  */
 router.get("/analytics/courses", getCourseAnalytics);
+
+const dropdownOptionRoutes = require('./dropdownOption.routes.js');
+router.use('/dropdown-options', dropdownOptionRoutes.adminRouter);
+
+router.get("/problem-tags", getAllProblemTags);
+router.delete("/problem-tags/:id", deleteProblemTag);
 
 module.exports = router;

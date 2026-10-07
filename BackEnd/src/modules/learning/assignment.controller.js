@@ -16,6 +16,7 @@ const getAssignmentsByCourse = catchAsync(async (request, response) => {
     await assignmentService.getAssignmentsByCourse(
       request.params.courseId,
       request.query,
+      request.user,
     );
   return paginated(
     response,
@@ -28,6 +29,7 @@ const getAssignmentsByCourse = catchAsync(async (request, response) => {
 const getAssignmentById = catchAsync(async (request, response) => {
   const assignment = await assignmentService.getAssignmentById(
     request.params.id,
+    request.user,
   );
   return success(response, assignment, "Assignment retrieved successfully");
 });

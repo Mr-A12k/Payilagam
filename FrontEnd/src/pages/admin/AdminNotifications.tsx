@@ -1,175 +1,73 @@
-import React, { useState, useEffect } from "react";
-import {
-  executeHttpGetRequest,
-  executeHttpPutRequest,
-  executeHttpDeleteRequest,
-} from "@/api/commonServices";
+import { useState } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { Link } from "react-router-dom";
+import { executeHttpGetRequest, executeHttpPutRequest, executeHttpDeleteRequest } from "@/api/commonServices";
 import { API_PATHS } from "@/api/constants";
 import { toast } from "react-hot-toast";
-import {
-  Bell,
-  CheckCircle,
-  Trash2,
-  Loader2,
-  Info,
-  AlertTriangle,
-} from "lucide-react";
-import { Card } from "@/components/ui/Card";
+import { ArrowLeft, ArrowRight, Bell, CheckCircle, Trash2, Loader2 } from "lucide-react";
+import { Button } from "@/components/ui";
+
+const getCourseId = (metadata: unknown): string | null => {
+  try {
+    const parsed = typeof metadata === "string" ? JSON.parse(metadata) : metadata;
+    if (!parsed || typeof parsed !== "object") return null;
+    const id = parsed.courseId ?? parsed.uniqueId;
+    return typeof id === "string" || typeof id === "number" ? String(id) : null;
+  } catch {
+    return null;
+  }
+};
 
 const AdminNotifications = () => {
-  const [notifications, setNotifications] = useState<any[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-
-  const fetchNotifications = React.useCallback(async () => {
+  const queryClient = useQueryClient();
+  const [page, setPage] = useState(1);
+  const [processingId, setProcessingId] = useState<string | null>(null);
+  const { data, isLoading, isError, refetch } = useQuery({
+    queryKey: ["adminNotifications", page],
+    queryFn: () => executeHttpGetRequest(API_PATHS.NOTIFICATIONS.BASE, { page, limit: 20 }),
+  });
+  const notifications = Array.isArray(data?.data?.data) ? data.data.data : [];
+  const updateNotification = async (id: string, remove: boolean) => {
+    if (processingId !== null) return;
+    setProcessingId(id);
     try {
-      const response = await executeHttpGetRequest(
-        `${(API_PATHS as any).NOTIFICATIONS.BASE}/notifications`,
-      );
-      if (response.data.success) {
-        setNotifications(response.data.data.notifications || []);
-      }
-    } catch (error) {
-      console.error(error);
-      toast.error("Failed to load notifications");
+      if (remove) await executeHttpDeleteRequest(`${API_PATHS.NOTIFICATIONS.BASE}/${id}`);
+      else await executeHttpPutRequest(API_PATHS.NOTIFICATIONS.READ(id));
+      if (remove && notifications.length === 1 && page > 1) setPage((value) => value - 1);
+      await queryClient.invalidateQueries({ queryKey: ["adminNotifications"] });
+      await queryClient.invalidateQueries({ queryKey: ["notifications"] });
+      if (remove) toast.success("Notification removed");
+    } catch {
+      toast.error(remove ? "Failed to delete notification" : "Failed to mark as read");
     } finally {
-      setIsLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    fetchNotifications();
-  }, [fetchNotifications]);
-
-  const markAsRead = async (id: string) => {
-    try {
-      await executeHttpPutRequest(
-        `${(API_PATHS as any).NOTIFICATIONS.BASE}/${id}/read`,
-      );
-      setNotifications(
-        notifications.map((n: any) =>
-          n.notificationId === id ? { ...n, isRead: true } : n,
-        ),
-      );
-    } catch (error) {
-      console.error(error);
-      toast.error("Failed to mark as read");
+      setProcessingId(null);
     }
   };
-
-  const deleteNotification = async (id: string) => {
-    try {
-      await executeHttpDeleteRequest(
-        `${(API_PATHS as any).NOTIFICATIONS.BASE}/${id}`,
-      );
-      setNotifications(
-        notifications.filter((n: any) => n.notificationId !== id),
-      );
-      toast.success("Notification removed");
-    } catch (error) {
-      console.error(error);
-      toast.error("Failed to delete notification");
-    }
-  };
-
-  const getIcon = (type: any) => {
-    switch (type) {
-      case "request":
-        return <AlertTriangle className="w-5 h-5 text-orange-500" />;
-      case "info":
-        return <Info className="w-5 h-5 text-blue-500" />;
-      default:
-        return <Bell className="w-5 h-5 text-slate-400" />;
-    }
-  };
-
-  if (isLoading) {
-    return (
-      <div className="flex-center min-h-[50vh]">
-        <Loader2 className="w-8 h-8 text-blue-500 animate-spin" />
-      </div>
-    );
-  }
 
   return (
-    <div className="p-6 max-w-5xl mx-auto space-y-6">
-      <div className="flex-between">
-        <h1 className="text-2xl font-bold text-white flex items-center gap-3">
-          <Bell className="w-6 h-6 text-blue-500" />
-          Admin Notifications
-        </h1>
-      </div>
-
-      <Card className="!p-0 border-slate-800 bg-slate-900 overflow-hidden">
-        {notifications.length === 0 ? (
-          <div className="p-12 text-center">
-            <Bell className="w-12 h-12 text-slate-600 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-slate-300">
-              No notifications
-            </h3>
-            <p className="text-slate-500 mt-1">You're all caught up!</p>
-          </div>
-        ) : (
-          <div className="divide-y divide-slate-800/50">
-            {notifications.map((notif: any) => (
-              <div
-                key={notif.notificationId}
-                className={`p-4 flex gap-4 transition-colors ${notif.isRead ? "bg-slate-900/50" : "bg-slate-800/50 hover:bg-slate-800"}`}
-              >
-                <div className="mt-1 shrink-0">{getIcon(notif.type)}</div>
-
-                <div className="flex-1 min-w-0">
-                  <div className="flex-between gap-4 mb-1">
-                    <h4
-                      className={`text-sm font-semibold truncate ${notif.isRead ? "text-slate-300" : "text-white"}`}
-                    >
-                      {notif.title}
-                    </h4>
-                    <span className="text-xs text-slate-500 whitespace-nowrap">
-                      {new Date(notif.createdAt).toLocaleDateString()}
-                    </span>
-                  </div>
-                  <p
-                    className={`text-sm ${notif.isRead ? "text-slate-400" : "text-slate-300"}`}
-                  >
-                    {notif.message}
-                  </p>
-
-                  {/* If metadata has a uniqueId, maybe show a link */}
-                  {notif.metadata && JSON.parse(notif.metadata).uniqueId && (
-                    <div className="mt-3">
-                      <a
-                        href={`/courses/${JSON.parse(notif.metadata).uniqueId}`}
-                        className="text-xs font-semibold text-blue-400 hover:text-blue-300 bg-blue-500/10 px-3 py-1.5 rounded-full transition-colors border border-blue-500/20 inline-block"
-                      >
-                        Review Course
-                      </a>
-                    </div>
-                  )}
+    <div className="mx-auto w-full min-w-0 max-w-5xl space-y-5 p-4 text-[var(--text-primary)] sm:p-6">
+      <header className="flex flex-wrap items-center justify-between gap-3"><h1 className="text-2xl font-semibold text-[var(--text-heading)]">Notifications</h1>{data && <span className="text-sm text-[var(--text-muted)]">{data.data.unreadCount ?? 0} unread</span>}</header>
+      <section className="border-t border-[var(--border-default)]" aria-label="Notifications">
+        {isLoading ? <p role="status" className="flex items-center justify-center gap-2 py-12 text-sm"><Loader2 className="h-4 w-4 animate-spin" /> Loading notifications...</p> : isError ? <div role="alert" className="flex flex-wrap items-center gap-3 py-8 text-sm"><p>Could not load notifications.</p><Button variant="outline" onClick={() => refetch()}>Retry</Button></div> : !notifications.length ? <div className="py-12 text-center text-[var(--text-muted)]"><Bell className="mx-auto mb-3 h-7 w-7" /><p className="text-sm">No notifications.</p></div> : (
+          <ul className="divide-y divide-[var(--border-default)]">
+            {notifications.map((notification: any) => {
+              const courseId = getCourseId(notification.metadata);
+              return <li key={notification.notificationId} className={`flex items-start gap-3 py-4 ${notification.isRead ? "" : "border-l-2 border-[var(--accent-primary)] pl-3"}`}>
+                <div className="min-w-0 flex-1">
+                  <div className="mb-1 flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1"><h2 className="break-words text-sm font-semibold">{notification.title}</h2><time className="text-xs text-[var(--text-muted)]">{new Date(notification.createdAt).toLocaleDateString()}</time></div>
+                  <p className="break-words text-sm text-[var(--text-secondary)]">{notification.message}</p>
+                  {courseId && <Link to={`/courses/${encodeURIComponent(courseId)}`} className="mt-2 inline-flex text-xs text-[var(--accent-primary)] hover:underline">Review course</Link>}
                 </div>
-
-                <div className="flex flex-col gap-2 shrink-0">
-                  {!notif.isRead && (
-                    <button
-                      onClick={() => markAsRead(notif.notificationId)}
-                      className="p-1.5 text-slate-400 hover:text-emerald-400 hover:bg-emerald-500/10 rounded-lg transition-colors"
-                      title="Mark as read"
-                    >
-                      <CheckCircle className="w-4 h-4" />
-                    </button>
-                  )}
-                  <button
-                    onClick={() => deleteNotification(notif.notificationId)}
-                    className="p-1.5 text-slate-400 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors"
-                    title="Delete"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
+                <div className="flex shrink-0 flex-col gap-1 sm:flex-row">
+                  {!notification.isRead && <Button variant="ghost" size="icon-sm" title="Mark as read" aria-label="Mark as read" disabled={processingId !== null} onClick={() => updateNotification(String(notification.notificationId), false)}><CheckCircle className="h-4 w-4" /></Button>}
+                  <Button variant="ghost" size="icon-sm" title="Delete notification" aria-label="Delete notification" disabled={processingId !== null} onClick={() => updateNotification(String(notification.notificationId), true)}><Trash2 className="h-4 w-4" /></Button>
                 </div>
-              </div>
-            ))}
-          </div>
+              </li>;
+            })}
+          </ul>
         )}
-      </Card>
+      </section>
+      <div className="flex flex-wrap items-center justify-end gap-3"><span className="text-xs text-[var(--text-muted)]">Page {page}</span><Button variant="outline" size="icon" title="Previous page" aria-label="Previous page" disabled={page === 1 || isLoading || processingId !== null} onClick={() => setPage((value) => value - 1)}><ArrowLeft className="h-4 w-4" /></Button><Button variant="outline" size="icon" title="Next page" aria-label="Next page" disabled={!data?.data?.pagination?.hasNext || isLoading || processingId !== null} onClick={() => setPage((value) => value + 1)}><ArrowRight className="h-4 w-4" /></Button></div>
     </div>
   );
 };

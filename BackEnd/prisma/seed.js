@@ -5,6 +5,38 @@ const prisma = new PrismaClient();
 async function main() {
   console.log('Seeding database with mock data...');
 
+  console.log('Seeding Dropdown Options...');
+  const defaultOptions = [
+    { fieldGroup: 'course_level', value: 'beginner', label: 'Beginner', sortOrder: 1 },
+    { fieldGroup: 'course_level', value: 'intermediate', label: 'Intermediate', sortOrder: 2 },
+    { fieldGroup: 'course_level', value: 'advanced', label: 'Advanced', sortOrder: 3 },
+    { fieldGroup: 'problem_difficulty', value: 'easy', label: 'Easy', sortOrder: 1 },
+    { fieldGroup: 'problem_difficulty', value: 'medium', label: 'Medium', sortOrder: 2 },
+    { fieldGroup: 'problem_difficulty', value: 'hard', label: 'Hard', sortOrder: 3 },
+    { fieldGroup: 'course_status', value: 'draft', label: 'Draft', sortOrder: 1 },
+    { fieldGroup: 'course_status', value: 'published', label: 'Published', sortOrder: 2 },
+    { fieldGroup: 'course_status', value: 'archived', label: 'Archived', sortOrder: 3 },
+    { fieldGroup: 'lesson_type', value: 'video', label: 'Video', sortOrder: 1 },
+    { fieldGroup: 'lesson_type', value: 'text', label: 'Article', sortOrder: 2 },
+    { fieldGroup: 'lesson_type', value: 'quiz', label: 'Quiz', sortOrder: 3 },
+    { fieldGroup: 'lesson_type', value: 'coding', label: 'Coding Challenge', sortOrder: 4 },
+    { fieldGroup: 'assignment_type', value: 'file_upload', label: 'File Upload', sortOrder: 1 },
+    { fieldGroup: 'assignment_type', value: 'coding_challenge', label: 'Coding Challenge', sortOrder: 2 },
+    { fieldGroup: 'assignment_type', value: 'quiz', label: 'Quiz', sortOrder: 3 },
+    { fieldGroup: 'assignment_type', value: 'text', label: 'Text', sortOrder: 4 },
+    { fieldGroup: 'resource_category', value: 'Documents', label: 'Documents', sortOrder: 1 },
+    { fieldGroup: 'resource_category', value: 'Code', label: 'Code', sortOrder: 2 },
+    { fieldGroup: 'resource_category', value: 'Videos', label: 'Videos', sortOrder: 3 },
+  ];
+
+  for (const opt of defaultOptions) {
+    await prisma.dropdownOption.upsert({
+      where: { fieldGroup_value: { fieldGroup: opt.fieldGroup, value: opt.value } },
+      update: {},
+      create: opt,
+    });
+  }
+
   // 1. Roles
   const roles = [
     { roleId: 1, roleName: 'admin' },

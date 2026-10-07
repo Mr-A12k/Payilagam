@@ -14,7 +14,8 @@ const resourceController = {
     const { title, description, category } = request.body;
     const uploaderId = request.user.userId;
 
-    if (!title || !category) {
+    if (typeof title !== 'string' || !title.trim() || typeof category !== 'string' || !category.trim()) {
+      require('fs').unlinkSync(request.file.path);
       return errorResponse(response, "Title and category are required", 400);
     }
 
@@ -90,7 +91,7 @@ const resourceController = {
       try {
         const fs = require("fs");
         const path = require("path");
-        const filePath = path.join(__dirname, "../../", resource.fileUrl);
+        const filePath = path.join(require('../../config/storage').resourceStoragePath, path.basename(resource.fileUrl));
         if (fs.existsSync(filePath)) {
           fs.unlinkSync(filePath);
         }

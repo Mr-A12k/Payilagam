@@ -1,4 +1,5 @@
 const prisma = require("../../config/prisma");
+const AppError = require('../../utils/AppError');
 
 const createNotification = async (userId, data) => {
   const { type, title, message, link } = data;
@@ -53,11 +54,11 @@ const markAsRead = async (notificationId, userId) => {
   });
 
   if (!notification) {
-    throw new Error("Notification not found");
+    throw new AppError("Notification not found", 404);
   }
 
   if (notification.userId !== userId) {
-    throw new Error("Access denied");
+    throw new AppError("Access denied", 403);
   }
 
   return prisma.notification.update({
@@ -81,11 +82,11 @@ const deleteNotification = async (notificationId, userId) => {
   });
 
   if (!notification) {
-    throw new Error("Notification not found");
+    throw new AppError("Notification not found", 404);
   }
 
   if (notification.userId !== userId) {
-    throw new Error("Access denied");
+    throw new AppError("Access denied", 403);
   }
 
   await prisma.notification.delete({

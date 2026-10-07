@@ -6,6 +6,8 @@
  */
 const express = require('express');
 const router = express.Router();
+router.use('/assignment/:assignmentId', require('./validation').params);
+router.use('/:id', (req, res, next) => ['my-submissions', 'assignment'].includes(req.params.id) ? next() : require('./validation').params(req, res, next));
 
 const {
     submitAssignment,

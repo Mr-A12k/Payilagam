@@ -35,7 +35,9 @@ exports.ragChatStream = async (query, topic, onToken, onComplete, onError) => {
 
     // 1. Retrieve from Redis
     try {
-      const client = createClient({ url: REDIS_URL });
+      const client = createClient({ url: REDIS_URL, socket: { connectTimeout: 2000, reconnectStrategy: false } });
+      client.on('error', error => console.error('AI index connection failed:', error.message));
+      try {
       await client.connect();
 
       const vectorStore = new RedisVectorStore(embeddings, {
@@ -55,6 +57,9 @@ exports.ragChatStream = async (query, topic, onToken, onComplete, onError) => {
             return `Content: ${match.pageContent}`;
           })
           .join("\n\n");
+      }
+      } finally {
+        if (client.isOpen) client.destroy();
       }
     } catch (error) {
       console.error("Local Redis Search failed:", error);
@@ -76,7 +81,7 @@ exports.ragChatStream = async (query, topic, onToken, onComplete, onError) => {
             .join("\n\n");
         }
       } catch (error) {
-        console.error("Tavily search failed:", e);
+        console.error("Tavily search failed:", error);
       }
     }
 

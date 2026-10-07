@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import {
-  Hash, Users, PhoneCall, Video, Search, Info,
-  MoreHorizontal, Pencil, Trash2, CheckCheck, Check, Sparkles,
+  ArrowLeft, Hash, Users, ShieldCheck, LockKeyhole,
+  MoreHorizontal, Pencil, Trash2, CheckCheck, Check, Reply,
 } from "lucide-react";
-import { Avatar, ConfirmDialog } from "@/components/ui";
+import { ConfirmDialog } from "@/components/ui";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem,
   DropdownMenuSeparator, DropdownMenuTrigger,
@@ -30,38 +30,33 @@ const fmtTime = (d: string) =>
 /* ── Typing indicator bubble ─────────────────────────────────────── */
 const TypingBubble = ({ avatarUrl, name }: { avatarUrl?: string; name?: string }) => (
   <div className="flex items-end gap-2.5 px-5 py-2">
-    <div className="w-8 h-8 rounded-full overflow-hidden shrink-0 ring-1 ring-white/10 shadow-sm">
+    <div className="w-8 h-8 rounded-full overflow-hidden shrink-0 ring-1 border-[var(--border-default)]">
       {avatarUrl
         ? <img src={avatarUrl} className="w-full h-full object-cover" alt="" />
-        : <div className="w-full h-full bg-slate-700 flex items-center justify-center text-[11px] font-bold text-slate-300">{name?.[0]?.toUpperCase() ?? "?"}</div>}
+        : <div className="w-full h-full bg-[var(--bg-surface-2)] flex items-center justify-center text-[11px] font-bold text-[var(--text-secondary)]">{name?.[0]?.toUpperCase() ?? "?"}</div>}
     </div>
-    <div className="relative flex items-center gap-1.5 bg-[#1c2333] border border-white/[0.08] rounded-[20px] rounded-bl-[4px] px-4 py-3 shadow-md">
+    <div className="relative flex items-center gap-1.5 bg-[var(--bg-surface)] border border-[var(--border-default)] rounded-lg rounded-bl-[4px] px-4 py-3">
       {[0, 1, 2].map(i => (
-        <span key={i} className="w-[6px] h-[6px] rounded-full bg-slate-400 block"
+        <span key={i} className="w-[6px] h-[6px] rounded-full bg-[var(--bg-surface-2)] block"
           style={{ animation: "typingDot 1.3s ease-in-out infinite", animationDelay: `${i * 0.2}s` }} />
       ))}
-      <svg className="absolute -left-[6px] bottom-0 w-[10px] h-[15px] text-[#1c2333] fill-current pointer-events-none" viewBox="0 0 10 15">
-        <path d="M10,0 C8,4 5,9 0,15 C6,15 10,10 10,5 Z" />
-      </svg>
     </div>
   </div>
 );
 
 /* ── Empty pane ──────────────────────────────────────────────────── */
-const EmptyPane = ({ icon: Icon, title, subtitle }: any) => (
-  <div className="flex-1 flex flex-col items-center justify-center bg-[#070a12] border-l border-white/[0.05]">
+const EmptyPane = ({ icon: Icon, title, subtitle, onBack }: any) => (
+  <div className="relative min-w-0 flex-1 flex flex-col items-center justify-center p-4 bg-[var(--bg-surface)]">
+    <button onClick={onBack} title="Back to conversations" aria-label="Back to conversations" className="absolute left-2 top-2 md:hidden p-2 rounded-lg hover:bg-[var(--bg-surface-2)]"><ArrowLeft className="w-5 h-5" /></button>
     <div className="flex flex-col items-center gap-5 max-w-[260px] text-center">
       <div className="relative">
-        <div className="w-20 h-20 rounded-[28px] bg-gradient-to-br from-slate-800/90 to-slate-900 border border-white/[0.08] flex items-center justify-center shadow-2xl">
-          <Icon className="w-8 h-8 text-slate-400" />
-        </div>
-        <div className="absolute -bottom-1 -right-1 w-7 h-7 rounded-full bg-blue-600 flex items-center justify-center shadow-lg shadow-blue-500/30 ring-2 ring-[#070a12]">
-          <Sparkles className="w-3.5 h-3.5 text-white" />
+        <div className="w-12 h-12 rounded-lg bg-[var(--bg-surface-2)] flex items-center justify-center">
+          <Icon className="w-8 h-8 text-[var(--text-muted)]" />
         </div>
       </div>
       <div>
-        <h2 className="text-[16px] font-bold text-slate-100 mb-1.5 tracking-tight">{title}</h2>
-        <p className="text-[12.5px] text-slate-500 leading-relaxed">{subtitle}</p>
+        <h2 className="text-[16px] font-bold text-[var(--text-primary)] mb-1.5 tracking-normal">{title}</h2>
+        <p className="text-[12.5px] text-[var(--text-muted)] leading-relaxed">{subtitle}</p>
       </div>
     </div>
   </div>
@@ -69,7 +64,7 @@ const EmptyPane = ({ icon: Icon, title, subtitle }: any) => (
 
 /* ── ChatArena Component (Authentic Apple iMessage Sharp Tails) ──── */
 const ChatArena = ({
-  isDMView, activeConv, activeChannel,
+  isDMView, activeConv, activeChannel, onBack,
   messages, user, isAdmin, getOtherParticipant,
   isTyping, onSendMessage, onTyping, emitReadReceipt,
   onEditMessage, onDeleteMessage, onEditChannelMessage, onDeleteChannelMessage,
@@ -82,14 +77,23 @@ const ChatArena = ({
   const [editText, setEditText] = useState("");
   const [deleteTarget, setDeleteTarget] = useState<any>(null);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [replyTarget, setReplyTarget] = useState<any>(null);
+  const chatKey = `${isDMView ? "dm" : "channel"}-${isDMView ? activeConv?.conversationId : activeChannel?.channelId}`;
+  const isMyChat = !isDMView || !!activeConv?.participants?.some((p: any) => Number(p.userId) === Number(user.userId));
+  const inputDisabled = isDMView && !isMyChat;
+  const isAdminReview = isAdmin && inputDisabled;
+  useEffect(() => { setReplyTarget(null); setEditId(null); setDeleteTarget(null); }, [chatKey]);
+  useEffect(() => {
+    if (replyTarget) setReplyTarget(messages.find((m: any) => m.messageId === replyTarget.messageId) || null);
+  }, [messages]);
 
   useEffect(() => { endRef.current?.scrollIntoView({ behavior: "smooth" }); }, [messages, isTyping]);
 
   useEffect(() => {
-    if (!isDMView || !emitReadReceipt || !messages.length) return;
+    if (!isDMView || !isMyChat || !emitReadReceipt || !messages.length) return;
     const ids = messages.filter((m: any) => m.sender?.userId !== user.userId && !m.isRead).map((m: any) => m.messageId);
     if (ids.length) emitReadReceipt(ids);
-  }, [messages, isDMView, emitReadReceipt, user.userId]);
+  }, [messages, isDMView, isMyChat, emitReadReceipt, user.userId]);
 
   useEffect(() => { if (editId) setTimeout(() => editRef.current?.focus(), 60); }, [editId]);
 
@@ -108,91 +112,91 @@ const ChatArena = ({
   };
 
   /* Empty states */
-  if (isDMView && !activeConv) return <EmptyPane icon={Users} title="iMessage" subtitle="Select a conversation or start a new message to chat with mentors and peers." />;
-  if (!isDMView && !activeChannel) return <EmptyPane icon={Hash} title="Select a Channel" subtitle="Choose a channel from the sidebar to collaborate with your workspace." />;
+  if (isDMView && !activeConv) return <EmptyPane onBack={onBack} icon={Users} title="Messages" subtitle="No conversation selected." />;
+  if (!isDMView && !activeChannel) return <EmptyPane onBack={onBack} icon={Hash} title="Channels" subtitle="No channel selected." />;
 
   /* Participant & Online state */
   const other = isDMView ? getOtherParticipant(activeConv) : null;
   const isOnline = other?.userId ? onlineUsers.includes(Number(other.userId)) : false;
-  const chatTitle = isDMView ? (other?.fullName || "Unknown") : activeChannel.name;
+  const chatTitle = isDMView ? (isAdminReview ? activeConv.participants.map((p: any) => p.user?.fullName || "Unknown").join(" & ") : other?.fullName || "Unknown") : activeChannel.name;
   const avatarUrl = other?.profileUrl ?? null;
   const avatarFallback = chatTitle[0]?.toUpperCase() || "U";
-  const isMyChat = isDMView ? activeConv?.participants?.some((p: any) => p.userId === user.userId) : true;
   const channelSlug = chatTitle.toLowerCase().replace(/\s+/g, "-");
-  const inputDisabled = isAdmin && !isMyChat && isDMView;
-  const inputPlaceholder = inputDisabled ? "Admins cannot reply to this chat…" : isDMView ? `iMessage` : `Message #${channelSlug}`;
+  const inputPlaceholder = inputDisabled ? "Read only" : isDMView ? "Message" : `Message #${channelSlug}`;
 
   return (
-    <div className="flex-1 flex flex-col min-w-0 bg-[#070a12] border-l border-white/[0.05] chat-font">
+    <div className="flex-1 flex flex-col min-h-0 min-w-0 bg-[var(--bg-surface)]">
 
       {/* ══════ APPLE GLASSHOUSE HEADER ════════════════════════════ */}
-      <div className="h-[60px] px-6 flex items-center justify-between shrink-0 bg-[#0c101d]/90 backdrop-blur-xl border-b border-white/[0.08] shadow-sm">
-        <div className="flex items-center gap-3.5 min-w-0">
-          {isDMView ? (
+      <div className="h-14 px-2 sm:px-4 flex items-center gap-2 shrink-0 bg-[var(--bg-surface)] border-b border-[var(--border-default)]">
+        <button onClick={onBack} title="Back to conversations" aria-label="Back to conversations" className="md:hidden p-2 shrink-0 rounded-lg hover:bg-[var(--bg-surface-2)]"><ArrowLeft className="w-5 h-5" /></button>
+        <div className="flex flex-1 items-center gap-3 min-w-0">
+          {isAdminReview ? <div className="w-10 h-10 rounded-xl bg-[var(--accent-primary-subtle)] text-[var(--accent-primary)] flex items-center justify-center shrink-0"><ShieldCheck className="w-5 h-5" /></div> : isDMView ? (
             <div className="relative shrink-0">
-              <div className="w-9.5 h-9.5 rounded-full overflow-hidden ring-2 ring-white/[0.1] shadow-md">
+              <div className="w-9.5 h-9.5 rounded-full overflow-hidden ring-2 border-[var(--border-default)]">
                 {avatarUrl
                   ? <img src={avatarUrl} className="w-full h-full object-cover" alt="" />
-                  : <div className="w-full h-full bg-gradient-to-br from-blue-600 to-indigo-700 flex items-center justify-center text-[14px] font-bold text-white">{avatarFallback}</div>
+                  : <div className="w-full h-full bg-[var(--bg-surface-2)] flex items-center justify-center text-[14px] font-bold text-[var(--text-primary)]">{avatarFallback}</div>
                 }
               </div>
               {/* Online indicator dot: ONLY IF ACTIVE ONLINE */}
               {isOnline && (
-                <span className="absolute -bottom-px -right-px w-3 h-3 rounded-full bg-emerald-500 border-[2.5px] border-[#0c101d] shadow-sm animate-pulse" />
+                <span className="absolute -bottom-px -right-px w-3 h-3 rounded-full bg-emerald-500 border-[2.5px] border-[var(--bg-surface)] animate-pulse" />
               )}
             </div>
           ) : (
-            <div className="w-9.5 h-9.5 rounded-xl bg-blue-500/10 border border-blue-400/20 flex items-center justify-center shrink-0">
-              <Hash className="w-5 h-5 text-blue-400" />
+            <div className="w-9.5 h-9.5 rounded-lg bg-[var(--bg-surface-2)] border border-[var(--border-default)] flex items-center justify-center shrink-0">
+              <Hash className="w-5 h-5 text-[var(--text-secondary)]" />
             </div>
           )}
           <div className="min-w-0">
-            <div className="text-[14px] font-bold text-slate-100 truncate leading-snug tracking-tight">
+            <div title={chatTitle} className="text-[14px] font-bold text-[var(--text-primary)] truncate leading-snug tracking-normal">
               {isDMView ? chatTitle : `#${channelSlug}`}
             </div>
             <div className="text-[11px] leading-snug truncate mt-0.5 font-medium">
-              {isDMView
+              {isAdminReview ? <span className="text-[var(--accent-primary)]">Admin view · Read only</span> : isDMView
                 ? isTyping
-                  ? <span className="text-emerald-400 font-semibold">typing…</span>
+                  ? <span className="text-[var(--text-secondary)] font-semibold">typing…</span>
                   : isOnline
-                    ? <span className="text-emerald-400">Active now</span>
-                    : <span className="text-slate-500">Offline</span>
-                : <span className="text-slate-500">{activeChannel.description || "No description"}</span>
+                    ? <span className="text-[var(--text-secondary)]">Active now</span>
+                    : <span className="text-[var(--text-muted)]">Offline</span>
+                : <span className="text-[var(--text-muted)]">{activeChannel.description || "No description"}</span>
               }
             </div>
           </div>
         </div>
 
-        {/* Action icons */}
-        <div className="flex items-center gap-1 shrink-0">
-          {isDMView && <>
-            <HdrBtn icon={PhoneCall} label="Voice Call" />
-            <HdrBtn icon={Video} label="FaceTime Video" />
-          </>}
-          <HdrBtn icon={Search} label="Search Chat" />
-          <HdrBtn icon={Info} label="Details" />
-        </div>
       </div>
 
+      {isAdminReview && <div className="flex items-start gap-3 px-4 py-3 bg-[var(--accent-primary-subtle)] border-b border-[var(--accent-primary-border)]">
+        <ShieldCheck className="w-4 h-4 mt-0.5 shrink-0 text-[var(--accent-primary)]" />
+        <div className="min-w-0 text-xs leading-relaxed">
+          <p className="font-semibold text-[var(--text-primary)]">Viewing other members’ conversation</p>
+          <p className="text-[var(--text-secondary)] [overflow-wrap:anywhere]">{chatTitle}. You can read this chat, but cannot send messages or change its history.</p>
+        </div>
+      </div>}
+
       {/* ══════ APPLE IMESSAGE FEED ════════════════════════════════ */}
-      <div className="flex-1 overflow-y-auto custom-scrollbar scroll-smooth px-2">
+      <div className="min-h-0 min-w-0 flex-1 overflow-y-auto overflow-x-hidden custom-scrollbar px-1 sm:px-4 bg-[var(--bg-base)]">
+
+        {isDMView && messages.length === 0 && <div className="px-6 py-12 text-center text-sm text-[var(--text-muted)]">{isAdminReview ? "No messages in this conversation." : "Start the conversation with a message."}</div>}
 
         {/* Channel welcome */}
         {!isDMView && messages.length === 0 && (
-          <div className="px-6 pt-10 pb-6 text-center flex flex-col items-center">
-            <div className="w-16 h-16 rounded-2xl bg-blue-500/10 border border-blue-400/20 flex items-center justify-center mb-4 shadow-xl">
-              <Hash className="w-7 h-7 text-blue-400" />
+          <div className="min-w-0 px-4 py-6 text-center flex flex-col items-center [overflow-wrap:anywhere]">
+            <div className="w-16 h-16 rounded-lg bg-[var(--bg-surface-2)] border border-[var(--border-default)] flex items-center justify-center mb-4">
+              <Hash className="w-7 h-7 text-[var(--text-secondary)]" />
             </div>
-            <h1 className="text-2xl font-extrabold text-slate-100 tracking-tight mb-1">#{channelSlug}</h1>
-            <p className="text-[13px] text-slate-500 leading-relaxed max-w-sm">
+            <h1 className="max-w-full text-lg font-semibold text-[var(--text-primary)] mb-1">#{channelSlug}</h1>
+            <p className="text-[13px] text-[var(--text-muted)] leading-relaxed max-w-sm">
               {activeChannel.description || `Welcome to #${channelSlug}. Start the discussion.`}
             </p>
-            <div className="mt-8 h-px w-full max-w-md bg-white/[0.06]" />
+            <div className="mt-8 h-px w-full max-w-md bg-[var(--bg-surface-2)]" />
           </div>
         )}
 
         {/* Messages list */}
-        <div className="py-4">
+        <div className="py-4 max-w-5xl mx-auto">
           {messages.map((msg: any, idx: number) => {
             const isOwn = msg.sender?.userId === user.userId;
             const prev = messages[idx - 1];
@@ -208,72 +212,76 @@ const ChatArena = ({
             const showDate = dateLabel && dateLabel !== prevLabel;
 
             /* Apple iMessage message grouping rounded corners */
-            const sentCorners = isLast ? "rounded-[20px] rounded-br-[4px]" : "rounded-[20px] rounded-br-[6px]";
-            const recvCorners = isLast ? "rounded-[20px] rounded-bl-[4px]" : "rounded-[20px] rounded-bl-[6px]";
+            const sentCorners = isLast ? "rounded-lg rounded-br-[4px]" : "rounded-lg rounded-br-[6px]";
+            const recvCorners = isLast ? "rounded-lg rounded-bl-[4px]" : "rounded-lg rounded-bl-[6px]";
 
             return (
               <div key={msg.messageId ?? idx}>
                 {/* Date separator */}
                 {showDate && (
                   <div className="flex items-center justify-center my-6 select-none">
-                    <span className="text-[10px] font-bold uppercase tracking-widest text-slate-500 px-3.5 py-1.5 rounded-full bg-slate-900/80 border border-white/[0.08] shadow-sm">
+                    <span className="text-[10px] font-bold uppercase tracking-normal text-[var(--text-muted)] px-3.5 py-1.5 rounded-full bg-[var(--bg-surface)] border border-[var(--border-default)]">
                       {dateLabel}
                     </span>
                   </div>
                 )}
 
                 {/* Message row */}
-                <div className={`group/row flex items-end px-3 transition-colors hover:bg-white/[0.01] rounded-xl ${isFirst ? "mt-4" : "mt-[3px]"} ${isOwn ? "flex-row-reverse gap-2" : "flex-row gap-2"}`}>
+                <div className={`group/row flex items-end px-3 transition-colors hover:bg-[var(--bg-surface-2)] rounded-lg ${isFirst ? "mt-4" : "mt-[3px]"} ${isOwn ? "flex-row-reverse gap-2" : "flex-row gap-2"}`}>
 
                   {/* Avatar slot (only on final message of a cluster) */}
                   <div className="w-8 shrink-0 self-end pb-0.5">
                     {isLast && (
-                      <div className="w-8 h-8 rounded-full overflow-hidden ring-1 ring-white/10 shadow-sm">
+                      <div className="w-8 h-8 rounded-full overflow-hidden ring-1 border-[var(--border-default)]">
                         {isOwn
                           ? (user.profileUrl
                             ? <img src={user.profileUrl} className="w-full h-full object-cover" alt="" />
-                            : <div className="w-full h-full bg-gradient-to-br from-blue-600 to-indigo-700 flex items-center justify-center text-[12px] font-bold text-white">{user.fullName?.[0]?.toUpperCase() ?? "U"}</div>)
+                            : <div className="w-full h-full bg-[var(--bg-surface-2)] flex items-center justify-center text-[12px] font-bold text-[var(--text-primary)]">{user.fullName?.[0]?.toUpperCase() ?? "U"}</div>)
                           : (msg.sender?.profileUrl
                             ? <img src={msg.sender.profileUrl} className="w-full h-full object-cover" alt="" />
-                            : <div className="w-full h-full bg-gradient-to-br from-emerald-600 to-teal-700 flex items-center justify-center text-[12px] font-bold text-white">{msg.sender?.fullName?.[0]?.toUpperCase() ?? "U"}</div>)
+                            : <div className="w-full h-full bg-[var(--bg-surface-2)] flex items-center justify-center text-[12px] font-bold text-[var(--text-primary)]">{msg.sender?.fullName?.[0]?.toUpperCase() ?? "U"}</div>)
                         }
                       </div>
                     )}
                   </div>
 
                   {/* Bubble & content */}
-                  <div className={`flex flex-col max-w-[65%] ${isOwn ? "items-end" : "items-start"}`}>
+                  <div className={`flex min-w-0 flex-col max-w-[calc(100%-2.5rem)] sm:max-w-[75%] ${isOwn ? "items-end" : "items-start"}`}>
                     {/* Sender name for received first message in cluster */}
                     {!isOwn && isFirst && (
-                      <div className="flex items-baseline gap-2 mb-1 ml-1">
-                        <span className="text-[12px] font-bold text-emerald-400 tracking-tight leading-none">{msg.sender?.fullName}</span>
-                        <span className="text-[10px] text-slate-500 leading-none">{fmtTime(msg.createdAt)}</span>
+                      <div className="flex min-w-0 flex-wrap items-baseline gap-2 mb-1 ml-1 [overflow-wrap:anywhere]">
+                        <span className="text-[12px] font-bold text-[var(--text-secondary)] tracking-normal leading-none">{msg.sender?.fullName}</span>
+                        <span className="text-[10px] text-[var(--text-muted)] leading-none">{fmtTime(msg.createdAt)}</span>
                       </div>
                     )}
 
                     <div className={`flex items-center gap-1.5 w-full ${isOwn ? "flex-row-reverse" : "flex-row"}`}>
                       {/* 3-dot dropdown menu for own messages */}
-                      {isOwn && !isEditing && (
-                        <div className="opacity-0 group-hover/row:opacity-100 transition-all duration-150 self-center shrink-0">
+                      {!inputDisabled && Number.isInteger(msg.messageId) && !isEditing && (
+                        <div className="self-center shrink-0">
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                              <button className="w-7 h-7 flex items-center justify-center rounded-full text-slate-500 hover:text-slate-200 hover:bg-white/10 transition-all cursor-pointer">
+                              <button title="Message actions" aria-label="Message actions" className="w-8 h-8 flex items-center justify-center rounded-lg text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-surface-2)] transition-colors cursor-pointer">
                                 <MoreHorizontal className="w-4 h-4" />
                               </button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent
                               align={isOwn ? "end" : "start"}
                               sideOffset={8}
-                              className="min-w-[160px] bg-[#1a1f2c] border border-white/[0.1] rounded-xl shadow-2xl shadow-black/80 p-1.5 z-50"
+                              className="min-w-[160px] bg-[var(--bg-surface)] border border-[var(--border-default)] rounded-lg p-1.5 z-50"
                             >
+                              <DropdownMenuItem onClick={() => setReplyTarget(msg)} className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-[var(--text-primary)] hover:bg-[var(--bg-surface-2)] cursor-pointer text-[12.5px] font-medium">
+                                <Reply className="w-3.5 h-3.5 text-emerald-500 shrink-0" />Reply
+                              </DropdownMenuItem>
+                              {isOwn && <>
                               <DropdownMenuItem
                                 onClick={() => startEdit(msg)}
-                                className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-200 hover:text-white hover:bg-white/[0.08] cursor-pointer text-[12.5px] font-medium"
+                                className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-[var(--text-primary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-surface-2)] cursor-pointer text-[12.5px] font-medium"
                               >
-                                <Pencil className="w-3.5 h-3.5 text-blue-400 shrink-0" />
+                                <Pencil className="w-3.5 h-3.5 text-sky-500 shrink-0" />
                                 Edit
                               </DropdownMenuItem>
-                              <DropdownMenuSeparator className="my-1 bg-white/[0.08]" />
+                              <DropdownMenuSeparator className="my-1 bg-[var(--bg-surface-2)]" />
                               <DropdownMenuItem
                                 onClick={() => setDeleteTarget(msg)}
                                 className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-red-400 hover:text-red-300 hover:bg-red-500/[0.12] cursor-pointer text-[12.5px] font-medium"
@@ -281,61 +289,55 @@ const ChatArena = ({
                                 <Trash2 className="w-3.5 h-3.5 shrink-0" />
                                 Delete
                               </DropdownMenuItem>
+                              </>}
                             </DropdownMenuContent>
                           </DropdownMenu>
                         </div>
                       )}
 
                       {/* ── Apple iMessage Bubble with Authentic Sharp Tail ── */}
-                      <div className={`relative min-w-[50px] shadow-md transition-all duration-150
+                      <div className={`relative min-w-0 max-w-full transition-colors duration-150
                         ${isOwn
-                          ? `bg-gradient-to-br from-[#007aff] to-[#0056d2] text-white ${sentCorners}`
-                          : `bg-[#1c2333] border border-white/[0.08] text-[#f2f2f7] ${recvCorners}`
+                          ? `bg-[var(--accent-primary-subtle)] border border-[var(--accent-primary-border)] text-[var(--text-primary)] ${sentCorners}`
+                          : `bg-[var(--bg-surface)] border border-[var(--border-default)] text-[var(--text-primary)] ${recvCorners}`
                         }`}
                       >
-                        {/* Sharp SVG Tail for Sent Message */}
-                        {isOwn && isLast && (
-                          <svg className="absolute -right-[6px] bottom-0 w-[10px] h-[15px] text-[#0056d2] fill-current pointer-events-none" viewBox="0 0 10 15">
-                            <path d="M0,0 C2,4 5,9 10,15 C4,15 0,10 0,5 Z" />
-                          </svg>
-                        )}
-
-                        {/* Sharp SVG Tail for Received Message */}
-                        {!isOwn && isLast && (
-                          <svg className="absolute -left-[6px] bottom-0 w-[10px] h-[15px] text-[#1c2333] fill-current pointer-events-none" viewBox="0 0 10 15">
-                            <path d="M10,0 C8,4 5,9 0,15 C6,15 10,10 10,5 Z" />
-                          </svg>
-                        )}
 
                         <div className={`px-4 ${isEditing ? "pt-3 pb-2.5" : "pt-2.5 pb-2"}`}>
+                          {msg.replyToId && (
+                            <div className="mb-2 min-w-0 border-l-2 border-emerald-500 bg-[var(--bg-input)] rounded-r-md px-2 py-1.5 text-xs [overflow-wrap:anywhere]">
+                              <p className="font-semibold text-[var(--text-secondary)]">{msg.replyTo?.isDeleted || !msg.replyTo ? "Original message unavailable" : msg.replyTo.sender?.fullName || "Message"}</p>
+                              {msg.replyTo && !msg.replyTo.isDeleted && <p className="text-[var(--text-muted)] line-clamp-2 whitespace-pre-wrap">{msg.replyTo.content}</p>}
+                            </div>
+                          )}
 
                           {/* Edit mode */}
                           {isEditing ? (
-                            <div className="flex flex-col gap-2 min-w-[220px]">
+                            <div className="flex flex-col gap-2 min-w-0 w-56 max-w-full">
                               <input
                                 ref={editRef}
                                 type="text"
                                 value={editText}
                                 onChange={e => setEditText(e.target.value)}
                                 onKeyDown={e => { if (e.key === "Enter") saveEdit(msg); if (e.key === "Escape") cancelEdit(); }}
-                                className="w-full bg-black/25 text-white text-[13.5px] px-3 py-2 rounded-xl border border-white/25 focus:outline-none focus:border-white/50 focus:ring-2 focus:ring-white/10"
+                                aria-label="Edit message"
+                                className="w-full min-w-0 bg-[var(--bg-input)] text-[var(--text-primary)] text-sm px-3 py-2 rounded-lg border border-[var(--border-default)] focus:outline-none focus:ring-2 focus:ring-[var(--border-focus)]"
                               />
-                              <div className="flex items-center justify-between">
-                                <span className="text-[10px] text-white/50">Enter to save · Esc to cancel</span>
+                              <div className="flex items-center justify-end">
                                 <div className="flex gap-3">
-                                  <button onClick={cancelEdit} className="text-[11px] text-white/60 hover:text-white cursor-pointer">Cancel</button>
-                                  <button onClick={() => saveEdit(msg)} className="text-[11px] font-bold text-white hover:text-blue-100 cursor-pointer">Save</button>
+                                  <button onClick={cancelEdit} className="text-[11px] text-[var(--text-muted)] hover:text-[var(--text-primary)] cursor-pointer">Cancel</button>
+                                  <button onClick={() => saveEdit(msg)} className="text-[11px] font-bold text-[var(--text-primary)] hover:text-[var(--text-secondary)] cursor-pointer">Save</button>
                                 </div>
                               </div>
                             </div>
 
                           ) : msg.type === "CODE_SNIPPET" ? (
-                            <pre className="bg-black/40 rounded-xl p-3 overflow-x-auto font-mono text-xs border border-white/10 my-1">
-                              <code className="text-sky-300">{msg.content}</code>
+                            <pre className="bg-[var(--bg-surface-2)] rounded-lg p-3 overflow-x-auto font-mono text-xs border border-[var(--border-default)] my-1">
+                              <code className="text-[var(--text-secondary)]">{msg.content}</code>
                             </pre>
 
                           ) : (
-                            <div className={`text-[14px] leading-relaxed break-words whitespace-pre-wrap ${isOwn ? "text-white" : "text-[#f2f2f7]"}`}>
+                            <div className="text-sm leading-relaxed [overflow-wrap:anywhere] whitespace-pre-wrap text-[var(--text-primary)] [&_pre]:max-w-full [&_pre]:overflow-x-auto [&_img]:max-w-full">
                               <ReactMarkdown>{msg.content}</ReactMarkdown>
                             </div>
                           )}
@@ -344,13 +346,13 @@ const ChatArena = ({
                           {!isEditing && (
                             <div className={`flex items-center gap-1 mt-1 select-none ${isOwn ? "justify-end" : "justify-end"}`}>
                               {msg.isEdited && (
-                                <span className={`text-[9.5px] italic ${isOwn ? "text-white/40" : "text-slate-500"}`}>edited</span>
+                                <span className={`text-[9.5px] italic ${isOwn ? "text-[var(--text-muted)]" : "text-[var(--text-muted)]"}`}>edited</span>
                               )}
-                              <span className={`text-[10px] ${isOwn ? "text-blue-100/70" : "text-slate-500"}`}>{fmtTime(msg.createdAt)}</span>
+                              <span className={`text-[10px] ${isOwn ? "text-[var(--text-secondary)]" : "text-[var(--text-muted)]"}`}>{fmtTime(msg.createdAt)}</span>
                               {isOwn && (
                                 msg.isRead
-                                  ? <CheckCheck className="w-3.5 h-3.5 text-sky-200 shrink-0" />
-                                  : <Check className="w-3.5 h-3.5 text-white/40 shrink-0" />
+                                  ? <CheckCheck className="w-3.5 h-3.5 text-[var(--text-secondary)] shrink-0" />
+                                  : <Check className="w-3.5 h-3.5 text-[var(--text-muted)] shrink-0" />
                               )}
                             </div>
                           )}
@@ -365,7 +367,7 @@ const ChatArena = ({
         </div>
 
         {/* Typing indicator */}
-        {isTyping && isDMView && (
+        {isTyping && isDMView && !inputDisabled && (
           <TypingBubble
             avatarUrl={getOtherParticipant(activeConv)?.profileUrl}
             name={getOtherParticipant(activeConv)?.fullName}
@@ -375,8 +377,8 @@ const ChatArena = ({
       </div>
 
       {/* ══════ APPLE INPUT BAR ═════════════════════════════════════ */}
-      <div className="border-t border-white/[0.06] bg-[#0c101d]/90 backdrop-blur-xl">
-        <ChatInput onSendMessage={onSendMessage} disabled={inputDisabled} placeholder={inputPlaceholder} emitTyping={onTyping} />
+      <div className="border-t border-[var(--border-default)] bg-[var(--bg-surface)]">
+        {inputDisabled ? <div className="flex items-center justify-center gap-2 px-4 py-5 text-xs text-[var(--text-muted)]"><LockKeyhole className="w-4 h-4 shrink-0" />Read-only conversation · Only participants can reply</div> : <ChatInput key={chatKey} onSendMessage={onSendMessage} placeholder={inputPlaceholder} emitTyping={onTyping} replyTarget={replyTarget} onCancelReply={() => setReplyTarget(null)} />}
       </div>
 
       {/* ══════ DELETE CONFIRMATION ═════════════════════════════════ */}
@@ -384,7 +386,7 @@ const ChatArena = ({
         isOpen={!!deleteTarget}
         onClose={() => setDeleteTarget(null)}
         onConfirm={confirmDelete}
-        title="Delete iMessage?"
+        title="Delete message?"
         description="This message will be deleted for everyone in this conversation. This cannot be undone."
         confirmText="Delete"
         cancelText="Cancel"
@@ -401,12 +403,5 @@ const ChatArena = ({
     </div>
   );
 };
-
-/* ── Header button helper ────────────────────────────────────────── */
-const HdrBtn = ({ icon: Icon, label }: any) => (
-  <button title={label} className="w-8 h-8 flex items-center justify-center rounded-full text-slate-400 hover:text-slate-100 hover:bg-white/[0.08] transition-all cursor-pointer">
-    <Icon className="w-[17px] h-[17px]" />
-  </button>
-);
 
 export default ChatArena;

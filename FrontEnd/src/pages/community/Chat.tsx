@@ -20,6 +20,16 @@ import {
 import toast from "react-hot-toast";
 import { Users } from "lucide-react";
 
+const updateQuotedMessage = (messages: any[], messageId: number, edited?: any) => messages
+  .filter((message: any) => edited || message.messageId !== messageId)
+  .map((message: any) => {
+    if (edited && message.messageId === messageId) return { ...message, ...edited };
+    if (message.replyToId !== messageId) return message;
+    return { ...message, replyTo: edited
+      ? { ...message.replyTo, content: edited.content }
+      : { messageId, isDeleted: true, content: null, sender: null } };
+  });
+
 const Chat = () => {
   const { user } = useSelector((state: any) => state.auth);
   const location = useLocation();
@@ -31,6 +41,7 @@ const Chat = () => {
   const [activeWorkspaceId, setActiveWorkspaceId] = useState<any>(null); // null = DM view
   const [activeChannelId, setActiveChannelId] = useState<any>(null);
   const [activeConvId, setActiveConvId] = useState<any>(null);
+  const [showMobileChat, setShowMobileChat] = useState(false);
 
   const [messages, setMessages] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -73,7 +84,7 @@ const Chat = () => {
     }
   };
 
-  const isAdmin = user?.pageAccess?.includes("PG_ADM");
+  const isAdmin = user?.role?.toLowerCase() === "admin" || user?.pageAccess?.includes("PG_ADM");
 
   // WebSocket Hook
   const { socket, isConnected, emitEvent } = useSocketContext();
@@ -118,10 +129,11 @@ const Chat = () => {
     const queryChannelId = params.get("channelId");
 
     if (queryConvId && conversations.length > 0) {
-      const convExists = conversations.some((c: any) => c.conversationId === queryConvId);
-      if (convExists) {
+      const conversation = conversations.find((c: any) => String(c.conversationId) === queryConvId);
+      if (conversation) {
         setActiveWorkspaceId(null);
-        setActiveConvId(queryConvId);
+        setActiveConvId(conversation.conversationId);
+        setShowMobileChat(true);
         // Clear query parameters so clicking around doesn't re-trigger it
         window.history.replaceState({}, document.title, "/chat");
       }
@@ -129,14 +141,16 @@ const Chat = () => {
       // Find workspace containing this channel
       let foundWorkspaceId = null;
       for (const ws of workspaces) {
-        if (ws.channels?.some((ch: any) => ch.channelId === queryChannelId)) {
+        if (ws.channels?.some((ch: any) => String(ch.channelId) === queryChannelId)) {
           foundWorkspaceId = ws.workspaceId;
           break;
         }
       }
       if (foundWorkspaceId) {
         setActiveWorkspaceId(foundWorkspaceId);
-        setActiveChannelId(queryChannelId);
+        const workspace = workspaces.find((ws: any) => ws.workspaceId === foundWorkspaceId);
+        setActiveChannelId(workspace.channels.find((ch: any) => String(ch.channelId) === queryChannelId).channelId);
+        setShowMobileChat(true);
         // Clear query parameters so clicking around doesn't re-trigger it
         window.history.replaceState({}, document.title, "/chat");
       }
@@ -150,7 +164,7 @@ const Chat = () => {
         (w: any) => w.workspaceId === activeWorkspaceId,
       );
       if (workspace?.channels?.length > 0) {
-        setActiveChannelId(workspace.channels[0].channelId);
+        setActiveChannelId((current: any) => workspace.channels.some((ch: any) => ch.channelId === current) ? current : workspace.channels[0].channelId);
       } else {
         setActiveChannelId(null);
       }
@@ -264,22 +278,22 @@ const Chat = () => {
 
     socket.on("message_edited", (editedMsg: any) => {
       setMessages((prev: any) =>
-        prev.map((m: any) => (m.messageId === editedMsg.messageId ? editedMsg : m))
+        updateQuotedMessage(prev, editedMsg.messageId, editedMsg)
       );
     });
 
     socket.on("message_deleted", ({ messageId }: any) => {
-      setMessages((prev: any) => prev.filter((m: any) => m.messageId !== messageId));
+      setMessages((prev: any) => updateQuotedMessage(prev, messageId));
     });
 
     socket.on("channel_message_edited", (editedMsg: any) => {
       setMessages((prev: any) =>
-        prev.map((m: any) => (m.messageId === editedMsg.messageId ? editedMsg : m))
+        updateQuotedMessage(prev, editedMsg.messageId, editedMsg)
       );
     });
 
     socket.on("channel_message_deleted", ({ messageId }: any) => {
-      setMessages((prev: any) => prev.filter((m: any) => m.messageId !== messageId));
+      setMessages((prev: any) => updateQuotedMessage(prev, messageId));
     });
 
     return () => {
@@ -302,7 +316,7 @@ const Chat = () => {
       socket.emit("edit_message", { messageId, content }, (res: any) => {
         if (res.success) {
           setMessages((prev: any) =>
-            prev.map((m: any) => (m.messageId === messageId ? res.message : m))
+            updateQuotedMessage(prev, messageId, res.message)
           );
           toast.success("Message updated!");
         } else {
@@ -318,7 +332,7 @@ const Chat = () => {
       if (!socket) return;
       socket.emit("delete_message", { messageId }, (res: any) => {
         if (res.success) {
-          setMessages((prev: any) => prev.filter((m: any) => m.messageId !== messageId));
+          setMessages((prev: any) => updateQuotedMessage(prev, messageId));
           toast.success("Message deleted!");
         } else {
           toast.error(res.error || "Failed to delete message");
@@ -334,7 +348,7 @@ const Chat = () => {
       socket.emit("edit_channel_message", { messageId, content }, (res: any) => {
         if (res.success) {
           setMessages((prev: any) =>
-            prev.map((m: any) => (m.messageId === messageId ? res.message : m))
+            updateQuotedMessage(prev, messageId, res.message)
           );
           toast.success("Message updated!");
         } else {
@@ -350,7 +364,7 @@ const Chat = () => {
       if (!socket) return;
       socket.emit("delete_channel_message", { messageId }, (res: any) => {
         if (res.success) {
-          setMessages((prev: any) => prev.filter((m: any) => m.messageId !== messageId));
+          setMessages((prev: any) => updateQuotedMessage(prev, messageId));
           toast.success("Message deleted!");
         } else {
           toast.error(res.error || "Failed to delete message");
@@ -361,17 +375,20 @@ const Chat = () => {
   );
 
   const handleSendMessage = useCallback(
-    (content: any) => {
+    (content: any, replyTarget: any = null) => {
       const isDMView = activeWorkspaceId === null;
       const currentId = isDMView ? activeConvId : activeChannelId;
 
-      if (!content.trim() || !currentId) return;
+      if (!content.trim() || !currentId) return false;
+      if (!isConnected) { toast.error("Chat is offline. Try again when connected."); return false; }
 
       const optimisticMessage = {
         messageId: `temp-${Date.now()}`,
         [isDMView ? "conversationId" : "channelId"]: currentId,
         senderId: user.userId,
         content,
+        replyToId: replyTarget?.messageId ?? null,
+        replyTo: replyTarget,
         type: "TEXT",
         createdAt: new Date().toISOString(),
         sender: user,
@@ -379,14 +396,22 @@ const Chat = () => {
 
       setMessages((prev: any) => [...prev, optimisticMessage]);
 
+      return new Promise<boolean>((resolve) => {
+      const timer = setTimeout(() => {
+        setMessages((prev: any) => prev.filter((m: any) => m.messageId !== optimisticMessage.messageId));
+        toast.error("Message delivery could not be confirmed. Check the chat before retrying.");
+        resolve(false);
+      }, 15000);
       emitEvent(
         isDMView ? "send_message" : "send_channel_message",
         {
           [isDMView ? "conversationId" : "channelId"]: currentId,
           content,
           type: "TEXT",
+          replyToId: replyTarget?.messageId ?? null,
         },
         (response: any) => {
+          clearTimeout(timer);
           if (response.success) {
             setMessages((prev: any) =>
               prev.map((m: any) =>
@@ -396,16 +421,19 @@ const Chat = () => {
               ),
             );
           } else {
+            toast.error(response.error || "Failed to send message");
             setMessages((prev: any) =>
               prev.filter(
                 (m: any) => m.messageId !== optimisticMessage.messageId,
               ),
             );
           }
+          resolve(Boolean(response.success));
         },
       );
+      });
     },
-    [activeWorkspaceId, activeConvId, activeChannelId, emitEvent, user],
+    [activeWorkspaceId, activeConvId, activeChannelId, emitEvent, user, isConnected],
   );
 
   const handleTyping = useCallback(
@@ -466,12 +494,13 @@ const Chat = () => {
   );
 
   return (
-    <div className="h-full w-full flex overflow-hidden font-sans bg-slate-950">
+    <div className="h-full min-h-0 min-w-0 w-full flex overflow-hidden font-sans bg-[var(--bg-base)] text-[var(--text-primary)]">
+      <div className={`${showMobileChat ? "hidden" : "flex"} min-h-0 min-w-0 w-full md:w-auto md:flex shrink-0`}>
       {/* Pane 1: Workspace Rail */}
       <WorkspaceRail
         workspaces={workspaces}
         activeWorkspaceId={activeWorkspaceId}
-        setActiveWorkspaceId={setActiveWorkspaceId}
+        setActiveWorkspaceId={(id: any) => { setActiveWorkspaceId(id); setShowMobileChat(false); }}
         onCreateWorkspace={() => setShowCreateWorkspaceModal(true)}
       />
 
@@ -480,9 +509,9 @@ const Chat = () => {
         workspaces={workspaces}
         conversations={conversations}
         activeConvId={activeConvId}
-        setActiveConvId={setActiveConvId}
+        setActiveConvId={(id: any) => { setActiveConvId(id); setShowMobileChat(id !== null); }}
         activeChannelId={activeChannelId}
-        setActiveChannelId={setActiveChannelId}
+        setActiveChannelId={(id: any) => { setActiveChannelId(id); setShowMobileChat(id !== null); }}
         isLoading={isLoading}
         activeWorkspaceId={activeWorkspaceId}
         getOtherParticipant={getOtherParticipant}
@@ -491,11 +520,15 @@ const Chat = () => {
         onNewConversation={(conv: any) => {
           setConversations((prev: any) => [conv, ...prev]);
           setActiveConvId(conv.conversationId);
+          setShowMobileChat(true);
         }}
       />
+      </div>
 
       {/* Pane 3: Chat Arena */}
+      <div className={`${showMobileChat ? "flex" : "hidden"} min-h-0 min-w-0 flex-1 md:flex`}>
       <ChatArena
+        onBack={() => setShowMobileChat(false)}
         isDMView={activeWorkspaceId === null}
         activeConv={activeConv}
         activeChannel={activeChannel}
@@ -512,56 +545,55 @@ const Chat = () => {
         onEditChannelMessage={handleEditChannelMessage}
         onDeleteChannelMessage={handleDeleteChannelMessage}
       />
+      </div>
 
       {/* Create Workspace Modal */}
       <Dialog open={showCreateWorkspaceModal} onOpenChange={setShowCreateWorkspaceModal}>
-        <DialogContent className="sm:max-w-[420px] bg-gradient-to-br from-[#182533] to-[#0e1621] border border-blue-500/25 text-slate-200 rounded-3xl shadow-2xl p-8 overflow-hidden relative">
-          <div className="absolute -right-24 -top-24 w-48 h-48 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
-          <div className="absolute -left-24 -bottom-24 w-48 h-48 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
+        <DialogContent className="w-[calc(100%-2rem)] sm:max-w-[420px] max-h-[90dvh] bg-[var(--bg-surface)] border border-[var(--border-default)] text-[var(--text-primary)] rounded-lg p-5 overflow-y-auto">
           
-          <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-blue-600/20 to-indigo-600/20 border border-blue-500/35 flex items-center justify-center text-blue-400 mx-auto mb-4 shadow-[0_0_15px_rgba(59,130,246,0.15)] animate-bounce duration-1000">
+          <div className="w-10 h-10 rounded-lg bg-[var(--bg-surface-2)] flex items-center justify-center text-[var(--text-secondary)] mx-auto mb-3">
             <Users className="w-5.5 h-5.5" />
           </div>
 
           <DialogHeader className="text-center space-y-2">
-            <DialogTitle className="text-xl font-black text-slate-100 text-center">Create Group</DialogTitle>
-            <DialogDescription className="text-xs text-slate-400 text-center leading-relaxed">
+            <DialogTitle className="text-xl font-black text-[var(--text-primary)] text-center">Create Group</DialogTitle>
+            <DialogDescription className="text-xs text-[var(--text-muted)] text-center leading-relaxed">
               Create a collaborative workspace for your team and student members.
             </DialogDescription>
           </DialogHeader>
 
           <form onSubmit={handleCreateWorkspace} className="space-y-5 mt-5">
             <div className="space-y-2">
-              <Label className="text-xs text-slate-400 font-bold tracking-wider uppercase">Group Name</Label>
+              <Label className="text-xs text-[var(--text-muted)] font-bold tracking-normal uppercase">Group Name</Label>
               <Input
                 value={newWorkspaceName}
                 onChange={(e: any) => setNewWorkspaceName(e.target.value)}
                 placeholder="e.g. Advanced Java Prep"
-                className="h-11 bg-[#0e1621]/80 border-slate-800 focus:border-blue-500/60 focus:ring-4 focus:ring-blue-500/10 text-slate-200 rounded-xl transition-all duration-300 shadow-inner px-4 text-sm"
+                className="h-11 bg-[var(--bg-surface)] border-[var(--border-default)] focus:border-[var(--border-default)] focus:ring-4 focus:ring-blue-500/10 text-[var(--text-primary)] rounded-lg transition-all duration-300 px-4 text-sm"
                 required
               />
             </div>
             <div className="space-y-2">
-              <Label className="text-xs text-slate-400 font-bold tracking-wider uppercase">Description</Label>
+              <Label className="text-xs text-[var(--text-muted)] font-bold tracking-normal uppercase">Description</Label>
               <Input
                 value={newWorkspaceDesc}
                 onChange={(e: any) => setNewWorkspaceDesc(e.target.value)}
                 placeholder="A brief description of this group..."
-                className="h-11 bg-[#0e1621]/80 border-slate-800 focus:border-blue-500/60 focus:ring-4 focus:ring-blue-500/10 text-slate-200 rounded-xl transition-all duration-300 shadow-inner px-4 text-sm"
+                className="h-11 bg-[var(--bg-surface)] border-[var(--border-default)] focus:border-[var(--border-default)] focus:ring-4 focus:ring-blue-500/10 text-[var(--text-primary)] rounded-lg transition-all duration-300 px-4 text-sm"
               />
             </div>
-            <div className="flex justify-end gap-3 pt-4 border-t border-slate-800/80 mt-6">
+            <div className="flex justify-end gap-3 pt-4 border-t border-[var(--border-default)] mt-6">
               <Button
                 type="button"
                 variant="ghost"
                 onClick={() => setShowCreateWorkspaceModal(false)}
-                className="text-slate-400 hover:text-slate-200 hover:bg-slate-850/60 rounded-xl font-bold px-5 h-10.5"
+                className="text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-surface)] rounded-lg font-bold px-5 h-10.5"
               >
                 Cancel
               </Button>
               <Button
                 type="submit"
-                className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white rounded-xl shadow-lg shadow-blue-500/15 hover:shadow-blue-500/25 transition-all font-bold px-6 h-10.5 cursor-pointer"
+                className="bg-[var(--bg-surface-2)] text-[var(--text-primary)] rounded-lg transition-all font-bold px-6 h-10.5 cursor-pointer"
               >
                 Create
               </Button>

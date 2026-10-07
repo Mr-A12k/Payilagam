@@ -31,7 +31,7 @@ const getAll = catchAsync(async (request, response) => {
     pagination.page,
     pagination.limit,
   );
-  return paginated(response, discussions, meta, "Discussions retrieved");
+  return paginated(response, discussions, paginationMetadata, "Discussions retrieved");
 });
 
 const getById = catchAsync(async (request, response) => {

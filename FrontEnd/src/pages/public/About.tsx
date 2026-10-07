@@ -199,15 +199,15 @@ const useCountUp = (target: any, duration = 2000) => {
 const StatCard = ({ stat }: any) => {
   const { ref, count } = useCountUp(stat.value);
   return (
-    <div ref={ref as any} className="flex min-w-[200px] flex-col items-center !p-8 bg-slate-900/50 text-center transition-all duration-300 hover:border-slate-700 hover:bg-slate-900 hover:shadow-lg hover:shadow-blue-900/10 sm:min-w-0"
+    <div ref={ref as any} className="flex min-w-[200px] flex-col items-center !p-8 bg-[var(--bg-surface)] border border-[var(--border-default)] rounded-2xl shadow-sm text-center transition-all duration-300 hover:border-[var(--accent-primary)] hover:shadow-lg sm:min-w-0"
     >
-      <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-slate-800/50 border border-slate-700/50">
-        <stat.icon className="icon-lg text-blue-400" />
+      <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-[var(--accent-primary-subtle)] border border-[var(--accent-primary-border)]">
+        <stat.icon className="icon-lg text-[var(--accent-primary)]" />
       </div>
-      <span className="text-4xl font-bold tracking-tight text-slate-200">
+      <span className="text-4xl font-bold tracking-tight text-[var(--text-heading)]">
         {count}
       </span>
-      <span className="mt-2 text-sm font-medium text-slate-400">
+      <span className="mt-2 text-sm font-medium text-[var(--text-muted)]">
         {stat.label}
       </span>
     </div>
@@ -216,10 +216,10 @@ const StatCard = ({ stat }: any) => {
 
 const About = () => {
   return (
-    <div className="min-h-screen bg-slate-950 font-sans overflow-x-hidden">
+    <div className="min-h-screen bg-[var(--bg-base)] text-[var(--text-primary)] font-sans overflow-x-hidden">
       {/* ── Hero Section ─────────────────────────────────────────────── */}
       <section
-        className="relative min-h-[70vh] flex items-center justify-center overflow-hidden bg-gradient-to-br from-slate-900 to-slate-950 text-white"
+        className="relative min-h-[60vh] flex items-center justify-center overflow-hidden bg-gradient-to-br from-blue-950 via-slate-900 to-indigo-950 text-white"
         aria-label="About hero"
       >
         {/* Decorative gradient orbs */}
@@ -227,15 +227,15 @@ const About = () => {
         <div className="absolute -bottom-40 -right-40 h-[500px] w-[500px] rounded-full bg-sky-900/10 blur-3xl" />
         <div className="absolute top-1/2 left-1/2 h-64 w-64 -translate-x-1/2 -translate-y-1/2 rounded-full bg-slate-800/50 blur-2xl" />
 
-        <div className="relative z-10 mx-auto max-w-4xl px-5 py-32 text-center sm:px-8">
+        <div className="relative z-10 mx-auto max-w-4xl px-5 py-28 text-center sm:px-8">
           <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-slate-700 bg-slate-800/50 px-4 py-1.5 text-sm font-medium backdrop-blur-sm text-slate-300">
             <Sparkles className="icon-base text-blue-400" />
             Since 2020
           </div>
-          <h1 className="text-5xl font-bold leading-tight tracking-tight sm:text-6xl lg:text-7xl text-slate-100">
+          <h1 className="text-5xl font-bold leading-tight tracking-tight sm:text-6xl lg:text-7xl text-white">
             About Payilagam
           </h1>
-          <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-slate-400 sm:text-xl">
+          <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-slate-300 sm:text-xl">
             Empowering the next generation of tech professionals with
             world-class education
           </p>
@@ -243,14 +243,13 @@ const About = () => {
       </section>
 
       {/* ── Mission / Vision / Values ────────────────────────────────── */}
-      <section className="bg-slate-950 py-24 relative" aria-label="Mission, vision, and values">
-        <div className="absolute inset-0 bg-slate-900/50"></div>
+      <section className="bg-[var(--bg-base)] py-24 relative" aria-label="Mission, vision, and values">
         <div className="relative z-10 mx-auto max-w-7xl px-5 sm:px-8 lg:px-12">
           <div className="mx-auto mb-16 max-w-3xl text-center">
-            <h2 className="text-4xl font-bold tracking-tight text-slate-100">
+            <h2 className="text-4xl font-bold tracking-tight text-[var(--text-heading)]">
               What Drives Us
             </h2>
-            <p className="mt-4 text-lg text-slate-400">
+            <p className="mt-4 text-lg text-[var(--text-secondary)]">
               Everything we build starts with three pillars that keep students
               at the center.
             </p>
@@ -260,17 +259,17 @@ const About = () => {
             {missionCards.map((card: any) => (
               <Card
                 key={card.title}
-                className="group relative !p-8 shadow-lg shadow-blue-900/10 backdrop-blur-xl transition-all duration-300 hover:-translate-y-2 hover:border-slate-700 hover:shadow-blue-500/10"
+                className="group relative !p-8 shadow-sm transition-all duration-300 hover:-translate-y-2 hover:border-[var(--accent-primary)] hover:shadow-lg"
               >
                 <div
                   className={`mb-6 flex h-14 w-14 items-center justify-center rounded-xl ${card.bg} transition-transform duration-300 group-hover:scale-110`}
                 >
                   <card.icon className={`h-7 w-7 ${card.color}`} />
                 </div>
-                <h3 className="mb-3 text-xl font-bold text-slate-200">
+                <h3 className="mb-3 text-xl font-bold text-[var(--text-heading)]">
                   {card.title}
                 </h3>
-                <p className="text-sm leading-relaxed text-slate-400">
+                <p className="text-sm leading-relaxed text-[var(--text-secondary)]">
                   {card.description}
                 </p>
               </Card>
@@ -280,7 +279,7 @@ const About = () => {
       </section>
 
       {/* ── Stats Section ────────────────────────────────────────────── */}
-      <section className="border-y border-slate-800 bg-slate-950 py-20" aria-label="Platform statistics">
+      <section className="border-y border-[var(--border-default)] bg-[var(--bg-surface-2)] py-20" aria-label="Platform statistics">
         <div className="mx-auto max-w-7xl px-5 sm:px-8 lg:px-12">
           <div className="flex gap-6 overflow-x-auto pb-4 scrollbar-hide sm:grid sm:grid-cols-2 sm:overflow-visible sm:pb-0 lg:grid-cols-4">
             {stats.map((stat: any) => (
@@ -291,13 +290,13 @@ const About = () => {
       </section>
 
       {/* ── Team Section ─────────────────────────────────────────────── */}
-      <section className="bg-slate-950 py-24" aria-label="Leadership team">
+      <section className="bg-[var(--bg-base)] py-24" aria-label="Leadership team">
         <div className="mx-auto max-w-7xl px-5 sm:px-8 lg:px-12">
           <div className="mx-auto mb-16 max-w-3xl text-center">
-            <h2 className="text-4xl font-bold tracking-tight text-slate-100">
+            <h2 className="text-4xl font-bold tracking-tight text-[var(--text-heading)]">
               Meet Our Leadership
             </h2>
-            <p className="mt-4 text-lg text-slate-400">
+            <p className="mt-4 text-lg text-[var(--text-secondary)]">
               A passionate team dedicated to making quality education
               accessible to everyone.
             </p>
@@ -307,7 +306,7 @@ const About = () => {
             {teamMembers.map((member: any) => (
               <Card
                 key={member.name}
-                className="group !p-8 text-center transition-all duration-300 hover:-translate-y-2 hover:border-slate-700 hover:shadow-lg hover:shadow-blue-500/10"
+                className="group !p-8 text-center transition-all duration-300 hover:-translate-y-2 hover:border-[var(--accent-primary)] hover:shadow-lg"
               >
                 {/* Avatar circle with initials */}
                 <div
@@ -315,13 +314,13 @@ const About = () => {
                 >
                   {member.initials}
                 </div>
-                <h3 className="text-lg font-bold text-slate-200">
+                <h3 className="text-lg font-bold text-[var(--text-heading)]">
                   {member.name}
                 </h3>
-                <p className="mt-1 text-sm font-semibold text-blue-400">
+                <p className="mt-1 text-sm font-semibold text-[var(--accent-primary)]">
                   {member.title}
                 </p>
-                <p className="mt-4 text-sm leading-relaxed text-slate-400">
+                <p className="mt-4 text-sm leading-relaxed text-[var(--text-secondary)]">
                   {member.bio}
                 </p>
               </Card>
@@ -331,21 +330,20 @@ const About = () => {
       </section>
 
       {/* ── Timeline Section ─────────────────────────────────────────── */}
-      <section className="bg-slate-950 py-24 relative" aria-label="Company timeline">
-        <div className="absolute inset-0 bg-slate-900/50"></div>
+      <section className="bg-[var(--bg-surface-2)] border-t border-[var(--border-default)] py-24 relative" aria-label="Company timeline">
         <div className="relative z-10 mx-auto max-w-5xl px-5 sm:px-8 lg:px-12">
           <div className="mx-auto mb-16 max-w-3xl text-center">
-            <h2 className="text-4xl font-bold tracking-tight text-slate-100">
+            <h2 className="text-4xl font-bold tracking-tight text-[var(--text-heading)]">
               Our Journey
             </h2>
-            <p className="mt-4 text-lg text-slate-400">
+            <p className="mt-4 text-lg text-[var(--text-secondary)]">
               Key milestones that have shaped Payilagam into what it is today.
             </p>
           </div>
 
           <div className="relative">
             {/* Vertical center line — hidden on mobile */}
-            <div className="absolute left-4 top-0 hidden h-full w-0.5 bg-gradient-to-b from-blue-500/20 via-slate-800 to-transparent md:left-1/2 md:block md:-translate-x-1/2" />
+            <div className="absolute left-4 top-0 hidden h-full w-0.5 bg-gradient-to-b from-blue-500/30 via-[var(--border-default)] to-transparent md:left-1/2 md:block md:-translate-x-1/2" />
 
             <div className="space-y-12 md:space-y-16">
               {milestones.map((milestone: any, index: any) => {
@@ -357,8 +355,8 @@ const About = () => {
                     className="relative flex flex-col gap-4 pl-12 md:flex-row md:items-center md:gap-8 md:pl-0"
                   >
                     {/* Mobile dot */}
-                    <div className="absolute left-2 top-1 flex h-5 w-5 items-center justify-center rounded-full border-2 border-slate-800 bg-slate-950 md:hidden">
-                      <div className="h-2 w-2 rounded-full bg-blue-400" />
+                    <div className="absolute left-2 top-1 flex h-5 w-5 items-center justify-center rounded-full border-2 border-[var(--border-default)] bg-[var(--bg-surface)] md:hidden">
+                      <div className="h-2 w-2 rounded-full bg-[var(--accent-primary)]" />
                     </div>
 
                     {/* Left content */}
@@ -368,7 +366,7 @@ const About = () => {
                       }`}
                     >
                       <Card
-                        className={`!p-6 shadow-sm shadow-blue-900/10 transition-all duration-300 hover:-translate-y-1 hover:border-slate-700 hover:shadow-blue-500/10 ${
+                        className={`!p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-[var(--accent-primary)] hover:shadow-md ${
                           isLeft ? "md:ml-auto md:mr-0" : ""
                         } max-w-md`}
                       >
@@ -377,25 +375,25 @@ const About = () => {
                             isLeft ? "md:flex-row-reverse" : ""
                           }`}
                         >
-                          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-slate-800">
-                            <milestone.icon className="icon-md text-blue-400" />
+                          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-[var(--accent-primary-subtle)]">
+                            <milestone.icon className="icon-md text-[var(--accent-primary)]" />
                           </div>
-                          <span className="text-sm font-bold text-blue-400">
+                          <span className="text-sm font-bold text-[var(--accent-primary)]">
                             {milestone.year}
                           </span>
                         </div>
-                        <h3 className="text-lg font-bold text-slate-200">
+                        <h3 className="text-lg font-bold text-[var(--text-heading)]">
                           {milestone.title}
                         </h3>
-                        <p className="mt-2 text-sm leading-relaxed text-slate-400">
+                        <p className="mt-2 text-sm leading-relaxed text-[var(--text-secondary)]">
                           {milestone.description}
                         </p>
                       </Card>
                     </div>
 
                     {/* Center dot — desktop only */}
-                    <div className="absolute left-1/2 hidden h-8 w-8 -translate-x-1/2 items-center justify-center rounded-full border-4 border-slate-950 bg-gradient-to-br from-blue-500 to-sky-400 shadow-md shadow-blue-900/50 md:flex">
-                      <div className="h-2 w-2 rounded-full bg-slate-900" />
+                    <div className="absolute left-1/2 hidden h-8 w-8 -translate-x-1/2 items-center justify-center rounded-full border-4 border-[var(--bg-surface-2)] bg-[var(--accent-primary)] shadow-md md:flex">
+                      <div className="h-2 w-2 rounded-full bg-white" />
                     </div>
 
                     {/* Spacer for the other half */}
@@ -414,14 +412,10 @@ const About = () => {
 
       {/* ── CTA Section ──────────────────────────────────────────────── */}
       <section
-        className="relative overflow-hidden bg-slate-950 py-24"
+        className="relative overflow-hidden bg-[var(--bg-base)] py-24"
         aria-label="Call to action"
       >
-        {/* Decorative orbs */}
-        <div className="absolute -left-20 -top-20 h-72 w-72 rounded-full bg-blue-600/10 blur-3xl" />
-        <div className="absolute -bottom-20 -right-20 h-80 w-80 rounded-full bg-sky-600/10 blur-3xl" />
-
-        <div className="relative z-10 mx-auto max-w-4xl px-5 text-center sm:px-8 border border-slate-800 bg-slate-900/50 rounded-3xl p-12 backdrop-blur-sm shadow-2xl shadow-blue-900/20">
+        <div className="relative z-10 mx-auto max-w-4xl px-5 text-center sm:px-8 border border-[var(--border-default)] bg-[var(--bg-surface)] rounded-3xl p-12 shadow-xl">
           <div className="mx-auto mb-6 h-16 flex justify-center">
             <img 
               src="https://payilagam.com/wp-content/uploads/2016/09/payilagam-logo.png" 
@@ -433,12 +427,12 @@ const About = () => {
                 event.target.nextSibling.style.display = 'block';
               }}
             />
-            <GraduationCap style={{display: 'none'}} className="h-12 w-12 text-blue-400" />
+            <GraduationCap style={{display: 'none'}} className="h-12 w-12 text-[var(--accent-primary)]" />
           </div>
-          <h2 className="text-4xl font-bold tracking-tight text-slate-100 sm:text-5xl">
+          <h2 className="text-4xl font-bold tracking-tight text-[var(--text-heading)] sm:text-5xl">
             Join Our Journey
           </h2>
-          <p className="mx-auto mt-4 max-w-2xl text-lg text-slate-400">
+          <p className="mx-auto mt-4 max-w-2xl text-lg text-[var(--text-secondary)]">
             Whether you're a student eager to learn, a mentor ready to guide,
             or a company looking to collaborate — there's a place for you at
             Payilagam.
@@ -447,7 +441,7 @@ const About = () => {
             <Link to="/signup">
               <Button
                 size="lg"
-                className="h-12 rounded-full bg-blue-500 px-8 font-bold text-white shadow-xl shadow-blue-900/20 hover:bg-blue-600 border border-blue-400/50"
+                className="h-12 rounded-full bg-[var(--action-bg)] hover:bg-[var(--action-hover)] px-8 font-bold text-white shadow-lg shadow-blue-500/20"
               >
                 Get Started
                 <ArrowRight className="ml-1 icon-base" />
@@ -457,7 +451,7 @@ const About = () => {
               <Button
                 size="lg"
                 variant="outline"
-                className="h-12 rounded-full border-slate-700 bg-slate-800 px-8 font-medium text-slate-200 hover:bg-slate-700 hover:text-white"
+                className="h-12 rounded-full border-[var(--border-default)] px-8 font-medium text-[var(--text-primary)] hover:bg-[var(--bg-hover)]"
               >
                 Contact Us
               </Button>

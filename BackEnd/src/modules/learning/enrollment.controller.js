@@ -32,6 +32,7 @@ const getCourseEnrollments = catchAsync(async (request, response) => {
     await enrollmentService.getCourseEnrollments(
       request.params.courseId,
       request.query,
+      request.user,
     );
   return paginated(
     response,
@@ -52,6 +53,7 @@ const checkEnrollment = catchAsync(async (request, response) => {
 const getEnrollmentStats = catchAsync(async (request, response) => {
   const stats = await enrollmentService.getEnrollmentStats(
     request.params.courseId,
+    request.user,
   );
   return success(response, stats, "Enrollment stats retrieved");
 });

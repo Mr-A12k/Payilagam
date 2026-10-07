@@ -25,6 +25,9 @@ const {
 } = require("./chat.controller");
 
 router.use(authenticate);
+router.use(require('./validation').validateIds);
+router.param('id', (req, res, next, value) => { try { require('./validation').id(value); next(); } catch (error) { next(error); } });
+router.param('channelId', (req, res, next, value) => { try { require('./validation').id(value); next(); } catch (error) { next(error); } });
 
 // Legacy 1-on-1 DM routes
 /**

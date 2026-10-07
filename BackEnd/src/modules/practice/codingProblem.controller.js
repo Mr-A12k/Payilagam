@@ -2,8 +2,10 @@ const catchAsync = require('../../utils/catchAsync');
 const codingProblemService = require('./codingProblem.service');
 const { success, error, paginated } = require('../../utils/responseHelper');
 const { getPaginationParams } = require('../../utils/pagination');
+const { ownProblem, validateProblem, parseId } = require('./practiceValidation');
 
 const create = catchAsync(async (request, response) => {
+    validateProblem(request.body, true);
     const problem = await codingProblemService.createProblem(request.user.userId, request.body);
     return success(response, problem, 'Problem created successfully', 201);
 });
@@ -24,6 +26,7 @@ const getAll = catchAsync(async (request, response) => {
 });
 
 const getById = catchAsync(async (request, response) => {
+    parseId(request.params.id);
     const problem = await codingProblemService.getProblemById(request.params.id, request.user.role);
     return success(response, problem, 'Problem retrieved successfully');
 });
@@ -34,11 +37,14 @@ const getBySlug = catchAsync(async (request, response) => {
 });
 
 const update = catchAsync(async (request, response) => {
+    await ownProblem(request.params.id, request.user);
+    validateProblem(request.body);
     const problem = await codingProblemService.updateProblem(request.params.id, request.body);
     return success(response, problem, 'Problem updated successfully');
 });
 
 const remove = catchAsync(async (request, response) => {
+    await ownProblem(request.params.id, request.user);
     await codingProblemService.deleteProblem(request.params.id);
     return success(response, null, 'Problem deleted successfully');
 });

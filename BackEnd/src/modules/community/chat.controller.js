@@ -34,12 +34,13 @@ const getMessages = catchAsync(async (request, response) => {
 const sendMessage = catchAsync(async (request, response) => {
   const conversationId = parseInt(request.params.id);
   const senderId = request.user.userId;
-  const { content } = request.body;
+  const { content, replyToId } = request.body;
 
   const message = await chatService.sendMessage(
     conversationId,
     senderId,
     content,
+    replyToId,
   );
   return success(response, message, "Message sent successfully");
 });
@@ -54,14 +55,14 @@ const getWorkspaces = catchAsync(async (request, response) => {
 const getChannelMessages = catchAsync(async (request, response) => {
   const channelId = parseInt(request.params.channelId);
   const cursor = request.query.cursor;
-  const messages = await chatService.getChannelMessages(channelId, cursor);
+  const messages = await chatService.getChannelMessages(channelId, cursor, request.user.userId, request.user.role);
   return success(response, messages, "Channel messages retrieved successfully");
 });
 
 const sendChannelMessage = catchAsync(async (request, response) => {
   const channelId = parseInt(request.params.channelId);
   const senderId = request.user.userId;
-  const { content, type, metadata } = request.body;
+  const { content, type, metadata, replyToId } = request.body;
 
   const message = await chatService.sendChannelMessage(
     channelId,
@@ -69,6 +70,7 @@ const sendChannelMessage = catchAsync(async (request, response) => {
     content,
     type,
     metadata,
+    replyToId,
   );
   return success(response, message, "Channel message sent successfully");
 });
@@ -92,23 +94,20 @@ const updateWorkspace = catchAsync(async (request, response) => {
   const userId = request.user.userId;
   const role = request.user.role;
 
-  try {
     const workspace = await chatService.updateWorkspace(workspaceId, name, description, userId, role);
     return success(response, workspace, "Workspace updated successfully");
-  } catch (error) {
-    return response.status(403).json({ success: false, message: error.message });
-  }
 });
 
 const addWorkspaceMember = catchAsync(async (request, response) => {
   const workspaceId = parseInt(request.params.id);
   const { userId } = request.body;
-  const member = await chatService.addWorkspaceMember(workspaceId, parseInt(userId));
+  await chatService.authorizeWorkspaceManager(workspaceId, request.user.userId, request.user.role);
+  const member = await chatService.addWorkspaceMember(workspaceId, require('./validation').id(userId));
   return success(response, member, "Member added successfully");
 });
 
 const joinWorkspace = catchAsync(async (request, response) => {
-  const workspaceId = parseInt(request.body.workspaceId);
+  const workspaceId = require('./validation').id(request.body.workspaceId);
   const userId = request.user.userId;
   const member = await chatService.addWorkspaceMember(workspaceId, userId);
   return success(response, member, "Joined workspace successfully");

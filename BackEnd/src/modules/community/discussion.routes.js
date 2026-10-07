@@ -24,6 +24,10 @@ const {
 
 const { authenticate } = require("../../middlewares/authMiddleware");
 const { validate, validationRules } = require("../../middlewares/validators");
+router.use(authenticate, require('./validation').validateIds);
+for (const parameter of ['id', 'discussionId', 'replyId']) {
+  router.param(parameter, (req, res, next, value) => { try { require('./validation').id(value); next(); } catch (error) { next(error); } });
+}
 
 // Discussion routes
 /**

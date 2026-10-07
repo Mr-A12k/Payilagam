@@ -10,7 +10,10 @@ const aiController = require("./ai.controller");
 const { authenticate } = require("../../middlewares/authMiddleware");
 
 const multer = require("multer");
-const upload = multer({ storage: multer.memoryStorage() });
+const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 10 * 1024 * 1024 }, fileFilter: (req, file, callback) => {
+  if (!['image/png', 'image/jpeg', 'image/webp'].includes(file.mimetype)) return callback(Object.assign(new Error('Upload a PNG, JPEG, or WebP image'), { statusCode: 400 }));
+  callback(null, true);
+} });
 
 // Using POST for SSE because we are sending query payload in body
 /**

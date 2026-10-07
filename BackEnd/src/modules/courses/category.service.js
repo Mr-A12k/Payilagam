@@ -1,4 +1,10 @@
 const prisma = require("../../config/prisma");
+const categoryError = (message, statusCode = 400) => Object.assign(new Error(message), { statusCode });
+const validateCategory = data => {
+  if (data.name !== undefined && (typeof data.name !== 'string' || !data.name.trim())) throw categoryError('Category name is required');
+  if (data.name !== undefined) data.name = data.name.trim();
+  if (data.parentId !== undefined && data.parentId !== null && (!Number.isInteger(data.parentId) || data.parentId < 1)) throw categoryError('Invalid parent category');
+};
 
 /**
  * Generate a URL-friendly slug from a category name
@@ -14,12 +20,14 @@ const generateSlug = (name) => {
  * Create a new category
  */
 const createCategory = async (data) => {
+  validateCategory(data);
+  if (!data.name) throw categoryError('Category name is required');
   const { name, description, icon, parentId } = data;
 
   // Check for duplicate name
   const existing = await prisma.category.findUnique({ where: { name } });
   if (existing) {
-    throw new Error("Category with this name already exists");
+    throw categoryError("Category with this name already exists", 409);
   }
 
   const slug = generateSlug(name);
@@ -27,7 +35,7 @@ const createCategory = async (data) => {
   // Check for duplicate slug
   const existingSlug = await prisma.category.findUnique({ where: { slug } });
   if (existingSlug) {
-    throw new Error("Category with this slug already exists");
+    throw categoryError("Category with this slug already exists", 409);
   }
 
   // Validate parentId if provided
@@ -36,7 +44,7 @@ const createCategory = async (data) => {
       where: { categoryId: parentId },
     });
     if (!parentCategory) {
-      throw new Error("Parent category not found");
+      throw categoryError("Parent category not found", 404);
     }
   }
 
@@ -106,7 +114,7 @@ const getCategoryById = async (id) => {
   });
 
   if (!category) {
-    throw new Error("Category not found");
+    throw categoryError("Category not found", 404);
   }
 
   return category;
@@ -116,12 +124,13 @@ const getCategoryById = async (id) => {
  * Update a category by ID
  */
 const updateCategory = async (id, data) => {
+  validateCategory(data);
   const existing = await prisma.category.findUnique({
     where: { categoryId: id },
   });
 
   if (!existing) {
-    throw new Error("Category not found");
+    throw categoryError("Category not found", 404);
   }
 
   const updateData = {};
@@ -132,7 +141,7 @@ const updateCategory = async (id, data) => {
       where: { name: data.name },
     });
     if (duplicate && duplicate.categoryId !== id) {
-      throw new Error("Category with this name already exists");
+      throw categoryError("Category with this name already exists", 409);
     }
     updateData.name = data.name;
     updateData.slug = generateSlug(data.name);
@@ -142,7 +151,7 @@ const updateCategory = async (id, data) => {
       where: { slug: updateData.slug },
     });
     if (slugDuplicate && slugDuplicate.categoryId !== id) {
-      throw new Error("Category with this slug already exists");
+      throw categoryError("Category with this slug already exists", 409);
     }
   }
 
@@ -151,14 +160,21 @@ const updateCategory = async (id, data) => {
 
   if (data.parentId !== undefined) {
     if (data.parentId === id) {
-      throw new Error("Category cannot be its own parent");
+      throw categoryError("Category cannot be its own parent");
     }
     if (data.parentId) {
       const parentCategory = await prisma.category.findUnique({
         where: { categoryId: data.parentId },
       });
       if (!parentCategory) {
-        throw new Error("Parent category not found");
+        throw categoryError("Parent category not found", 404);
+      }
+      let ancestor = parentCategory;
+      const visited = new Set();
+      while (ancestor) {
+        if (ancestor.categoryId === id || visited.has(ancestor.categoryId)) throw categoryError('Category hierarchy cannot contain a cycle');
+        visited.add(ancestor.categoryId);
+        ancestor = ancestor.parentId ? await prisma.category.findUnique({ where: { categoryId: ancestor.parentId } }) : null;
       }
     }
     updateData.parentId = data.parentId;
@@ -189,17 +205,17 @@ const deleteCategory = async (id) => {
   });
 
   if (!existing) {
-    throw new Error("Category not found");
+    throw categoryError("Category not found", 404);
   }
 
   if (existing.children.length > 0) {
-    throw new Error(
+    throw categoryError(
       "Cannot delete category with subcategories. Delete or reassign children first.",
     );
   }
 
   if (existing._count.courses > 0) {
-    throw new Error(
+    throw categoryError(
       "Cannot delete category with associated courses. Reassign courses first.",
     );
   }

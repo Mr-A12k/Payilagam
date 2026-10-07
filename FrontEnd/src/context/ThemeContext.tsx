@@ -1,10 +1,9 @@
 /**
- * @file ThemeContext.jsx
- * @description Global theme context providing dark/light mode management.
- * - Reads initial theme from: Redux user.theme → localStorage → default "dark"
- * - Applies theme by setting data-theme attribute on <html> element
- * - Persists to localStorage immediately on change
- * - Persists to DB via PUT /auth/profile when user is authenticated
+ * @file ThemeContext.tsx
+ * @description Global theme context providing Dark / Light mode management.
+ * - Supports strictly Dark and Light themes (all others commented out as requested).
+ * - Guaranteed persistence across page reloads via localStorage + pre-hydration script.
+ * - Persists to DB via PUT /auth/profile when user is authenticated.
  */
 import {
   createContext,
@@ -17,8 +16,27 @@ import { useSelector } from "react-redux";
 import { executeHttpPutRequest } from "@/api/commonServices";
 import { API_PATHS } from "@/api/constants";
 
+export const THEMES = [
+  { value: "dark", label: "Midnight Blue", color: "#2563eb", light: false },
+  { value: "light", label: "Light", color: "#292d34", light: true },
+  /*
+  // Other themes kept commented out as requested:
+  { value: "cyber", label: "Cyber Indigo", color: "#6366f1", light: false },
+  { value: "ocean", label: "Ocean", color: "#1765a3", light: true },
+  { value: "rose", label: "Rose", color: "#a33658", light: true },
+  { value: "graphite", label: "Graphite", color: "#e7bf75", light: false },
+  { value: "forest", label: "Forest", color: "#8ad6a8", light: false },
+  { value: "ember", label: "Ember", color: "#ffad96", light: false },
+  */
+];
+
+const normalizeTheme = (val: unknown): "dark" | "light" => {
+  if (val === "light") return "light";
+  return "dark"; // Default to dark for any other value (prevents resetting on refresh)
+};
+
 interface ThemeContextType {
-  theme: string;
+  theme: "dark" | "light";
   setTheme: (theme: string) => void;
   toggleTheme: () => void;
   isLight: boolean;
@@ -34,56 +52,65 @@ const ThemeContext = createContext<ThemeContextType>({
 export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
   const { user } = useSelector((state: any) => state.auth);
 
-  // Determine initial theme: user DB preference > localStorage > default dark
-  const getInitialTheme = () => {
-    if (user?.theme) return user.theme;
-    const stored = localStorage.getItem("theme");
-    if (stored === "light" || stored === "dark") return stored;
+  // Determine initial theme: localStorage takes highest priority on client refresh
+  const getInitialTheme = (): "dark" | "light" => {
+    try {
+      const stored = localStorage.getItem("theme");
+      if (stored === "light" || stored === "dark") return stored;
+      if (user?.theme === "light" || user?.theme === "dark") return user.theme;
+    } catch {
+      // ignore storage access errors
+    }
     return "dark";
   };
 
-  const [theme, setThemeState] = useState(getInitialTheme);
+  const [theme, setThemeState] = useState<"dark" | "light">(getInitialTheme);
 
-  // Apply data-theme attribute to <html> so CSS vars cascade everywhere
-  const applyTheme = useCallback((t: any) => {
-    document.documentElement.setAttribute("data-theme", t);
+  // Apply theme attributes to <html> element and sync localStorage
+  const applyTheme = useCallback((t: "dark" | "light") => {
+    const selected = normalizeTheme(t);
+    document.documentElement.setAttribute("data-theme", selected);
+    document.documentElement.setAttribute("data-palette", selected);
+    try {
+      localStorage.setItem("theme", selected);
+    } catch {
+      // ignore
+    }
   }, []);
 
-  // When user logs in (user object arrives), sync their DB theme preference
-  // When user logs out (user becomes null), revert to default 'dark' theme
+  // When user profile loads from server, only sync if user explicitly has a valid theme saved in DB
   useEffect(() => {
-    if (user?.theme && user.theme !== theme) {
-      setThemeState(user.theme);
-      applyTheme(user.theme);
-      localStorage.setItem("theme", user.theme);
-    } else if (user === null) {
-      setThemeState("dark");
-      applyTheme("dark");
+    if (user?.theme && (user.theme === "light" || user.theme === "dark")) {
+      const stored = localStorage.getItem("theme");
+      // If local storage is missing or matches DB, apply
+      if (!stored && user.theme !== theme) {
+        setThemeState(user.theme);
+        applyTheme(user.theme);
+      }
     }
-  }, [user?.theme, user === null]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [user?.theme, theme, applyTheme]);
 
-  // On mount (and theme change), keep the DOM in sync
+  // Keep DOM in sync on mount and whenever theme state changes
   useEffect(() => {
     applyTheme(theme);
   }, [theme, applyTheme]);
 
   const setTheme = useCallback(
-    async (newTheme: any) => {
-      if (newTheme !== "dark" && newTheme !== "light") return;
+    async (newTheme: string) => {
+      const target = normalizeTheme(newTheme);
 
-      // Apply immediately for instant visual feedback
-      setThemeState(newTheme);
-      applyTheme(newTheme);
-      localStorage.setItem("theme", newTheme);
+      // Apply immediately for instant feedback and lock into localStorage
+      setThemeState(target);
+      applyTheme(target);
 
       // Persist to DB if authenticated
       if (user) {
         try {
           await executeHttpPutRequest(API_PATHS.AUTH.PROFILE, {
-            theme: newTheme,
+            theme: target,
           });
         } catch (error) {
-          // Silent failure — localStorage is still updated
+          // Non-blocking failure - localStorage is already locked
           console.warn("Failed to persist theme to server:", error);
         }
       }
@@ -92,12 +119,17 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
   );
 
   const toggleTheme = useCallback(() => {
-    setTheme(theme === "dark" ? "light" : "dark");
+    setTheme(theme === "light" ? "dark" : "light");
   }, [theme, setTheme]);
 
   return (
     <ThemeContext.Provider
-      value={{ theme, setTheme, toggleTheme, isLight: theme === "light" }}
+      value={{
+        theme,
+        setTheme,
+        toggleTheme,
+        isLight: theme === "light",
+      }}
     >
       {children}
     </ThemeContext.Provider>

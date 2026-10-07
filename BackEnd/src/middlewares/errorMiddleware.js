@@ -13,6 +13,7 @@ const notFound = (request, response, next) => {
 // eslint-disable-next-line no-unused-vars
 const errorHandler = (error, request, response, next) => {
   const statusCode = error.statusCode || 500;
+  if (error.code === 'LIMIT_FILE_SIZE') return response.status(413).json({ success: false, message: 'Uploaded file is too large' });
 
   // Log all errors using Winston
   logger.error(

@@ -1,0 +1,189 @@
+{
+  "reference": "C:\\Users\\Kabil\\.codex\\plugins\\cache\\openai-curated-remote\\openai-templates\\0.1.1\\skills\\artifact-template-system-design\\assets\\reference.docx",
+  "reference_sha256": "13504f6c221a42c1726460a9e865e563355539ff97d702d6c9b2267b4b261d76",
+  "output": "D:\\TaskPro\\docs\\design\\Payilagam_UI_System_Design.docx",
+  "output_sha256": "d867af3919966a269a359a318f93300957bef46a0afe7e3c043eec5652ea0356",
+  "changed_parts": [
+    "word/document.xml",
+    "word/footer1.xml",
+    "word/footnotes.xml"
+  ],
+  "preserve_only_parts_unchanged": 21,
+  "document_layout_xml_unchanged": true,
+  "unfilled_placeholders": 0,
+  "sections": 1,
+  "tables": 9,
+  "render_status": "blocked: FileNotFoundError: LibreOffice soffice.exe was not found on PATH",
+  "visual_inspection": "Template cover preview only; final pages not rendered",
+  "application_tests": "Not run; documentation-only task",
+  "parts": [
+    {
+      "path": "word/header1.xml",
+      "size": 1791,
+      "reference_sha256": "3bf69710819b375475073d4b0ee633a04c2f64aa732cb859f7e6fbcf91e82a15",
+      "output_sha256": "3bf69710819b375475073d4b0ee633a04c2f64aa732cb859f7e6fbcf91e82a15",
+      "policy": "preserve only"
+    },
+    {
+      "path": "word/header2.xml",
+      "size": 1791,
+      "reference_sha256": "963cce02bd0011b04cb2276d81a515d7dbe3f0e4d7a0512a1dcb43c338501783",
+      "output_sha256": "963cce02bd0011b04cb2276d81a515d7dbe3f0e4d7a0512a1dcb43c338501783",
+      "policy": "preserve only"
+    },
+    {
+      "path": "word/footer1.xml",
+      "size": 3186,
+      "reference_sha256": "7379a8a738857d8716819a7a33278f11eed3b227cb6d4b8583e24ea71d82caa9",
+      "output_sha256": "148ca29deb66c954db8b0bbe22dc8465163cf56de401ba51d5f0c6ac8f16066a",
+      "policy": "text editable"
+    },
+    {
+      "path": "word/footer2.xml",
+      "size": 1791,
+      "reference_sha256": "dec75ce89f56d3f0d5642fc6826ffb519ba7a66d568c61615354a81d4dbd3f92",
+      "output_sha256": "dec75ce89f56d3f0d5642fc6826ffb519ba7a66d568c61615354a81d4dbd3f92",
+      "policy": "preserve only"
+    },
+    {
+      "path": "word/footnotes.xml",
+      "size": 2240,
+      "reference_sha256": "32800f6ede848974200ec3b5ccdec0441f34232b21cb8032eeaee08423cd64ad",
+      "output_sha256": "98e17c793ed40ac9bff62df97155364cb35974328d28533993e94184568e5280",
+      "policy": "text editable"
+    },
+    {
+      "path": "word/numbering.xml",
+      "size": 8589,
+      "reference_sha256": "8ae47749605f60cda2f453d4fb1d4ee48edf498ca44224a5e6cbc047603725c6",
+      "output_sha256": "8ae47749605f60cda2f453d4fb1d4ee48edf498ca44224a5e6cbc047603725c6",
+      "policy": "preserve only"
+    },
+    {
+      "path": "word/settings.xml",
+      "size": 2152,
+      "reference_sha256": "fb088d0a3dbf7f5e5a5a399b898acf16aa2a6fc3b2984bc3eb0d4946f73ac005",
+      "output_sha256": "fb088d0a3dbf7f5e5a5a399b898acf16aa2a6fc3b2984bc3eb0d4946f73ac005",
+      "policy": "preserve only"
+    },
+    {
+      "path": "word/fontTable.xml",
+      "size": 2599,
+      "reference_sha256": "fbf051c0789377c917324a8d58f9f5da42e1e3c4ccd1324e3280bca9e3372b48",
+      "output_sha256": "fbf051c0789377c917324a8d58f9f5da42e1e3c4ccd1324e3280bca9e3372b48",
+      "policy": "preserve only"
+    },
+    {
+      "path": "word/_rels/fontTable.xml.rels",
+      "size": 1342,
+      "reference_sha256": "9e696b4181565fe8b8033e71faa2ce80663faba9392b00873fc0dcf2667fcd21",
+      "output_sha256": "9e696b4181565fe8b8033e71faa2ce80663faba9392b00873fc0dcf2667fcd21",
+      "policy": "preserve only"
+    },
+    {
+      "path": "word/styles.xml",
+      "size": 14480,
+      "reference_sha256": "97d73aa6932aa6da7c1bcd45943ca9b123c95ed0ebb5f032a8910d040fcc4298",
+      "output_sha256": "97d73aa6932aa6da7c1bcd45943ca9b123c95ed0ebb5f032a8910d040fcc4298",
+      "policy": "preserve only"
+    },
+    {
+      "path": "word/document.xml",
+      "size": 228142,
+      "reference_sha256": "db8a6819670a90e1ab4c805072770dfc6cc9f5abb1de441dcdbc545b4c0e8a1e",
+      "output_sha256": "8bc4713d9722e1f56cc03ad3710f53781f2bf7939cf916aa3702f5fc0e1fabf2",
+      "policy": "text editable"
+    },
+    {
+      "path": "word/_rels/document.xml.rels",
+      "size": 1778,
+      "reference_sha256": "e0aaf0daccdeb2e03cf0f0d0518dac5d9ec367392a1819ad673de36fa344cca4",
+      "output_sha256": "e0aaf0daccdeb2e03cf0f0d0518dac5d9ec367392a1819ad673de36fa344cca4",
+      "policy": "preserve only"
+    },
+    {
+      "path": "_rels/.rels",
+      "size": 298,
+      "reference_sha256": "77494e8e16bbf29213e494792349e3d49d2397a4007b2816a058337d804e79a1",
+      "output_sha256": "77494e8e16bbf29213e494792349e3d49d2397a4007b2816a058337d804e79a1",
+      "policy": "preserve only"
+    },
+    {
+      "path": "word/fonts/HelveticaNeueLight-regular.ttf",
+      "size": 90572,
+      "reference_sha256": "86fadd919d6b0c78b61b928828768a3137b9ad67e9a14ddc2891c6ce25b23f0f",
+      "output_sha256": "86fadd919d6b0c78b61b928828768a3137b9ad67e9a14ddc2891c6ce25b23f0f",
+      "policy": "preserve only"
+    },
+    {
+      "path": "word/fonts/HelveticaNeueLight-bold.ttf",
+      "size": 90892,
+      "reference_sha256": "f4b06f1a460c24da8a2a62210250f662064d1ec9ed3b0ef1d673f281e5445426",
+      "output_sha256": "f4b06f1a460c24da8a2a62210250f662064d1ec9ed3b0ef1d673f281e5445426",
+      "policy": "preserve only"
+    },
+    {
+      "path": "word/fonts/HelveticaNeue-bold.ttf",
+      "size": 89720,
+      "reference_sha256": "d55d0ca5a027475c35cfc5a9ebf038e5d0d7c5140083ec2732a67727eaeb20c5",
+      "output_sha256": "d55d0ca5a027475c35cfc5a9ebf038e5d0d7c5140083ec2732a67727eaeb20c5",
+      "policy": "preserve only"
+    },
+    {
+      "path": "word/fonts/HelveticaNeue-regular.ttf",
+      "size": 90892,
+      "reference_sha256": "f4b06f1a460c24da8a2a62210250f662064d1ec9ed3b0ef1d673f281e5445426",
+      "output_sha256": "f4b06f1a460c24da8a2a62210250f662064d1ec9ed3b0ef1d673f281e5445426",
+      "policy": "preserve only"
+    },
+    {
+      "path": "word/theme/theme1.xml",
+      "size": 7642,
+      "reference_sha256": "742bf86bb312d06389e21644f7e861273fe4f124f422c57cce0c28360b06f32d",
+      "output_sha256": "742bf86bb312d06389e21644f7e861273fe4f124f422c57cce0c28360b06f32d",
+      "policy": "preserve only"
+    },
+    {
+      "path": "word/media/image1.png",
+      "size": 72092,
+      "reference_sha256": "4e2f1a97fcad1f6ebfc0bd5e2b2783c4bf0cf9de908bc63ce150666738ac5537",
+      "output_sha256": "4e2f1a97fcad1f6ebfc0bd5e2b2783c4bf0cf9de908bc63ce150666738ac5537",
+      "policy": "preserve only"
+    },
+    {
+      "path": "word/fonts/HelveticaNeueLight-italic.ttf",
+      "size": 92588,
+      "reference_sha256": "da6d9fc94465945e04009194d533da3e1ec96c7f6177ee6a77fa89247d3c5784",
+      "output_sha256": "da6d9fc94465945e04009194d533da3e1ec96c7f6177ee6a77fa89247d3c5784",
+      "policy": "preserve only"
+    },
+    {
+      "path": "word/fonts/HelveticaNeue-boldItalic.ttf",
+      "size": 91516,
+      "reference_sha256": "ba7822562fd8133eef9d83d197cdb19e55cfc5a4077029e081aa38f07a7981e5",
+      "output_sha256": "ba7822562fd8133eef9d83d197cdb19e55cfc5a4077029e081aa38f07a7981e5",
+      "policy": "preserve only"
+    },
+    {
+      "path": "word/fonts/HelveticaNeueLight-boldItalic.ttf",
+      "size": 92888,
+      "reference_sha256": "a627c106749fdc7c3893c3e1385de3f73f7c311c8cf841c5a2176f55a6883cae",
+      "output_sha256": "a627c106749fdc7c3893c3e1385de3f73f7c311c8cf841c5a2176f55a6883cae",
+      "policy": "preserve only"
+    },
+    {
+      "path": "word/fonts/HelveticaNeue-italic.ttf",
+      "size": 92888,
+      "reference_sha256": "a627c106749fdc7c3893c3e1385de3f73f7c311c8cf841c5a2176f55a6883cae",
+      "output_sha256": "a627c106749fdc7c3893c3e1385de3f73f7c311c8cf841c5a2176f55a6883cae",
+      "policy": "preserve only"
+    },
+    {
+      "path": "[Content_Types].xml",
+      "size": 1930,
+      "reference_sha256": "4c3be72f4c54fad4fc7c3a0e3c0b80b63d285c2b07c761853cdcb1075ac9dd18",
+      "output_sha256": "4c3be72f4c54fad4fc7c3a0e3c0b80b63d285c2b07c761853cdcb1075ac9dd18",
+      "policy": "preserve only"
+    }
+  ]
+}

@@ -47,7 +47,7 @@ export function ImageCropper({
       open={isOpen}
       onOpenChange={(open: any) => !open && !isLoading && onClose()}
     >
-      <DialogContent className="max-w-md w-full">
+      <DialogContent className="max-w-md">
         <DialogHeader>
           <DialogTitle>Crop your avatar</DialogTitle>
         </DialogHeader>
@@ -75,7 +75,7 @@ export function ImageCropper({
             min={1}
             max={3}
             step={0.1}
-            aria-labelledby="Zoom"
+            aria-label="Zoom"
             onChange={(event: React.SyntheticEvent<any>) =>
               setZoom(Number((event.target as HTMLInputElement).value))
             }

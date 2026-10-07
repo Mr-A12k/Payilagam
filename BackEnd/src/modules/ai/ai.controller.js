@@ -3,7 +3,7 @@ const aiService = require("./ai.service");
 exports.chat = async (request, response) => {
   const { query, topic } = request.body;
 
-  if (!query) {
+  if (typeof query !== 'string' || !query.trim()) {
     return response
       .status(400)
       .json({ success: false, message: "Query is required" });

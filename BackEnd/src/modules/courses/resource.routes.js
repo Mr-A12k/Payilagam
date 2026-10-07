@@ -14,7 +14,7 @@ const authMiddleware = require("../../middlewares/authMiddleware");
 
 // Ensure storage directory exists
 const storagePath =
-  process.env.RESOURCE_STORAGE_PATH || path.join(__dirname, "../../resources");
+  require('../../config/storage').resourceStoragePath;
 if (!fs.existsSync(storagePath)) {
   fs.mkdirSync(storagePath, { recursive: true });
 }
@@ -73,9 +73,9 @@ const upload = multer({
       callback(null, true);
     } else {
       callback(
-        new Error(
+        Object.assign(new Error(
           "Invalid file type. Only PDFs, Images, Videos, Word, and Excel documents are allowed.",
-        ),
+        ), { statusCode: 400 }),
         false,
       );
     }

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Search, MoreVertical, Phone, Video } from "lucide-react";
+import { MessageSquare } from "lucide-react";
 import { Avatar } from "@/components/ui";
 
 const ChatWindow = ({
@@ -27,23 +27,15 @@ const ChatWindow = ({
           color: "var(--text-muted)",
         }}
       >
-        <div
-          className="w-80 h-80 bg-contain bg-center bg-no-repeat mb-8 opacity-20"
-          style={{
-            backgroundImage:
-              "url('https://static.whatsapp.net/rsrc.php/v3/y6/r/wa66cgSqA4m.png')",
-            filter: "var(--theme-filter-invert)",
-          }}
-        ></div>
+        <MessageSquare className="w-10 h-10 mb-4" />
         <h2
-          className="text-3xl font-light mb-4"
+          className="text-lg font-semibold mb-2"
           style={{ color: "var(--text-heading)" }}
         >
-          WhatsApp Web Clone
+          Messages
         </h2>
         <p className="text-[14px] max-w-md text-center leading-relaxed">
-          Send and receive messages without keeping your phone online. <br />
-          Select a chat to start messaging.
+          No conversation selected.
         </p>
       </div>
     );
@@ -56,7 +48,7 @@ const ChatWindow = ({
     : otherParticipantName;
 
   return (
-    <div className="flex-1 flex flex-col min-w-0 relative">
+    <div className="flex-1 flex flex-col min-w-0 min-h-0 relative">
       {/* Chat Header */}
       <div
         className="h-16 px-4 flex items-center justify-between shrink-0 z-10 border-b"
@@ -65,16 +57,16 @@ const ChatWindow = ({
           borderColor: "var(--border-default)",
         }}
       >
-        <div className="flex items-center gap-4 cursor-pointer">
+        <div className="flex min-w-0 items-center gap-3">
           <Avatar
             src={otherParticipantAvatar}
             fallback={chatTitle?.[0] || "U"}
             size="md"
             className="w-10 h-10 rounded-full"
           />
-          <div className="flex flex-col">
+          <div className="min-w-0 flex flex-col">
             <span
-              className="text-[16px] font-medium"
+              className="truncate text-sm font-medium"
               style={{ color: "var(--text-heading)" }}
             >
               {chatTitle}
@@ -88,53 +80,28 @@ const ChatWindow = ({
                   typing...
                 </span>
               ) : (
-                "click here for contact info"
+                ""
               )}
             </span>
           </div>
         </div>
 
-        <div
-          className="flex items-center gap-6"
-          style={{ color: "var(--text-muted)" }}
-        >
-          <Video className="w-5 h-5 cursor-pointer hover:text-[var(--text-primary)] transition-colors" />
-          <Phone className="w-5 h-5 cursor-pointer hover:text-[var(--text-primary)] transition-colors" />
-          <span
-            className="w-px h-6"
-            style={{ background: "var(--border-default)" }}
-          ></span>
-          <Search className="w-5 h-5 cursor-pointer hover:text-[var(--text-primary)] transition-colors" />
-          <MoreVertical className="w-5 h-5 cursor-pointer hover:text-[var(--text-primary)] transition-colors" />
-        </div>
       </div>
 
       {/* Messages Area */}
       <div
-        className="flex-1 overflow-y-auto px-[5%] py-4 space-y-1 relative"
+        className="min-h-0 min-w-0 flex-1 overflow-y-auto px-3 py-4 space-y-1 relative"
         style={{
           background: "var(--bg-base)",
           scrollbarWidth: "thin",
           scrollbarColor: "var(--border-default) transparent",
         }}
       >
-        {/* WhatsApp Doodle Background Layer */}
-        <div
-          className="absolute inset-0 z-0 pointer-events-none"
-          style={{
-            backgroundImage:
-              "url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png')",
-            backgroundSize: "contain",
-            backgroundRepeat: "repeat",
-            opacity: 0.9,
-            filter: "var(--theme-filter-invert)",
-          }}
-        />
 
         {/* Date Badge */}
         <div className="flex justify-center my-4 sticky top-2 z-10">
           <span
-            className="px-3 py-1.5 rounded-lg text-[12.5px] uppercase shadow-sm"
+            className="px-3 py-1.5 rounded-lg text-[12.5px] uppercase"
             style={{
               background: "var(--bg-surface-2)",
               color: "var(--text-muted)",
@@ -164,11 +131,11 @@ const ChatWindow = ({
               className={`flex ${isMine ? "justify-end" : "justify-start"} ${isLastInGroup ? "mb-2" : "mb-0.5"}`}
             >
               <div
-                className={`relative max-w-[65%] px-2.5 py-1.5 shadow-sm text-[14.2px] leading-relaxed break-words`}
+                className="relative min-w-0 max-w-[90%] sm:max-w-[75%] px-3 py-2 text-sm leading-relaxed [overflow-wrap:anywhere]"
                 style={{
                   background: isMine
                     ? "var(--bg-surface-2)"
-                    : "var(--bg-surface-1)",
+                    : "var(--bg-surface)",
                   color: "var(--text-primary)",
                   borderRadius: "7.5px",
                   borderTopRightRadius:
@@ -202,7 +169,7 @@ const ChatWindow = ({
                     width="8"
                     height="13"
                     className="absolute top-0 -left-[8px]"
-                    style={{ color: "var(--bg-surface-1)" }}
+                    style={{ color: "var(--bg-surface)" }}
                   >
                     <path
                       opacity=".13"
@@ -215,9 +182,9 @@ const ChatWindow = ({
                   </svg>
                 )}
 
-                <span className="mr-8">{message.content}</span>
+                <span>{message.content}</span>
 
-                <div className="absolute right-1.5 bottom-1 flex items-center gap-1">
+                <div className="mt-1 flex justify-end items-center gap-1">
                   <span
                     className="text-[10px]"
                     style={{ color: "var(--text-muted)" }}

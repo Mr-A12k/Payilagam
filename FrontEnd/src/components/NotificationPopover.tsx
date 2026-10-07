@@ -1,8 +1,7 @@
-import React, { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Bell, BellOff, CheckCircle2, MessageSquare } from "lucide-react";
 import { useSocketContext } from "@/context/SocketContext";
 import { Link } from "react-router-dom";
-import { Button } from "./ui/Button";
 
 const NotificationPopover = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -30,6 +29,8 @@ const NotificationPopover = () => {
   return (
     <div className="relative" ref={popoverRef}>
       <button
+        aria-label="Notifications"
+        aria-expanded={isOpen}
         onClick={() => setIsOpen(!isOpen)}
         className="relative p-2 text-slate-400 hover:text-white hover:bg-slate-800 rounded-full transition-colors focus:outline-none"
       >
@@ -44,7 +45,7 @@ const NotificationPopover = () => {
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-80 bg-slate-900 border border-slate-800 rounded-2xl shadow-xl shadow-black/50 z-50 overflow-hidden">
+        <div className="fixed inset-x-3 top-16 sm:absolute sm:inset-x-auto sm:right-0 sm:top-auto sm:mt-2 sm:w-80 bg-slate-900 border border-slate-800 rounded-lg shadow-xl z-50 overflow-hidden">
           <div className="flex items-center justify-between p-4 border-b border-slate-800 bg-slate-900/50">
             <h3 className="font-semibold text-white">Notifications</h3>
             <div className="flex items-center gap-2">
@@ -53,7 +54,11 @@ const NotificationPopover = () => {
                 className="text-xs text-slate-400 hover:text-white transition-colors"
                 title={isMuted ? "Unmute Notifications" : "Mute Notifications"}
               >
-                {isMuted ? <BellOff className="w-4 h-4" /> : <Bell className="w-4 h-4" />}
+                {isMuted ? (
+                  <BellOff className="w-4 h-4" />
+                ) : (
+                  <Bell className="w-4 h-4" />
+                )}
               </button>
               {unreadCount > 0 && (
                 <button
@@ -77,7 +82,11 @@ const NotificationPopover = () => {
                 {notifications.map((notif, idx) => (
                   <Link
                     key={idx}
-                    to={notif.channelId ? `/chat?channelId=${notif.channelId}` : `/chat?conversationId=${notif.conversationId}`}
+                    to={
+                      notif.channelId
+                        ? `/chat?channelId=${notif.channelId}`
+                        : `/chat?conversationId=${notif.conversationId}`
+                    }
                     onClick={() => setIsOpen(false)}
                     className="flex items-start gap-3 p-4 hover:bg-slate-800/50 transition-colors border-b border-slate-800/50 last:border-0 group"
                   >
@@ -97,7 +106,7 @@ const NotificationPopover = () => {
               </div>
             )}
           </div>
-          
+
           <div className="p-3 border-t border-slate-800 bg-slate-900/50 text-center flex items-center justify-center gap-4">
             {unreadCount > 0 ? (
               <>

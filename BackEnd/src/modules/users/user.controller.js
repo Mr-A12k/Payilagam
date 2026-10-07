@@ -1,6 +1,7 @@
 const userService = require('./user.service');
+const mentorApplicationService = require('./mentorApplication.service');
 const catchAsync = require('../../utils/catchAsync');
-const { success, error } = require('../../utils/responseHelper');
+const { success, error, paginated } = require('../../utils/responseHelper');
 
 const getMentors = catchAsync(async (request, response) => {
     const mentors = await userService.getMentors();
@@ -14,8 +15,8 @@ const getMentorDetails = catchAsync(async (request, response) => {
     try {
         const details = await userService.getMentorDetails(id, currentUserId);
         return success(response, details, 'Mentor details retrieved successfully');
-    } catch (error) {
-        return error(response, error.message, 404);
+    } catch (err) {
+        return error(response, err.message, err.statusCode || 404);
     }
 });
 
@@ -44,7 +45,7 @@ const applyAsMentor = catchAsync(async (request, response) => {
     const { bio, skills, experience } = request.body;
     
     try {
-        const application = await userService.applyAsMentor(userId, bio, skills, experience);
+        const application = await mentorApplicationService.applyAsMentor(userId, bio, skills, experience);
         return success(response, application, 'Mentor application submitted successfully');
     } catch (err) {
         return response.status(400).json({ success: false, message: err.message });
@@ -57,8 +58,8 @@ const getMentorApplications = catchAsync(async (request, response) => {
         return response.status(403).json({ success: false, message: "Unauthorized. Admin access only." });
     }
 
-    const applications = await userService.getMentorApplications();
-    return success(response, applications, 'Mentor applications retrieved successfully');
+    const { applications, pagination } = await mentorApplicationService.getMentorApplications(request.query);
+    return paginated(response, applications, pagination, 'Mentor applications retrieved successfully');
 });
 
 const updateMentorApplicationStatus = catchAsync(async (request, response) => {
@@ -75,16 +76,16 @@ const updateMentorApplicationStatus = catchAsync(async (request, response) => {
     }
 
     try {
-        const updated = await userService.updateMentorApplicationStatus(id, status);
+        const updated = await mentorApplicationService.updateMentorApplicationStatus(id, status);
         return success(response, updated, `Application status updated to ${status}`);
     } catch (err) {
-        return response.status(400).json({ success: false, message: err.message });
+        return response.status(err.statusCode || 400).json({ success: false, message: err.message });
     }
 });
 
 const getMyMentorApplication = catchAsync(async (request, response) => {
     const userId = request.user.userId;
-    const application = await userService.getMyMentorApplication(userId);
+    const application = await mentorApplicationService.getMyMentorApplication(userId);
     return success(response, application, 'My mentor application retrieved successfully');
 });
 

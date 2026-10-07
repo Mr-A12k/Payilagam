@@ -1,4 +1,6 @@
 const prisma = require('../../config/prisma');
+const { gradeQuiz } = require('./quiz');
+const { integer, text, fail, services } = require('./validation');
 const { getPaginationParams, getPaginationMeta, getSortParams } = require('../../utils/pagination');
 
 /**
@@ -35,6 +37,10 @@ const submitAssignment = async (studentId, assignmentId, data) => {
     }
 
     const { submissionFile, submissionText, code, language } = data;
+    for (const key of ['submissionFile', 'submissionText', 'code', 'language']) text(data[key], key);
+    const quizResult = assignment.type === 'quiz' ? gradeQuiz(assignment.quiz, data.answers) : null;
+    if (!quizResult && ![submissionFile, submissionText, code].some(value => typeof value === 'string' && value.trim())) fail('Submission content is required');
+    if (assignment.type === 'coding_challenge' && (!code?.trim() || !language?.trim())) fail('Code and language are required');
 
     const submission = await prisma.assignmentSubmission.create({
         data: {
@@ -44,6 +50,7 @@ const submitAssignment = async (studentId, assignmentId, data) => {
             submissionText: submissionText || null,
             code: code || null,
             language: language || null,
+            ...(quizResult && { ...quizResult, submissionFile: null, code: null, language: null }),
         },
         include: {
             assignment: {
@@ -71,7 +78,10 @@ const submitAssignment = async (studentId, assignmentId, data) => {
 /**
  * Get all submissions for an assignment (mentor/admin view) - paginated.
  */
-const getSubmissionsByAssignment = async (assignmentId, query) => {
+const getSubmissionsByAssignment = async (assignmentId, query, user) => {
+    const assignment = await prisma.assignment.findUnique({ where: { assignmentId: Number(assignmentId) }, include: { course: true } });
+    if (!assignment) fail('Assignment not found', 404);
+    if (!user || user.role !== 'admin' && assignment.course.mentorId !== user.userId) fail('Not authorized to view submissions', 403);
     const { page, limit, skip, take } = getPaginationParams(query);
     const orderBy = getSortParams(query, ['submittedAt', 'marks', 'status'], 'submittedAt', 'desc');
 
@@ -198,6 +208,9 @@ const gradeSubmission = async (submissionId, mentorId, role, data) => {
     }
 
     const { marks, feedback, status } = data;
+    if (marks !== undefined) integer(marks, 'marks', 0);
+    text(feedback, 'feedback');
+    if (status !== undefined && !['submitted', 'reviewed', 'graded', 'returned'].includes(status)) fail('Invalid submission status');
 
     // Validate marks against totalMarks
     if (marks !== undefined && marks > submission.assignment.totalMarks) {
@@ -236,7 +249,7 @@ const gradeSubmission = async (submissionId, mentorId, role, data) => {
 /**
  * Get a single submission by ID with full details.
  */
-const getSubmissionById = async (submissionId) => {
+const getSubmissionById = async (submissionId, user) => {
     const submission = await prisma.assignmentSubmission.findUnique({
         where: { submissionId: parseInt(submissionId) },
         include: {
@@ -272,14 +285,15 @@ const getSubmissionById = async (submissionId) => {
         throw new Error('Submission not found');
     }
 
+    if (!user || user.role !== 'admin' && submission.studentId !== user.userId && submission.assignment.course.mentorId !== user.userId) fail('Not authorized to view this submission', 403);
     return submission;
 };
 
-module.exports = {
+module.exports = services({
     submitAssignment,
     getSubmissionsByAssignment,
     getStudentSubmissions,
     getMySubmissions,
     gradeSubmission,
     getSubmissionById,
-};
+});

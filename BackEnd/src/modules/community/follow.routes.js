@@ -18,6 +18,14 @@ const {
 } = require("./follow.controller");
 
 router.use(authenticate);
+const followService = require('./follow.service');
+const catchAsync = require('../../utils/catchAsync');
+const { success } = require('../../utils/responseHelper');
+router.get('/requests/sent', catchAsync(async (req, res) => success(res, await followService.getSentRequests(req.user.userId), 'Sent requests retrieved')));
+router.delete('/request/:id', catchAsync(async (req, res) => success(res, await followService.cancelRequest(req.user.userId, req.params.id), 'Request cancelled')));
+for (const direction of ['following', 'followers']) {
+  router.delete(`/${direction}/:id`, catchAsync(async (req, res) => success(res, await followService.removeConnection(req.user.userId, req.params.id, direction), 'Connection removed')));
+}
 
 /**
  * @swagger

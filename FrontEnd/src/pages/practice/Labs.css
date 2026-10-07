@@ -1,0 +1,493 @@
+/* ══════════════════════════════════════════════════
+   Labs.css — Blue & Midnight Blue Cloud Sandbox Catalog
+   Harmonized across Dark (Midnight Blue) and Light themes
+   ══════════════════════════════════════════════════ */
+
+.labs-page-wrap {
+  width: 100%;
+  min-width: 0;
+  max-width: 1440px;
+  margin: 0 auto;
+  color: var(--text-primary);
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+/* ══════════════════════════════════════════════════
+   FEATURED SPOTLIGHT (Active Compiler Sandbox)
+   ══════════════════════════════════════════════════ */
+.labs-spotlight-card {
+  position: relative;
+  overflow: hidden;
+  padding: 34px 38px;
+  border-radius: 18px;
+  /* Radiant Midnight Blue to Electric Blue hero gradient */
+  background: linear-gradient(
+    135deg,
+    #131c38 0%,
+    #172554 28%,
+    #1e3a8a 55%,
+    #2563eb 82%,
+    #3b82f6 100%
+  );
+  border: 1px solid rgba(147, 197, 253, 0.32);
+  box-shadow: 
+    0 20px 48px -12px rgba(37, 99, 235, 0.38),
+    0 0 24px rgba(59, 130, 246, 0.18),
+    inset 0 1px 1px rgba(255, 255, 255, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 24px;
+}
+
+/* Subtle dot matrix pattern over the right side */
+.labs-spotlight-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 360px;
+  height: 100%;
+  background-image: radial-gradient(rgba(255, 255, 255, 0.22) 1.5px, transparent 1.5px);
+  background-size: 16px 16px;
+  pointer-events: none;
+  mask-image: radial-gradient(circle at 75% 50%, black 30%, transparent 80%);
+  -webkit-mask-image: radial-gradient(circle at 75% 50%, black 30%, transparent 80%);
+}
+
+.labs-spotlight-left {
+  max-width: 720px;
+  position: relative;
+  z-index: 1;
+}
+
+.labs-spotlight-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: 9999px;
+  background: rgba(10, 15, 29, 0.45) !important;
+  border: 1px solid rgba(255, 255, 255, 0.22) !important;
+  color: #bfdbfe !important;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 14px;
+  backdrop-filter: blur(8px);
+}
+
+.labs-spotlight-title {
+  font-size: clamp(22px, 3.2vw, 32px);
+  font-weight: 800;
+  line-height: 1.18;
+  color: #ffffff !important;
+  letter-spacing: -0.025em;
+  margin: 0 0 10px;
+}
+
+.labs-spotlight-desc {
+  font-size: 14px;
+  line-height: 1.6;
+  color: rgba(240, 246, 255, 0.95) !important;
+  margin: 0 0 20px;
+  max-width: 600px;
+}
+
+/* Chips inside banner */
+.labs-spotlight-chips {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.labs-chip {
+  padding: 4px 12px;
+  border-radius: 20px;
+  background: rgba(10, 15, 29, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  font-size: 12px;
+  font-weight: 600;
+  color: #f1f5f9;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  backdrop-filter: blur(8px);
+}
+.labs-chip.chip-gold {
+  color: #fde047;
+  border-color: rgba(250, 204, 21, 0.35);
+  background: rgba(234, 179, 8, 0.14);
+}
+.labs-chip.chip-blue {
+  color: #93c5fd;
+  border-color: rgba(96, 165, 250, 0.35);
+  background: rgba(59, 130, 246, 0.14);
+}
+.labs-chip.chip-cyan {
+  color: #67e8f9;
+  border-color: rgba(34, 211, 238, 0.35);
+  background: rgba(6, 182, 212, 0.14);
+}
+
+/* Right side CTA Button */
+.labs-spotlight-right {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 12px;
+}
+
+.labs-spotlight-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 44px;
+  padding: 0 22px;
+  border-radius: 10px;
+  background: #ffffff;
+  color: #0a0f1d;
+  font-size: 13.5px;
+  font-weight: 700;
+  text-decoration: none;
+  box-shadow: 
+    0 8px 24px rgba(0, 0, 0, 0.25),
+    0 1px 2px rgba(0, 0, 0, 0.1);
+  transition: all 160ms cubic-bezier(0.16, 1, 0.3, 1);
+  white-space: nowrap;
+}
+.labs-spotlight-btn:hover {
+  background: #f8fafc;
+  transform: translateY(-2px);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.32);
+}
+.labs-spotlight-btn svg {
+  width: 15px;
+  height: 15px;
+  transition: transform 160ms ease;
+}
+.labs-spotlight-btn:hover svg {
+  transform: translate(2px, -2px);
+}
+
+.labs-live-indicator {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: #6ee7b7;
+  font-weight: 600;
+  background: rgba(10, 15, 29, 0.4);
+  padding: 3px 10px;
+  border-radius: 20px;
+  border: 1px solid rgba(110, 231, 183, 0.2);
+}
+.labs-pulse-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #10b981;
+  box-shadow: 0 0 10px #10b981;
+  animation: pulse-dot 2s ease infinite;
+}
+
+/* ══════════════════════════════════════════════════
+   TOOLBAR & CATEGORY PILLS (Screenshot Style)
+   ══════════════════════════════════════════════════ */
+.labs-toolbar-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+/* Search Box */
+.labs-search-bar {
+  position: relative;
+  min-width: 240px;
+  max-width: 320px;
+}
+.labs-search-bar svg {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 15px;
+  height: 15px;
+  color: var(--text-muted);
+  pointer-events: none;
+}
+.labs-search-input {
+  width: 100%;
+  height: 40px;
+  padding-left: 38px;
+  padding-right: 14px;
+  border-radius: 9999px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  color: var(--text-primary);
+  font-size: 13px;
+  outline: none;
+  transition: border-color 150ms, box-shadow 150ms;
+}
+.labs-search-input:focus {
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 0 3px var(--accent-primary-subtle);
+}
+
+/* Category Pills */
+.labs-category-pills {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 2px;
+  scrollbar-width: none;
+}
+.labs-category-pills::-webkit-scrollbar {
+  display: none;
+}
+
+.labs-cat-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 18px;
+  border-radius: 9999px;
+  font-size: 13px;
+  font-weight: 550;
+  border: 1px solid var(--border-default);
+  background: var(--bg-surface-2);
+  color: var(--text-secondary);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 140ms ease;
+}
+.labs-cat-pill:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+  border-color: var(--accent-primary);
+}
+
+/* Active Pill: Vibrant Brand Blue */
+.labs-cat-pill.is-active {
+  background: var(--accent-primary) !important;
+  color: #ffffff !important;
+  border-color: var(--accent-primary) !important;
+  font-weight: 700;
+  box-shadow: 0 3px 12px rgba(37, 99, 235, 0.32);
+}
+.labs-cat-count {
+  font-size: 11px;
+  opacity: 0.85;
+  font-weight: 700;
+}
+
+/* ══════════════════════════════════════════════════
+   LABS CARDS GRID (Harmonized Theme Cards)
+   ══════════════════════════════════════════════════ */
+.labs-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 20px;
+}
+
+.lab-card-modern {
+  display: flex;
+  flex-direction: column;
+  padding: 24px;
+  border-radius: 16px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  text-decoration: none;
+  color: var(--text-primary);
+  position: relative;
+  transition: all 180ms cubic-bezier(0.16, 1, 0.3, 1);
+  overflow: hidden;
+}
+.lab-card-modern:hover {
+  transform: translateY(-2px);
+  border-color: var(--accent-primary);
+  box-shadow: 
+    0 16px 36px -10px color-mix(in srgb, var(--accent-primary) 18%, transparent),
+    0 0 0 1px var(--accent-primary-border);
+}
+
+/* Top Row: Squircle Badge + Status Pill */
+.lab-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 18px;
+}
+
+.lab-card-icon-wrap {
+  width: 44px;
+  height: 44px;
+  border-radius: 11px;
+  display: grid;
+  place-items: center;
+  background: var(--accent-primary-subtle);
+  color: var(--accent-primary);
+  border: 1px solid var(--accent-primary-border);
+  transition: transform 180ms ease, border-color 180ms ease;
+}
+.lab-card-modern:hover .lab-card-icon-wrap {
+  transform: scale(1.08);
+  border-color: var(--accent-primary);
+}
+
+/* Status Badges */
+.lab-card-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: 9999px;
+  font-size: 11.5px;
+  font-weight: 600;
+}
+.lab-card-badge.badge-live {
+  background: color-mix(in srgb, var(--accent-success) 12%, transparent);
+  color: var(--accent-success);
+  border: 1px solid color-mix(in srgb, var(--accent-success) 28%, transparent);
+}
+.lab-card-badge.badge-upcoming {
+  background: color-mix(in srgb, var(--accent-warning) 12%, transparent);
+  color: var(--accent-warning);
+  border: 1px solid color-mix(in srgb, var(--accent-warning) 28%, transparent);
+}
+
+/* Title & Description */
+.lab-card-title-group {
+  margin-bottom: 12px;
+}
+.lab-card-category {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--accent-primary);
+  margin-bottom: 5px;
+}
+.lab-card-title {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--text-heading);
+  margin: 0;
+  line-height: 1.35;
+  transition: color 140ms ease;
+}
+.lab-card-modern:hover .lab-card-title {
+  color: var(--accent-primary);
+}
+
+.lab-card-desc {
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: var(--text-secondary);
+  margin: 0 0 18px;
+  flex: 1;
+}
+
+/* Tags in Card */
+.lab-card-tags {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 20px;
+}
+.lab-card-tag {
+  padding: 3px 10px;
+  border-radius: 6px;
+  background: var(--bg-surface-2);
+  border: 1px solid var(--border-default);
+  font-size: 11.5px;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+.lab-card-tag.tag-highlight {
+  background: color-mix(in srgb, var(--accent-warning) 12%, transparent);
+  color: var(--accent-warning);
+  border-color: color-mix(in srgb, var(--accent-warning) 28%, transparent);
+}
+
+/* Card Footer Callout */
+.lab-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 14px;
+  border-top: 1px solid var(--border-subtle);
+  font-size: 13px;
+  font-weight: 600;
+}
+.lab-card-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--accent-primary);
+  font-weight: 600;
+  transition: all 140ms ease;
+}
+.lab-card-action.action-muted {
+  color: var(--text-muted);
+  font-weight: 500;
+}
+.lab-card-modern:hover .lab-card-action {
+  gap: 8px;
+}
+.lab-card-modern:hover .lab-card-action.action-muted {
+  color: var(--text-primary);
+}
+.lab-card-action svg {
+  width: 14px;
+  height: 14px;
+}
+
+/* ══════════════════════════════════════════════════
+   RESPONSIVE DESIGN
+   ══════════════════════════════════════════════════ */
+@media (max-width: 900px) {
+  .labs-spotlight-card {
+    padding: 24px 20px;
+  }
+  .labs-spotlight-right {
+    align-items: flex-start;
+    width: 100%;
+  }
+  .labs-spotlight-btn {
+    width: 100%;
+  }
+  .labs-grid {
+    grid-template-columns: 1fr;
+  }
+  .labs-search-bar {
+    max-width: 100%;
+    width: 100%;
+  }
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.85); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lab-card-modern {
+    transition: none !important;
+    transform: none !important;
+  }
+  .labs-pulse-dot {
+    animation: none !important;
+  }
+}

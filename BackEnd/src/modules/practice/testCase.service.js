@@ -13,7 +13,7 @@ const addTestCase = async (problemId, data) => {
 
     const { input, expectedOutput, isHidden, orderIndex } = data;
 
-    if (!input || !expectedOutput) {
+    if (typeof input !== 'string' || typeof expectedOutput !== 'string') {
         throw new Error('Input and expected output are required');
     }
 

@@ -24,12 +24,11 @@ import {
 import {
   Dialog,
   DialogContent,
-  DialogHeader,
   DialogTitle,
   DialogTrigger,
   Input,
-  Label,
   Button,
+  Select, SelectTrigger, SelectValue, SelectContent, SelectItem,
 } from "@/components/ui";
 
 const CATEGORIES = [
@@ -75,11 +74,10 @@ const ResourceCard = ({ resource }: any) => {
   };
 
   return (
-    <div className="bg-slate-900/80 backdrop-blur-sm border border-slate-800 rounded-xl p-5 shadow-lg hover:shadow-[0_0_25px_rgba(56,189,248,0.1)] transition-all flex flex-col group h-full hover:border-slate-700 relative overflow-hidden">
-      <div className="absolute inset-0 bg-gradient-to-b from-blue-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+    <div className="bg-[var(--bg-surface)] border border-[var(--border-default)] rounded-xl p-5 shadow-sm hover:shadow-lg transition-all flex flex-col group h-full hover:border-[var(--accent-primary)] relative overflow-hidden">
       <div className="relative z-10 flex flex-col h-full">
         <div className="flex justify-between items-start mb-4">
-          <div className="w-12 h-12 rounded-xl flex items-center justify-center bg-slate-950 border border-slate-800 text-blue-400 group-hover:scale-110 group-hover:border-blue-500/30 group-hover:bg-blue-500/10 transition-all shadow-inner shadow-blue-900/20">
+          <div className="w-12 h-12 rounded-xl flex items-center justify-center bg-[var(--accent-primary-subtle)] border border-[var(--accent-primary-border)] text-[var(--accent-primary)] group-hover:scale-110 transition-all">
             {resource.type === "pdf" ? (
               <FileText className="w-6 h-6" />
             ) : resource.type === "video" ? (
@@ -88,29 +86,30 @@ const ResourceCard = ({ resource }: any) => {
               <FileIcon className="w-6 h-6" />
             )}
           </div>
-          <span className="text-[10px] font-bold uppercase tracking-widest text-sky-300 bg-slate-950/80 border border-slate-800 px-3 py-1 rounded-full shadow-sm">
+          <span className="text-[10px] font-bold uppercase tracking-widest text-[var(--accent-primary)] bg-[var(--accent-primary-subtle)] border border-[var(--accent-primary-border)] px-3 py-1 rounded-full shadow-sm">
             {resource.category}
           </span>
         </div>
-        <h4 className="font-bold text-base mb-2 text-slate-100 group-hover:text-blue-400 transition-colors line-clamp-1">
+        <h4 className="font-bold text-base mb-2 text-[var(--text-heading)] group-hover:text-[var(--accent-primary)] transition-colors line-clamp-1">
           {resource.title}
         </h4>
-        <p className="text-xs text-slate-400 mb-5 flex-1 line-clamp-2 leading-relaxed">
+        <p className="text-xs text-[var(--text-secondary)] mb-5 flex-1 line-clamp-2 leading-relaxed">
           {resource.description}
         </p>
 
-        <div className="flex items-center justify-between border-t border-slate-800/80 pt-4 mt-auto">
+        <div className="flex items-center justify-between border-t border-[var(--border-subtle)] pt-4 mt-auto">
           <div className="flex flex-col gap-1">
-            <span className="text-[10px] font-medium text-slate-500">
-              By <span className="text-slate-300">{resource.uploader?.fullName || "Community"}</span>
+            <span className="text-[10px] font-medium text-[var(--text-muted)]">
+              By <span className="text-[var(--text-secondary)] font-medium">{resource.uploader?.fullName || "Community"}</span>
             </span>
-            <span className="text-[10px] font-bold text-slate-400">
+            <span className="text-[10px] font-semibold text-[var(--text-muted)]">
               {formatSize(resource.sizeBytes)} • {resource.downloads} DLs
             </span>
           </div>
           <button
             onClick={handleDownload}
-            className="text-slate-400 hover:text-white hover:bg-blue-600 p-2.5 rounded-lg transition-all border border-slate-700 hover:border-blue-500 hover:shadow-[0_0_15px_rgba(37,99,235,0.4)]"
+            aria-label="Download resource"
+            className="text-[var(--text-secondary)] hover:text-white hover:bg-[var(--accent-primary)] p-2.5 rounded-lg transition-all border border-[var(--border-default)] hover:border-[var(--accent-primary)]"
           >
             <Download className="w-4 h-4" />
           </button>
@@ -209,60 +208,50 @@ const FreeResources = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 font-sans pb-20">
+    <div className="min-h-screen bg-[var(--bg-base)] text-[var(--text-primary)] font-sans pb-20">
       {/* Hero Section */}
-      <div className="bg-slate-950 py-16 lg:py-24 relative overflow-hidden border-b border-slate-900/50 shadow-[0_10px_40px_rgba(0,0,0,0.5)]">
+      <div className="bg-[var(--bg-surface)] py-16 lg:py-24 relative overflow-hidden border-b border-[var(--border-default)] shadow-sm">
         {/* Glowing Orbs */}
         <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[60%] bg-blue-600/10 blur-[120px] rounded-full pointer-events-none" />
         <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[50%] bg-sky-500/10 blur-[100px] rounded-full pointer-events-none" />
 
-        {/* Decorative Grid */}
-        <div
-          className="absolute inset-0 opacity-[0.02]"
-          style={{
-            backgroundImage:
-              "linear-gradient(#fff 1px, transparent 1px), linear-gradient(90deg, #fff 1px, transparent 1px)",
-            backgroundSize: "32px 32px",
-          }}
-        ></div>
-
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 flex flex-col md:flex-row items-center justify-between gap-12">
           <div className="max-w-2xl">
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-900 border border-slate-800 text-sky-300 text-[10px] font-bold uppercase tracking-widest mb-6 shadow-[0_0_15px_rgba(56,189,248,0.15)]">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[var(--accent-primary-subtle)] border border-[var(--accent-primary-border)] text-[var(--accent-primary)] text-[10px] font-bold uppercase tracking-widest mb-6">
               <Sparkles className="w-3 h-3" />
               <span>Community Hub</span>
             </div>
-            <h1 className="text-4xl lg:text-6xl font-extrabold text-transparent bg-clip-text bg-gradient-to-b from-white via-slate-200 to-slate-500 tracking-tight leading-tight mb-6 drop-shadow-sm">
+            <h1 className="text-4xl lg:text-6xl font-extrabold text-[var(--text-heading)] tracking-tight leading-tight mb-6">
               Free Learning <br className="hidden md:block"/>
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-sky-300">Materials</span>
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-sky-500">Materials</span>
             </h1>
-            <p className="text-slate-400 text-base md:text-lg mb-8 max-w-xl leading-relaxed">
+            <p className="text-[var(--text-secondary)] text-base md:text-lg mb-8 max-w-xl leading-relaxed">
               Accelerate your learning with high-quality cheat sheets,
               templates, and datasets contributed by the Payilagam community and
               expert mentors.
             </p>
 
             <div className="flex items-center gap-3 w-full max-w-md relative">
-              <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+              <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)]" />
               <input
                 type="text"
                 placeholder="Search for resources..."
                 value={searchTerm}
                 onChange={(event: React.SyntheticEvent<any>) => setSearchTerm((event.target as HTMLInputElement).value)}
-                className="w-full pl-9 pr-3 py-2.5 text-sm bg-slate-900/10 border border-white/20 rounded-md text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 backdrop-blur-sm transition-all"
+                className="w-full pl-9 pr-3 py-2.5 text-sm bg-[var(--bg-surface-2)] border border-[var(--border-default)] rounded-lg text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--accent-primary)] transition-all"
               />
             </div>
           </div>
 
           {/* Upload Call to Action */}
-          <div className="bg-slate-900/5 border border-white/10 p-6 rounded-xl backdrop-blur-md w-full md:w-auto shrink-0 text-center">
-            <div className="w-12 h-12 bg-blue-500/20 rounded-full flex items-center justify-center mx-auto mb-4 border border-blue-500/30">
-              <UploadCloud className="w-5 h-5 text-blue-300" />
+          <div className="bg-[var(--bg-surface-2)] border border-[var(--border-default)] p-6 rounded-2xl shadow-sm w-full md:w-auto shrink-0 text-center">
+            <div className="w-12 h-12 bg-[var(--accent-primary-subtle)] rounded-full flex items-center justify-center mx-auto mb-4 border border-[var(--accent-primary-border)]">
+              <UploadCloud className="w-5 h-5 text-[var(--accent-primary)]" />
             </div>
-            <h3 className="text-white font-bold mb-2">
+            <h3 className="text-[var(--text-heading)] font-bold mb-2">
               Have something to share?
             </h3>
-            <p className="text-xs text-slate-400 mb-5 max-w-[200px] mx-auto">
+            <p className="text-xs text-[var(--text-muted)] mb-5 max-w-[200px] mx-auto">
               Upload your own resources to help fellow learners.
             </p>
 
@@ -276,32 +265,29 @@ const FreeResources = () => {
                       navigate("/login", { state: { from: location } });
                     }
                   }}
-                  className="w-full h-11 text-sm font-bold rounded-xl bg-blue-600 hover:bg-blue-500 border-0 shadow-[0_0_20px_rgba(37,99,235,0.3)] transition-all transform hover:-translate-y-0.5 text-white"
+                  className="w-full h-11 text-sm font-bold rounded-xl bg-[var(--action-bg)] hover:bg-[var(--action-hover)] text-white shadow-md transition-all"
                 >
                   Upload Resource
                 </Button>
               </DialogTrigger>
-              <DialogContent showCloseButton={false} className="w-[480px] max-w-[95vw] bg-[#0d1117] border border-slate-700/50 rounded-2xl shadow-2xl shadow-black/60 p-0 overflow-hidden">
-                {/* Top gradient bar */}
-                <div className="h-px w-full bg-gradient-to-r from-transparent via-blue-500/50 to-transparent" />
-
+              <DialogContent showCloseButton={false} className="w-[480px] max-w-[95vw] bg-[var(--bg-surface)] border border-[var(--border-default)] rounded-2xl shadow-2xl p-0 overflow-hidden text-[var(--text-primary)]">
                 {/* Header */}
-                <div className="px-6 pt-5 pb-4 border-b border-slate-800/60">
+                <div className="px-6 pt-5 pb-4 border-b border-[var(--border-default)]">
                   <div className="flex items-start justify-between">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center shadow-inner shrink-0">
-                        <UploadCloud className="w-5 h-5 text-blue-400" />
+                      <div className="w-10 h-10 rounded-xl bg-[var(--accent-primary-subtle)] border border-[var(--accent-primary-border)] flex items-center justify-center shrink-0">
+                        <UploadCloud className="w-5 h-5 text-[var(--accent-primary)]" />
                       </div>
                       <div>
-                        <DialogTitle className="text-[15px] font-bold text-slate-100 tracking-tight leading-tight">
+                        <DialogTitle className="text-[15px] font-bold text-[var(--text-heading)] tracking-tight leading-tight">
                           Upload a Resource
                         </DialogTitle>
-                        <p className="text-[11px] text-slate-500 mt-0.5">Share your knowledge with the Payilagam community</p>
+                        <p className="text-[11px] text-[var(--text-muted)] mt-0.5">Share your knowledge with the Payilagam community</p>
                       </div>
                     </div>
                     <button
                       onClick={() => setIsUploadOpen(false)}
-                      className="p-1.5 text-slate-500 hover:text-slate-200 hover:bg-slate-800 rounded-lg transition-all cursor-pointer mt-0.5"
+                      className="p-1.5 text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-hover)] rounded-lg transition-all cursor-pointer mt-0.5"
                     >
                       <X className="w-4 h-4" />
                     </button>
@@ -364,32 +350,26 @@ const FreeResources = () => {
                         value={uploadTitle}
                         onChange={(event: React.SyntheticEvent<any>) => setUploadTitle((event.target as HTMLInputElement).value)}
                         placeholder="e.g., Python Cheat Sheet 2024"
-                        className="h-10 bg-slate-800/60 border-slate-700/60 text-slate-100 placeholder-slate-600 text-[13px] rounded-xl focus:border-blue-500/60 focus:ring-blue-500/10"
+                        className="h-10 bg-[var(--bg-surface-2)] border-[var(--border-default)] text-[var(--text-primary)] placeholder-[var(--text-muted)] text-[13px] rounded-xl focus:border-[var(--accent-primary)]"
                       />
                     </div>
 
                     <div>
-                      <label htmlFor="res-category" className="block text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Category</label>
-                      <select
-                        id="res-category"
-                        value={uploadCategory}
-                        onChange={(event: React.SyntheticEvent<any>) => setUploadCategory((event.target as HTMLInputElement).value)}
-                        className="w-full h-10 text-[13px] rounded-xl border border-slate-700/60 px-3 bg-slate-800/60 text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500/60 cursor-pointer"
-                      >
-                        {CATEGORIES.filter((c: any) => c !== "All").map((c: any) => (
-                          <option key={c} value={c} className="bg-slate-900">{c}</option>
-                        ))}
-                      </select>
+                      <label htmlFor="res-category" className="block text-[11px] font-semibold text-[var(--text-secondary)] uppercase tracking-wider mb-1.5">Category</label>
+                      <Select value={uploadCategory} onValueChange={setUploadCategory}>
+                        <SelectTrigger id="res-category"><SelectValue /></SelectTrigger>
+                        <SelectContent>{CATEGORIES.filter(c => c !== "All").map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}</SelectContent>
+                      </Select>
                     </div>
 
                     <div>
-                      <label htmlFor="res-desc" className="block text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Description <span className="text-slate-600 normal-case font-normal tracking-normal">(optional)</span></label>
+                      <label htmlFor="res-desc" className="block text-[11px] font-semibold text-[var(--text-secondary)] uppercase tracking-wider mb-1.5">Description <span className="text-[var(--text-muted)] normal-case font-normal tracking-normal">(optional)</span></label>
                       <Input
                         id="res-desc"
                         value={uploadDesc}
                         onChange={(event: React.SyntheticEvent<any>) => setUploadDesc((event.target as HTMLInputElement).value)}
                         placeholder="Briefly describe what this resource covers…"
-                        className="h-10 bg-slate-800/60 border-slate-700/60 text-slate-100 placeholder-slate-600 text-[13px] rounded-xl focus:border-blue-500/60 focus:ring-blue-500/10"
+                        className="h-10 bg-[var(--bg-surface-2)] border-[var(--border-default)] text-[var(--text-primary)] placeholder-[var(--text-muted)] text-[13px] rounded-xl focus:border-[var(--accent-primary)]"
                       />
                     </div>
                   </div>
@@ -400,14 +380,14 @@ const FreeResources = () => {
                   <button
                     onClick={() => setIsUploadOpen(false)}
                     disabled={isUploading}
-                    className="h-10 px-5 rounded-xl text-[13px] font-semibold text-slate-400 hover:text-slate-100 hover:bg-slate-800 border border-slate-700/50 transition-all cursor-pointer disabled:opacity-50"
+                    className="h-10 px-5 rounded-xl text-[13px] font-semibold text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-hover)] border border-[var(--border-default)] transition-all cursor-pointer disabled:opacity-50"
                   >
                     Cancel
                   </button>
                   <button
                     onClick={handleUploadSubmit}
                     disabled={isUploading || !uploadFile}
-                    className="h-10 px-6 rounded-xl text-[13px] font-bold text-white bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 shadow-lg shadow-blue-500/20 transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98] flex items-center gap-2"
+                    className="h-10 px-6 rounded-xl text-[13px] font-bold text-white bg-[var(--action-bg)] hover:bg-[var(--action-hover)] shadow-md transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98] flex items-center gap-2"
                   >
                     {isUploading ? (
                       <><svg className="animate-spin w-3.5 h-3.5" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg> Uploading…</>
@@ -425,26 +405,26 @@ const FreeResources = () => {
       {/* Main Content Area */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-6 relative z-20">
         {/* Filters Box */}
-        <div className="bg-slate-900 rounded-md shadow-sm border border-slate-800 p-2 flex items-center justify-between overflow-x-auto gap-4 mb-5">
+        <div className="bg-[var(--bg-surface)] rounded-xl shadow-sm border border-[var(--border-default)] p-2 flex items-center justify-between overflow-x-auto gap-4 mb-5">
           <div className="flex items-center gap-1 min-w-max">
-            <div className="px-3 py-1 flex items-center gap-1.5 text-xs font-bold text-slate-400 border-r border-slate-800 mr-2">
+            <div className="px-3 py-1 flex items-center gap-1.5 text-xs font-bold text-[var(--text-muted)] border-r border-[var(--border-default)] mr-2">
               <Layers className="w-3.5 h-3.5" /> Categories
             </div>
             {CATEGORIES.map((cat: any) => (
               <button
                 key={cat}
                 onClick={() => setActiveCategory(cat)}
-                className={`px-4 py-1.5 rounded-md text-xs font-bold transition-all ${
+                className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${
                   activeCategory === cat
-                    ? "bg-slate-950 border border-slate-700 text-sky-300 shadow-[0_0_10px_rgba(56,189,248,0.1)]"
-                    : "text-slate-400 hover:text-slate-200 hover:bg-slate-800/50"
+                    ? "bg-[var(--accent-primary)] text-white shadow-sm"
+                    : "text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-hover)]"
                 }`}
               >
                 {cat}
               </button>
             ))}
           </div>
-          <button className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-500 hover:text-slate-100 shrink-0">
+          <button className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-[var(--text-muted)] hover:text-[var(--text-primary)] shrink-0">
             <Filter className="w-3 h-3" /> Filter
           </button>
         </div>
@@ -452,10 +432,10 @@ const FreeResources = () => {
         {/* Resources Grid */}
         <div className="mb-6">
           <div className="flex justify-between items-end mb-4">
-            <h2 className="text-lg font-bold text-slate-100">
+            <h2 className="text-lg font-bold text-[var(--text-heading)]">
               {activeCategory === "All" ? "Latest Additions" : activeCategory}
             </h2>
-            <span className="text-xs text-slate-500 font-medium">
+            <span className="text-xs text-[var(--text-muted)] font-medium">
               {Array.isArray(resources) ? resources.length : 0} resources found
             </span>
           </div>
@@ -473,14 +453,14 @@ const FreeResources = () => {
                 : null}
             </div>
           ) : (
-            <div className="bg-slate-900 border border-slate-800 rounded-md p-12 text-center flex flex-col items-center">
-              <div className="w-12 h-12 bg-slate-950 rounded-full flex items-center justify-center mb-4">
-                <Search className="w-5 h-5 text-slate-400" />
+            <div className="bg-[var(--bg-surface)] border border-[var(--border-default)] rounded-xl p-12 text-center flex flex-col items-center">
+              <div className="w-12 h-12 bg-[var(--bg-surface-2)] rounded-full flex items-center justify-center mb-4">
+                <Search className="w-5 h-5 text-[var(--text-muted)]" />
               </div>
-              <h3 className="text-sm font-bold text-slate-100 mb-1">
+              <h3 className="text-sm font-bold text-[var(--text-heading)] mb-1">
                 No resources found
               </h3>
-              <p className="text-xs text-slate-500">
+              <p className="text-xs text-[var(--text-muted)]">
                 Try adjusting your search or upload the first resource in this
                 category!
               </p>

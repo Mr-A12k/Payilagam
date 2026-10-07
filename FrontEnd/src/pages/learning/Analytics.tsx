@@ -1,91 +1,68 @@
-/**
- * @fileoverview Analytics page for Payilagam .
- * Shows learning statistics (hours, courses completed, streak,
- * average score) in stat cards and an empty-state chart placeholder
- * that appears once the user has enough data.
- */
-import { BarChart2, TrendingUp, Clock, Target } from "lucide-react";
-import { Card } from "@/components/ui";
+import { useDashboardStats } from "@/hooks";
+import { Button } from "@/components/ui";
+import { BookOpen, CheckCircle2, ListChecks, Flame, RotateCcw } from "lucide-react";
+import { WorkspacePage, PageHeader, LoadingState } from "@/components/workspace/Workspace";
+import "./Analytics.css";
+import { useSelector } from "react-redux";
+import StaffAnalytics from "./StaffAnalytics";
 
-const Analytics = () => {
+const StudentAnalytics = () => {
+  const { data, isLoading, isError, refetch } = useDashboardStats();
+  const stats = data?.data?.data;
+  const total = Number(stats?.totalCourses);
+  const completed = Number(stats?.completedCourses);
+  const completionRate = Number.isFinite(total) && total > 0 && Number.isFinite(completed) ? Math.min(100, Math.max(0, Math.round(completed / total * 100))) : null;
+
+  const metrics = [
+    { label: "Enrolled", value: stats?.totalCourses, icon: BookOpen },
+    { label: "Completed", value: stats?.completedCourses, icon: CheckCircle2 },
+    { label: "Lessons done", value: stats?.totalLessonsCompleted, icon: ListChecks },
+    { label: "Current streak", value: stats?.currentStreak != null ? `${stats.currentStreak} days` : undefined, icon: Flame },
+  ];
+
   return (
-    <div className="min-h-screen bg-slate-950 p-6 lg:p-8">
-      <div className="max-w-7xl mx-auto">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-slate-100 mb-2">Analytics</h1>
-          <p className="text-slate-400">
-            View your learning statistics and performance metrics.
-          </p>
-        </div>
+    <WorkspacePage className="analytics-workspace">
+      <PageHeader title="Learning Analytics" description="Course completion, lesson activity, and your current streak." />
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          {[
-            {
-              label: "Total Hours",
-              value: "0",
-              icon: Clock,
-              color: "text-blue-400",
-              bg: "bg-blue-500/10 border border-blue-500/20 shadow-[0_0_15px_rgba(59,130,246,0.15)]",
-            },
-            {
-              label: "Courses Completed",
-              value: "0",
-              icon: Target,
-              color: "text-emerald-400",
-              bg: "bg-emerald-500/10 border border-emerald-500/20 shadow-[0_0_15px_rgba(16,185,129,0.15)]",
-            },
-            {
-              label: "Current Streak",
-              value: "0 days",
-              icon: TrendingUp,
-              color: "text-amber-400",
-              bg: "bg-amber-500/10 border border-amber-500/20 shadow-[0_0_15px_rgba(245,158,11,0.15)]",
-            },
-            {
-              label: "Average Score",
-              value: "0%",
-              icon: BarChart2,
-              color: "text-purple-400",
-              bg: "bg-purple-500/10 border border-purple-500/20 shadow-[0_0_15px_rgba(168,85,247,0.15)]",
-            },
-          ].map((stat: any, i: any) => (
-              <Card
-              key={i}
-              className="flex items-center gap-5 hover:bg-slate-800/50 transition-colors"
-            >
-              <div
-                className={`w-14 h-14 rounded-xl ${stat.bg} ${stat.color} flex-center shrink-0`}
-              >
-                <stat.icon className="w-7 h-7 shrink-0 transition-transform duration-200" />
-              </div>
-              <div>
-                <p className="text-sm font-medium text-slate-500 mb-1">
-                  {stat.label}
-                </p>
-                <h3 className="text-3xl font-bold text-slate-100 tracking-tight">
-                  {stat.value}
-                </h3>
-              </div>
-            </Card>
-          ))}
+      {isLoading ? <LoadingState label="Loading learning statistics..." /> : isError || !stats ? (
+        <div role="alert" className="anl-error">
+          <p>Unable to load learning statistics.</p>
+          <Button variant="secondary" onClick={() => refetch()}><RotateCcw className="h-4 w-4" />Retry</Button>
         </div>
-
-        <Card className="p-16 text-center">
-          <div className="w-20 h-20 bg-slate-950 border border-slate-800 text-slate-500 rounded-2xl flex-center mx-auto mb-6">
-            <BarChart2 className="w-10 h-10 shrink-0 transition-transform duration-200" />
+      ) : <>
+        {/* ── Stat cards ─────────────────────────── */}
+        <section aria-label="Learning metrics">
+          <div className="anl-stats">
+            {metrics.map(({ label, value, icon: Icon }) => (
+              <div key={label} className="anl-stat-card">
+                <span className="anl-stat-label"><Icon aria-hidden="true" />{label}</span>
+                <span className="anl-stat-value">{value ?? "—"}</span>
+              </div>
+            ))}
           </div>
-          <h2 className="text-2xl font-bold text-slate-100 mb-3 tracking-tight">
-            Not enough data
-          </h2>
-          <p className="text-slate-400 max-w-md mx-auto text-lg">
-            Complete some lessons and assessments to see your learning trends and
-            detailed analytics here.
-          </p>
-        </Card>
-      </div>
-    </div>
+        </section>
+
+        {/* ── Completion card ────────────────────── */}
+        <section className="anl-section" aria-labelledby="completion-heading">
+          <div className="anl-completion">
+            <div>
+              <h2 id="completion-heading">Course completion</h2>
+              <p>{completionRate === null ? "No enrolled course activity yet." : `${stats.completedCourses} of ${stats.totalCourses} enrolled courses completed`}</p>
+            </div>
+            <div>
+              <span className="anl-completion-pct">{completionRate === null ? "—" : `${completionRate}%`}</span>
+              <progress className="anl-progress" aria-label="Enrolled courses completed" max={100} value={completionRate ?? 0} />
+            </div>
+          </div>
+        </section>
+      </>}
+    </WorkspacePage>
   );
 };
 
-export default Analytics;
+const Analytics = () => {
+  const user = useSelector((state: any) => state.auth.user);
+  return user?.role === "admin" || user?.role === "mentor" ? <StaffAnalytics admin={user.role === "admin"} /> : <StudentAnalytics />;
+};
 
+export default Analytics;

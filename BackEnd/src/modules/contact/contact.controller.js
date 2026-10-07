@@ -8,6 +8,8 @@ const { success, error } = require("../../utils/responseHelper");
  */
 const submitContactForm = catchAsync(async (request, response) => {
   const { fullName, email, subject, message } = request.body;
+  if ([fullName, email, subject, message].some(value => typeof value !== 'string')) return error(response, 'Contact fields must be strings', 400);
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) return error(response, 'Invalid email address', 400);
 
   // Validate required fields
   const missingFields = [];

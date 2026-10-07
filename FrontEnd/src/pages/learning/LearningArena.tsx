@@ -1,355 +1,87 @@
-/**
- * @fileoverview Learning Arena page for Payilagam .
- * Full-screen lesson viewer with embedded video player, tabbed
- * content area (assignment / resources / discussion), and a
- * sidebar listing all modules and lessons with progress indicators.
- */
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import DOMPurify from "dompurify";
-import { useParams, Link, useNavigate } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
+import { useBackNavigation } from "@/hooks/useBackNavigation";
 import { executeHttpGetRequest } from "@/api/commonServices";
 import { API_PATHS } from "@/api/constants";
-import {
-  ArrowLeft,
-  Play,
-  Check,
-  Lock,
-  MessageSquare,
-  FileText,
-  UploadCloud,
-  ChevronRight,
-  Bot,
-  Maximize,
-  Minimize
-} from "lucide-react";
-import { Button, Card } from "@/components/ui";
+import { useCourseDetail, useLessonDetail, useModulesByCourse } from "@/hooks";
+import { ArrowLeft, ArrowRight, Bot, Check, List, Maximize, Minimize, Play } from "lucide-react";
+import { Button } from "@/components/ui";
 
 const LearningArena = () => {
-  const { courseId, moduleId, lessonId } = useParams();
-  const navigate = useNavigate();
-
-  const [course, setCourse] = useState<any>(null);
-  const [modules, setModules] = useState<any[]>([]);
-  const [currentLesson, setCurrentLesson] = useState<any>(null);
-  const [activeTab, setActiveTab] = useState("assignment");
+  const { courseId = "", moduleId = "", lessonId = "" } = useParams();
+  const goBack = useBackNavigation(`/courses/${courseId}`);
   const [isFocusMode, setIsFocusMode] = useState(false);
-
-  useEffect(() => {
-    const fetchLearningData = async () => {
-      try {
-        const [courseResponse, modulesResponse, lessonResponse] = await Promise.all([
-          executeHttpGetRequest(`${API_PATHS.COURSES.BASE}/${courseId}`),
-          executeHttpGetRequest(API_PATHS.MODULES.COURSE(courseId!)),
-          executeHttpGetRequest(`${API_PATHS.LESSONS.BASE}/${lessonId}`),
-        ]);
-
-        if (courseResponse.data.success) setCourse(courseResponse.data.data);
-        if (modulesResponse.data.success) setModules(modulesResponse.data.data);
-        if (lessonResponse.data.success) setCurrentLesson(lessonResponse.data.data);
-      } catch (error) {
-        console.error("Failed to load learning data", error);
-      }
-    };
-
-    fetchLearningData();
-  }, [courseId, lessonId]);
-
-  // Find next lesson for navigation
-  let nextLesson = null;
-  if (modules.length > 0 && currentLesson) {
-    const flatLessons = modules.flatMap((moduleItem: any) =>
-      moduleItem.lessons.map((lessonItem: any) => ({ ...lessonItem, moduleId: moduleItem.moduleId })),
-    );
-    const currentIndex = flatLessons.findIndex(
-      (lessonItem: any) => lessonItem.lessonId === parseInt(lessonId!),
-    );
-    if (currentIndex < flatLessons.length - 1)
-      nextLesson = flatLessons[currentIndex + 1];
-  }
-
-  const handleNextLesson = () => {
-    if (nextLesson) {
-      navigate(
-        `/learn/${courseId}/module/${nextLesson.moduleId}/lesson/${nextLesson.lessonId}`,
-      );
-    } else {
-      navigate(`/courses/${courseId}`);
-    }
-  };
+  const [curriculumOpen, setCurriculumOpen] = useState(false);
+  const courseQuery = useCourseDetail(courseId);
+  const modulesQuery = useModulesByCourse(courseId);
+  const lessonQuery = useLessonDetail(lessonId);
+  const progressQuery = useQuery({
+    queryKey: ["course-progress", courseId],
+    queryFn: () => executeHttpGetRequest(API_PATHS.PROGRESS.COURSE(courseId)),
+    enabled: !!courseId,
+    retry: false,
+  });
+  const course = courseQuery.data?.data?.data;
+  const lesson = lessonQuery.data?.data?.data;
+  const progressData = progressQuery.data?.data?.data;
+  const modules = progressData?.modules ?? modulesQuery.data?.data?.data ?? [];
+  const flatLessons = modules.flatMap((module: any) => (module.lessons ?? []).map((item: any) => ({ ...item, moduleId: module.moduleId })));
+  const currentIndex = flatLessons.findIndex((item: any) => String(item.lessonId) === lessonId);
+  const nextLesson = currentIndex >= 0 ? flatLessons[currentIndex + 1] : null;
+  const progress = progressData?.overallProgress != null && Number.isFinite(Number(progressData.overallProgress))
+    ? Math.max(0, Math.min(100, Number(progressData.overallProgress))) : null;
 
   return (
-    <div className="flex flex-col h-screen bg-slate-950 overflow-hidden font-sans text-slate-300">
-      {/* Top Navbar */}
-      <header className="h-16 bg-slate-900 border-b border-slate-800 flex items-center justify-between px-6 shrink-0 z-20 shadow-blue-900/10 shadow-md">
-        <div className="flex items-center gap-4">
-          <Link
-            to={`/courses/${courseId}`}
-            className="text-slate-400 hover:text-slate-200 transition-colors"
-          >
-            <ArrowLeft className="w-5 h-5" />
-          </Link>
-          <div>
-            <div className="text-blue-400 font-bold text-sm leading-tight">
-              Payilagam{" "}
-            </div>
-            <div className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
-              {course?.courseName || "COURSE NAME"}
-            </div>
-          </div>
+    <div className="flex h-dvh min-w-0 flex-col overflow-hidden bg-[var(--bg-base)] text-[var(--text-primary)]">
+      <header className="flex shrink-0 flex-wrap items-center justify-between gap-2 border-b border-[var(--border-default)] bg-[var(--bg-surface)] p-3 sm:px-5">
+        <div className="flex min-w-0 flex-1 items-center gap-2">
+          <Button size="icon" variant="ghost" onClick={goBack} aria-label="Go back" title="Go back"><ArrowLeft className="h-4 w-4" /></Button>
+          <span className="truncate text-sm font-semibold">{course?.courseName || "Course"}</span>
         </div>
-
-        <div className="flex items-center gap-6">
-          <Button 
-            variant="secondary"
-            onClick={() => setIsFocusMode(!isFocusMode)}
-            className="!text-sm px-3 py-1.5"
-          >
-            {isFocusMode ? <Minimize className="icon-base" /> : <Maximize className="icon-base" />}
-            <span className="hidden sm:inline">{isFocusMode ? "Exit Focus" : "Focus Mode"}</span>
+        <div className="flex items-center gap-1">
+          <Button size="icon" variant="ghost" title={isFocusMode ? "Exit focus mode" : "Focus mode"} aria-label={isFocusMode ? "Exit focus mode" : "Focus mode"} aria-pressed={isFocusMode} onClick={() => { setIsFocusMode(!isFocusMode); setCurriculumOpen(false); }}>
+            {isFocusMode ? <Minimize className="h-4 w-4" /> : <Maximize className="h-4 w-4" />}
           </Button>
-
-          <div className="hidden md:flex items-center gap-3">
-            <span className="text-sm font-medium text-slate-400">
-              Course Progress
-            </span>
-            <div className="w-32 bg-slate-800 h-2 rounded-full overflow-hidden border border-slate-700">
-              <div className="bg-blue-500 h-full w-[75%] rounded-full shadow-[0_0_10px_rgba(59,130,246,0.8)]"></div>
-            </div>
-          </div>
-          <Button onClick={handleNextLesson} className="rounded-lg px-6 border-0 shadow-[0_0_15px_rgba(37,99,235,0.4)]">
-            Next Lesson
+          <Button variant="secondary" aria-expanded={curriculumOpen} aria-controls="lesson-curriculum" className={isFocusMode ? "" : "lg:hidden"} onClick={() => setCurriculumOpen(!curriculumOpen)}><List className="h-4 w-4" /><span className="hidden sm:inline">Curriculum</span><span className="sr-only sm:hidden">Curriculum</span></Button>
+          <Button asChild size="icon" variant="secondary">
+            <Link aria-label={nextLesson ? "Next lesson" : "Back to course"} title={nextLesson ? "Next lesson" : "Back to course"} to={nextLesson ? `/learn/${courseId}/module/${nextLesson.moduleId}/lesson/${nextLesson.lessonId}` : `/courses/${courseId}`} onClick={() => setCurriculumOpen(false)}><ArrowRight className="h-4 w-4" /></Link>
           </Button>
         </div>
       </header>
-
-      <div className="flex flex-1 overflow-hidden relative">
-        {/* Main Content Area */}
-        <main className="flex-1 flex flex-col overflow-y-auto pb-20 custom-scrollbar">
-          <div className={`p-6 mx-auto w-full transition-all duration-300 ${isFocusMode ? "max-w-7xl" : "max-w-5xl"}`}>
-            {/* Video Player */}
-            <div className={`w-full aspect-video bg-slate-950 rounded-2xl overflow-hidden relative shadow-[0_8px_30px_rgb(0,0,0,0.5)] border border-slate-800 group ${isFocusMode ? "ring-1 ring-blue-500/30 shadow-blue-900/20" : ""}`}>
-              {currentLesson?.videoUrl ? (
-                <iframe
-                  src={currentLesson.videoUrl}
-                  className="w-full h-full absolute inset-0"
-                  frameBorder="0"
-                  allowFullScreen
-                ></iframe>
-              ) : (
-                <div className="absolute inset-0 bg-slate-900 flex-center">
-                  <div className="absolute inset-0 bg-gradient-to-tr from-slate-950 to-slate-900 opacity-90"></div>
-                  <div className="w-20 h-20 bg-blue-500/10 border border-blue-500/30 rounded-full flex-center relative z-10 shadow-[0_0_30px_rgba(59,130,246,0.3)] cursor-pointer transform transition-all group-hover:scale-110 group-hover:bg-blue-500/20 group-hover:shadow-[0_0_40px_rgba(59,130,246,0.5)]">
-                    <Play className="icon-lg w-8 h-8 text-blue-400 ml-1" />
-                  </div>
-                  {/* Decorative lines for the mock video player */}
-                  <div
-                    className="absolute inset-0 opacity-10"
-                    style={{
-                      backgroundImage:
-                        "linear-gradient(#334155 1px, transparent 1px), linear-gradient(90deg, #334155 1px, transparent 1px)",
-                      backgroundSize: "40px 40px",
-                    }}
-                  ></div>
-                </div>
-              )}
-            </div>
-
-            {/* Lesson Info */}
-            <div className="mt-8 mb-6">
-              <div className="flex items-center gap-2 mb-3">
-                <span className="px-2.5 py-1 bg-blue-500/10 text-blue-400 border border-blue-500/20 text-xs font-bold rounded-full shadow-[0_0_10px_rgba(59,130,246,0.1)]">
-                  MODULE{" "}
-                  {modules.findIndex((moduleItem: any) => moduleItem.moduleId === parseInt(moduleId!)) +
-                    1}
-                </span>
-                <span className="text-slate-400 text-sm font-medium">
-                  Lesson {lessonId}: {currentLesson?.title}
-                </span>
-              </div>
-
-              <h1 className="text-3xl font-bold text-slate-100 mb-4 drop-shadow-sm">
-                {currentLesson?.title || "Designing for 10M Concurrent Users"}
-              </h1>
-
-              <button className="flex items-center gap-2 text-sky-400 font-semibold text-sm hover:text-sky-300 hover:underline mb-4 transition-colors">
-                <Bot className="w-4 h-4" /> Ask Lumi about this lesson
-              </button>
-
-              <div className="text-slate-400 leading-relaxed mb-8 text-base">
-                {currentLesson?.content ? (
-                  <div
-                    dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(currentLesson.content) }}
-                  />
-                ) : (
-                  <p>
-                    In this session, we dive deep into the principles of
-                    horizontal scaling and database sharding. Learn how to
-                    manage state across distributed nodes while maintaining
-                    zero-latency response times for your global user base.
-                  </p>
-                )}
-              </div>
-
-              {/* Tabs */}
-              <div className="border-b border-slate-800 flex gap-8 mb-6">
-                <button
-                  onClick={() => setActiveTab("assignment")}
-                  className={`pb-3 font-semibold text-sm flex items-center gap-2 transition-all relative ${activeTab === "assignment" ? "text-blue-400 drop-shadow-[0_0_8px_rgba(96,165,250,0.5)]" : "text-slate-500 hover:text-slate-300"}`}
-                >
-                  <FileText className="w-4 h-4" /> Assignment Submission
-                  {activeTab === "assignment" && (
-                    <div className="absolute bottom-[-1px] left-0 right-0 h-0.5 bg-blue-400 shadow-[0_0_10px_rgba(96,165,250,0.8)]"></div>
-                  )}
-                </button>
-                <button
-                  onClick={() => setActiveTab("resources")}
-                  className={`pb-3 font-semibold text-sm flex items-center gap-2 transition-all relative ${activeTab === "resources" ? "text-blue-400 drop-shadow-[0_0_8px_rgba(96,165,250,0.5)]" : "text-slate-500 hover:text-slate-300"}`}
-                >
-                  <UploadCloud className="w-4 h-4" /> Resources
-                  {activeTab === "resources" && (
-                    <div className="absolute bottom-[-1px] left-0 right-0 h-0.5 bg-blue-400 shadow-[0_0_10px_rgba(96,165,250,0.8)]"></div>
-                  )}
-                </button>
-                <button
-                  onClick={() => setActiveTab("discussion")}
-                  className={`pb-3 font-semibold text-sm flex items-center gap-2 transition-all relative ${activeTab === "discussion" ? "text-blue-400 drop-shadow-[0_0_8px_rgba(96,165,250,0.5)]" : "text-slate-500 hover:text-slate-300"}`}
-                >
-                  <MessageSquare className="w-4 h-4" /> Discussion (24)
-                  {activeTab === "discussion" && (
-                    <div className="absolute bottom-[-1px] left-0 right-0 h-0.5 bg-blue-400 shadow-[0_0_10px_rgba(96,165,250,0.8)]"></div>
-                  )}
-                </button>
-              </div>
-
-              {/* Tab Content */}
-              <div>
-                {activeTab === "assignment" && (
-                  <div className="border-2 border-dashed border-slate-800 bg-slate-900/50 rounded-2xl p-12 flex flex-col items-center justify-center text-center cursor-pointer hover:bg-slate-800/80 hover:border-slate-700 transition-all duration-300 shadow-inner">
-                    <div className="w-12 h-12 bg-blue-500/10 border border-blue-500/20 text-blue-400 rounded-xl flex items-center justify-center mb-4 shadow-[0_0_15px_rgba(59,130,246,0.15)]">
-                      <UploadCloud className="w-6 h-6" />
-                    </div>
-                    <h3 className="text-lg font-bold text-slate-200 mb-1">
-                      Upload Your Solution
-                    </h3>
-                    <p className="text-slate-400 text-sm">
-                      Drag and drop or click to browse
-                    </p>
-                  </div>
-                )}
-                {activeTab === "resources" && (
-                  <Card className="p-8 text-center text-slate-400 bg-slate-900/30 border-slate-800/50">
-                    No resources available for this lesson.
-                  </Card>
-                )}
-                {activeTab === "discussion" && (
-                  <Card className="p-8 text-center text-slate-400 bg-slate-900/30 border-slate-800/50">
-                    Discussion forum coming soon.
-                  </Card>
-                )}
-              </div>
-            </div>
+      <div className="flex min-h-0 flex-1 flex-col lg:flex-row">
+        <aside id="lesson-curriculum" aria-label="Course curriculum" className={`${curriculumOpen ? "flex" : isFocusMode ? "hidden" : "hidden lg:flex"} max-h-[45dvh] w-full shrink-0 flex-col overflow-y-auto border-b border-[var(--border-default)] bg-[var(--bg-surface)] lg:order-last lg:max-h-none lg:w-72 lg:border-b-0 lg:border-l`}>
+          <div className="border-b border-[var(--border-default)] p-4">
+            <h2 className="text-sm font-semibold">Course Content</h2>
+            {progress !== null && <div className="mt-3"><div className="mb-1 flex justify-between text-xs text-[var(--text-muted)]"><span>Completed</span><span>{progress}%</span></div><progress aria-label="Course progress" value={progress} max={100} className="h-1.5 w-full accent-[var(--accent-primary)]" /></div>}
+          </div>
+          {modulesQuery.isLoading && !progressData ? <p role="status" className="p-4 text-sm">Loading curriculum...</p> : modulesQuery.isError && !progressData ? <div className="p-4"><p className="mb-2 text-sm">Unable to load curriculum.</p><Button variant="secondary" onClick={() => modulesQuery.refetch()}>Retry</Button></div> : modules.length === 0 ? <p className="p-4 text-sm text-[var(--text-muted)]">No lessons available.</p> : modules.map((module: any, index: number) => (
+            <section key={module.moduleId}>
+              <h3 className="break-words bg-[var(--bg-surface-2)] px-4 py-3 text-xs font-semibold">{index + 1}. {module.title}</h3>
+              {(module.lessons ?? []).map((item: any, lessonIndex: number) => {
+                const active = String(item.lessonId) === lessonId;
+                return <Link key={item.lessonId} aria-current={active ? "page" : undefined} to={`/learn/${courseId}/module/${module.moduleId}/lesson/${item.lessonId}`} onClick={() => setCurriculumOpen(false)} className={`flex items-start gap-2 border-l-2 px-4 py-3 text-sm ${active ? "border-[var(--accent-primary)] bg-[var(--accent-primary-subtle)] text-[var(--accent-primary)]" : "border-transparent hover:bg-[var(--bg-hover)]"}`}>
+                  {item.completed ? <Check aria-label="Completed" className="mt-0.5 h-4 w-4 shrink-0" /> : <Play className="mt-0.5 h-4 w-4 shrink-0" />}<span className="min-w-0 break-words">{lessonIndex + 1}. {item.title}</span>
+                </Link>;
+              })}
+            </section>
+          ))}
+        </aside>
+        <main className="min-h-0 min-w-0 flex-1 overflow-y-auto">
+          <div className="mx-auto max-w-5xl p-4 sm:p-6">
+            {lessonQuery.isLoading ? <p role="status">Loading lesson...</p> : lessonQuery.isError || !lesson ? <div role="alert"><p className="mb-3">Unable to load this lesson.</p><Button variant="secondary" onClick={() => lessonQuery.refetch()}>Retry</Button></div> : <>
+              {lesson.videoUrl && <div className="aspect-video overflow-hidden rounded-lg border border-[var(--border-default)] bg-black"><iframe key={lessonId} title={lesson.title || "Lesson video"} src={lesson.videoUrl} className="h-full w-full border-0" allowFullScreen /></div>}
+              <div className="mt-5 mb-2 text-xs text-[var(--text-muted)]">{modules.find((module: any) => String(module.moduleId) === moduleId)?.title}</div>
+              <h1 className="mb-4 break-words text-xl font-semibold sm:text-2xl">{lesson.title}</h1>
+              <Button asChild variant="ghost" className="mb-4"><Link to="/ai-assistant" state={{ prompt: `Explain the lesson "${lesson.title}" from "${course?.courseName || "this course"}".`, topic: "all" }}><Bot className="h-4 w-4" />Ask AI</Link></Button>
+              {lesson.content ? <div className="max-w-full break-words text-sm leading-7 text-[var(--text-secondary)] [&_pre]:overflow-x-auto [&_img]:max-w-full [&_table]:block [&_table]:overflow-x-auto" dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(lesson.content) }} /> : <p className="text-sm text-[var(--text-muted)]">No lesson notes available.</p>}
+            </>}
           </div>
         </main>
-
-        {/* Right Sidebar */}
-        <aside className={`w-80 shrink-0 bg-slate-900 border-l border-slate-800 flex flex-col relative z-10 transition-all duration-300 shadow-[-10px_0_30px_rgba(0,0,0,0.3)] ${isFocusMode ? "hidden" : "hidden lg:flex"}`}>
-          <div className="p-6 border-b border-slate-800 flex justify-between items-center sticky top-0 bg-slate-900/95 backdrop-blur-sm z-10">
-            <h3 className="font-bold text-lg text-slate-100">Course Content</h3>
-            <button className="text-slate-500 hover:text-slate-300 transition-colors">
-              <ChevronRight className="w-5 h-5" />
-            </button>
-          </div>
-
-          <div className="flex-1 overflow-y-auto custom-scrollbar">
-            {modules.map((module: any, moduleIndex: any) => (
-              <div key={module.moduleId} className="mb-2">
-                <div className="p-4 bg-slate-950/50 border-y border-slate-800/50">
-                  <h4 className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
-                    SECTION {moduleIndex + 1}: {module.title}
-                  </h4>
-                </div>
-                <div>
-                  {module.lessons?.map((lesson: any, lessonIndex: any) => {
-                    const isActive = lesson.lessonId === parseInt(lessonId!);
-                    // Mocking completion status for UI visual match
-                    const isCompleted =
-                      lessonIndex <
-                      (lesson.lessonId === parseInt(lessonId!) ? lessonIndex : 2);
-                    const isLocked = lessonIndex > 1 && !isActive && !isCompleted;
-
-                    return (
-                      <Link
-                        key={lesson.lessonId}
-                        to={`/learn/${courseId}/module/${module.moduleId}/lesson/${lesson.lessonId}`}
-                        className={`w-full flex flex-col p-4 text-left transition-all duration-300 relative group ${
-                          isActive
-                            ? "bg-blue-900/20 border-l-4 border-blue-400 shadow-[inset_4px_0_15px_rgba(96,165,250,0.1)]"
-                            : "hover:bg-slate-800/50 border-l-4 border-transparent hover:shadow-[inset_4px_0_15px_rgba(56,189,248,0.05)] hover:border-slate-700"
-                        }`}
-                      >
-                        <div className="flex items-start justify-between">
-                          <div className="flex items-start gap-3">
-                            <div className="mt-1 shrink-0">
-                              {isActive ? (
-                                <div className="w-5 h-5 rounded-md bg-blue-500 flex items-center justify-center shadow-[0_0_10px_rgba(59,130,246,0.6)] ring-2 ring-blue-500/20">
-                                  <div className="w-1.5 h-1.5 bg-slate-900 rounded-full"></div>
-                                </div>
-                              ) : isCompleted ? (
-                                <div className="w-5 h-5 rounded-md border border-sky-400/50 bg-sky-400/10 flex items-center justify-center">
-                                  <Check className="w-3.5 h-3.5 text-sky-400" />
-                                </div>
-                              ) : (
-                                <div className="w-5 h-5 rounded-md border border-slate-700 group-hover:border-slate-500 transition-colors"></div>
-                              )}
-                            </div>
-                            <div>
-                              <p
-                                className={`text-sm font-medium transition-colors ${isActive ? "text-blue-400 drop-shadow-[0_0_8px_rgba(96,165,250,0.3)]" : "text-slate-300 group-hover:text-slate-200"}`}
-                              >
-                                {lessonIndex + 1}. {lesson.title}
-                              </p>
-                              <div className="flex items-center gap-2 mt-1">
-                                <span className="text-xs text-slate-500 group-hover:text-slate-400 transition-colors">
-                                  12:45
-                                </span>
-                              </div>
-                            </div>
-                          </div>
-                          <div className="shrink-0 ml-2 mt-1">
-                            {isActive ? (
-                              <Play className="w-4 h-4 text-blue-400 drop-shadow-[0_0_5px_rgba(96,165,250,0.5)]" />
-                            ) : isLocked ? (
-                              <Lock className="w-4 h-4 text-slate-400" />
-                            ) : null}
-                          </div>
-                        </div>
-                      </Link>
-                    );
-                  })}
-                </div>
-              </div>
-            ))}
-          </div>
-
-          <div className="p-4 border-t border-slate-800 mt-auto bg-slate-900/95 backdrop-blur-sm">
-            <div className="flex items-center justify-between text-xs text-slate-400 mb-2">
-              <span>Course Progress</span>
-              <span className="font-bold text-blue-400">75%</span>
-            </div>
-            <div className="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden border border-slate-700">
-              <div className="bg-blue-500 h-full w-[75%] rounded-full shadow-[0_0_10px_rgba(59,130,246,0.8)]"></div>
-            </div>
-          </div>
-        </aside>
       </div>
-
-      {/* Floating AI Button */}
-      <button className="fixed bottom-6 right-6 w-14 h-14 bg-slate-800 border border-slate-700 text-sky-400 rounded-full shadow-[0_0_20px_rgba(56,189,248,0.2)] flex-center hover:bg-slate-700 hover:text-sky-300 hover:shadow-[0_0_25px_rgba(56,189,248,0.4)] transition-all duration-300 hover:scale-105 z-50">
-        <Bot className="icon-lg" />
-      </button>
     </div>
   );
 };
 
 export default LearningArena;
-
