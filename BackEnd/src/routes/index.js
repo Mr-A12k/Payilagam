@@ -27,6 +27,7 @@ const reportRoutes = require('../modules/admin/report.routes.js');
 const userRoutes = require('../modules/users/user.routes.js');
 
 router.use('/admin', adminRoutes);
+router.use('/ui-settings', require('../modules/customization/customization.routes'));
 router.use('/ai', aiRoutes);
 router.use('/assignments', assignmentRoutes);
 router.use('/auth', authRoutes);

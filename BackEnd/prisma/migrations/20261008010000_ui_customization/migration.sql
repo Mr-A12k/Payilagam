@@ -1,0 +1,6 @@
+CREATE TABLE "ui_customizations" (
+  "key" TEXT NOT NULL PRIMARY KEY,
+  "value" JSONB NOT NULL,
+  "revision" INTEGER NOT NULL DEFAULT 1,
+  "updated_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP
+);

@@ -10,6 +10,15 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model UiCustomization {
+  key       String   @id
+  value     Json
+  revision  Int      @default(1)
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("ui_customizations")
+}
+
 // ─────────────────────────────────────────────────────────────
 // AUTH & USER MANAGEMENT
 // ─────────────────────────────────────────────────────────────
