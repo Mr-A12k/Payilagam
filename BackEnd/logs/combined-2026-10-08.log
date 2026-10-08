@@ -1,0 +1,24 @@
+[2026-10-08 07:17:11] ERROR: GET /api/ui-settings - Cannot read properties of undefined (reading 'findMany') 
+TypeError: Cannot read properties of undefined (reading 'findMany')
+    at Object.getSettings (D:\TaskPro\BackEnd\src\modules\customization\customization.service.js:6:45)
+    at D:\TaskPro\BackEnd\src\modules\customization\customization.routes.js:6:75
+    at D:\TaskPro\BackEnd\src\utils\catchAsync.js:9:25
+    at Layer.handleRequest (D:\TaskPro\BackEnd\node_modules\router\lib\layer.js:152:17)
+    at next (D:\TaskPro\BackEnd\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (D:\TaskPro\BackEnd\node_modules\router\lib\route.js:117:3)
+    at handle (D:\TaskPro\BackEnd\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (D:\TaskPro\BackEnd\node_modules\router\lib\layer.js:152:17)
+    at D:\TaskPro\BackEnd\node_modules\router\index.js:295:15
+    at processParams (D:\TaskPro\BackEnd\node_modules\router\index.js:582:12)
+[2026-10-08 07:17:12] ERROR: GET /api/ui-settings - Cannot read properties of undefined (reading 'findMany') 
+TypeError: Cannot read properties of undefined (reading 'findMany')
+    at Object.getSettings (D:\TaskPro\BackEnd\src\modules\customization\customization.service.js:6:45)
+    at D:\TaskPro\BackEnd\src\modules\customization\customization.routes.js:6:75
+    at D:\TaskPro\BackEnd\src\utils\catchAsync.js:9:25
+    at Layer.handleRequest (D:\TaskPro\BackEnd\node_modules\router\lib\layer.js:152:17)
+    at next (D:\TaskPro\BackEnd\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (D:\TaskPro\BackEnd\node_modules\router\lib\route.js:117:3)
+    at handle (D:\TaskPro\BackEnd\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (D:\TaskPro\BackEnd\node_modules\router\lib\layer.js:152:17)
+    at D:\TaskPro\BackEnd\node_modules\router\index.js:295:15
+    at processParams (D:\TaskPro\BackEnd\node_modules\router\index.js:582:12)
