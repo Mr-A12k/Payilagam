@@ -1,10 +1,9 @@
 import { useState, useEffect, useRef } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
-import { useBackNavigation } from "@/hooks/useBackNavigation";
 import { executeHttpGetRequest, executeHttpPostRequest } from "@/api/commonServices";
 import { API_PATHS } from "@/api/constants";
 import { Play, Share2, Loader2, Code2, ArrowLeft, TerminalSquare } from "lucide-react";
-import { Button, Select, SelectTrigger, SelectValue, SelectContent, SelectItem, Input } from "@/components/ui";
+import { Button, Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui";
 import toast from "react-hot-toast";
 
 import EditorModule from "react-simple-code-editor";
@@ -250,7 +249,7 @@ const CodingLab = () => {
             <Editor
               value={code}
               onValueChange={setCode}
-              highlight={(c) => highlightWithPrism(c, language)}
+              highlight={(c: string) => highlightWithPrism(c, language)}
               padding={16}
               style={{ minHeight: "100%", fontSize: 14, outline: "none" }}
               textareaClassName="focus:outline-none"

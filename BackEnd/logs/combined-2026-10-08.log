@@ -22,3 +22,13 @@ TypeError: Cannot read properties of undefined (reading 'findMany')
     at Layer.handleRequest (D:\TaskPro\BackEnd\node_modules\router\lib\layer.js:152:17)
     at D:\TaskPro\BackEnd\node_modules\router\index.js:295:15
     at processParams (D:\TaskPro\BackEnd\node_modules\router\index.js:582:12)
+[2026-10-08 07:33:19] ERROR: GET /api/ui-settings - Not Found - /api/ui-settings 
+Error: Not Found - /api/ui-settings
+    at notFound (D:\TaskPro\BackEnd\src\middlewares\errorMiddleware.js:8:17)
+    at Layer.handleRequest (D:\TaskPro\BackEnd\node_modules\router\lib\layer.js:152:17)
+    at trimPrefix (D:\TaskPro\BackEnd\node_modules\router\index.js:342:13)
+    at D:\TaskPro\BackEnd\node_modules\router\index.js:297:9
+    at processParams (D:\TaskPro\BackEnd\node_modules\router\index.js:582:12)
+    at Immediate.next (D:\TaskPro\BackEnd\node_modules\router\index.js:291:5)
+    at Immediate._onImmediate (D:\TaskPro\BackEnd\node_modules\router\index.js:688:15)
+    at process.processImmediate (node:internal/timers:506:21)
