@@ -1,13 +1,13 @@
 /**
- * @file Labs.jsx
+ * @file Labs.tsx
  * @description Labs Hub — a fully searchable and filterable grid of all available and upcoming lab environments.
  */
 import { useState, useMemo } from "react";
-import { Search, Filter, Beaker } from "lucide-react";
-import { Button } from "@/components/ui";
-import { cn } from "@/lib/utils";
+import { Link } from "react-router-dom";
+import { Search, ArrowUpRight, Beaker, Code2 } from "lucide-react";
 import { ALL_LABS } from "@/lib/labsData";
 import { LabCard } from "@/components/LabCard";
+import "./Labs.css";
 
 const CATEGORIES = [
   "All",
@@ -18,12 +18,6 @@ const CATEGORIES = [
   "Security",
   "Emerging Tech"
 ];
-
-// ─────────────────────────────────────────────────────────────
-// Subcomponents
-// ─────────────────────────────────────────────────────────────
-
-
 
 // ─────────────────────────────────────────────────────────────
 // Main Page Component
@@ -44,92 +38,111 @@ export default function Labs() {
     });
   }, [searchTerm, activeCategory]);
 
-  return (
-    <div className="min-h-screen bg-slate-950 pb-20">
-      {/* Hero Section */}
-      <div className="relative pt-12 pb-16 overflow-hidden">
-        {/* Background Effects */}
-        <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] rounded-full bg-blue-900/20 blur-[120px] pointer-events-none" />
-        <div className="absolute top-[20%] right-[-10%] w-[40%] h-[40%] rounded-full bg-indigo-900/20 blur-[120px] pointer-events-none" />
-        
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <div className="text-center max-w-3xl mx-auto">
-            <div className="inline-flex items-center justify-center p-3 bg-blue-500/10 rounded-2xl mb-6 border border-blue-500/20">
-              <Beaker className="w-8 h-8 text-blue-400" />
-            </div>
-            <h1 className="text-4xl md:text-5xl font-extrabold text-white tracking-tight mb-6 leading-tight">
-              Payilagam <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-400">Labs</span>
-            </h1>
-            <p className="text-lg text-slate-400 mb-8 leading-relaxed">
-              Immersive, browser-based environments to practice coding, networking, databases, and more. Stop watching and start building.
-            </p>
+  const categoryCounts = useMemo(() => {
+    const counts: Record<string, number> = { All: ALL_LABS.length };
+    ALL_LABS.forEach((lab: any) => {
+      counts[lab.category] = (counts[lab.category] || 0) + 1;
+    });
+    return counts;
+  }, []);
 
-            {/* Search Bar */}
-            <div className="relative max-w-2xl mx-auto group">
-              <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
-                <Search className="h-5 w-5 text-slate-400 group-focus-within:text-blue-400 transition-colors" />
-              </div>
-              <input
-                type="text"
-                placeholder="Search labs, technologies, or topics..."
-                value={searchTerm}
-                onChange={(event: React.SyntheticEvent<any>) => setSearchTerm((event.target as HTMLInputElement).value)}
-                className="w-full bg-slate-900/80 backdrop-blur-md border border-slate-800 text-slate-200 rounded-2xl pl-12 pr-4 py-4 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all shadow-xl"
-              />
-            </div>
+  return (
+    <div className="labs-page-wrap">
+      {/* Featured Spotlight — Coding Lab (the only live one) */}
+      <div className="labs-spotlight-card">
+        <div className="labs-spotlight-left">
+          <div className="labs-spotlight-pill">
+            <span className="labs-pulse-dot" aria-hidden="true" />
+            Live Sandbox
+          </div>
+          <h1 className="labs-spotlight-title">
+            Payilagam Coding Lab
+          </h1>
+          <p className="labs-spotlight-desc">
+            A full online compiler supporting Python, JavaScript, Java, C, C++ and more — powered by Judge0. 
+            Write, run and share code instantly from your browser.
+          </p>
+          <div className="labs-spotlight-chips">
+            <span className="labs-chip chip-gold">
+              <Code2 size={13} /> Multi-Language
+            </span>
+            <span className="labs-chip chip-blue">
+              <ArrowUpRight size={13} /> Instant Execution
+            </span>
+            <span className="labs-chip chip-cyan">
+              <Beaker size={13} /> Share Links
+            </span>
+          </div>
+        </div>
+        <div className="labs-spotlight-right">
+          <Link to="/labs/code" className="labs-spotlight-btn">
+            Launch Sandbox <ArrowUpRight />
+          </Link>
+          <div className="labs-live-indicator">
+            <span className="labs-pulse-dot" aria-hidden="true" />
+            Live & Ready
           </div>
         </div>
       </div>
 
-      {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        
-        {/* Categories */}
-        <div className="flex items-center gap-2 overflow-x-auto pb-4 mb-8 scrollbar-hide no-scrollbar">
-          <Filter className="w-4 h-4 text-slate-500 mr-2 shrink-0" />
-          {CATEGORIES.map((category: any) => (
+      {/* Toolbar: Search + Category Pills */}
+      <div className="labs-toolbar-row">
+        <div className="labs-search-bar">
+          <Search />
+          <input
+            type="text"
+            placeholder="Search labs, technologies..."
+            value={searchTerm}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value)}
+            className="labs-search-input"
+          />
+        </div>
+        <div className="labs-category-pills">
+          {CATEGORIES.map((category) => (
             <button
               key={category}
               onClick={() => setActiveCategory(category)}
-              className={cn(
-                "whitespace-nowrap px-4 py-2 rounded-full text-sm font-medium transition-all",
-                activeCategory === category 
-                  ? "bg-blue-600 text-white shadow-lg shadow-blue-900/20 border border-blue-500"
-                  : "bg-slate-900 text-slate-400 hover:text-white hover:bg-slate-800 border border-slate-800"
-              )}
+              className={`labs-cat-pill ${activeCategory === category ? "is-active" : ""}`}
             >
               {category}
+              <span className="labs-cat-count">({categoryCounts[category] || 0})</span>
             </button>
           ))}
         </div>
-
-        {/* Results Grid */}
-        {filteredLabs.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {filteredLabs.map((lab: any) => (
-              <LabCard key={lab.id} lab={lab} />
-            ))}
-          </div>
-        ) : (
-          <div className="text-center py-24 bg-slate-900/50 rounded-2xl border border-slate-800/50 backdrop-blur-sm">
-            <div className="w-16 h-16 bg-slate-800/50 rounded-2xl flex-center mx-auto mb-4 border border-slate-700/50">
-              <Search className="w-8 h-8 text-slate-500" />
-            </div>
-            <h3 className="text-xl font-bold text-white mb-2">No labs found</h3>
-            <p className="text-slate-400 max-w-md mx-auto">
-              We couldn't find any labs matching "{searchTerm}" in the {activeCategory} category.
-            </p>
-            <Button 
-              variant="outline" 
-              className="mt-6 border-slate-700 hover:bg-slate-800"
-              onClick={() => { setSearchTerm(""); setActiveCategory("All"); }}
-            >
-              Clear Filters
-            </Button>
-          </div>
-        )}
-
       </div>
+
+      {/* Results Grid */}
+      {filteredLabs.length > 0 ? (
+        <div className="labs-grid">
+          {filteredLabs.map((lab: any) => (
+            <LabCard key={lab.id} lab={lab} />
+          ))}
+        </div>
+      ) : (
+        <div style={{ textAlign: "center", padding: "60px 20px" }}>
+          <div
+            style={{
+              width: 56, height: 56, borderRadius: 14,
+              background: "var(--bg-surface-2)", border: "1px solid var(--border-default)",
+              display: "grid", placeItems: "center", margin: "0 auto 16px",
+            }}
+          >
+            <Search size={24} style={{ color: "var(--text-muted)" }} />
+          </div>
+          <h3 style={{ fontSize: 18, fontWeight: 700, color: "var(--text-heading)", marginBottom: 6 }}>
+            No labs found
+          </h3>
+          <p style={{ color: "var(--text-secondary)", fontSize: 14, maxWidth: 400, margin: "0 auto 16px" }}>
+            We couldn't find any labs matching "{searchTerm}" in the {activeCategory} category.
+          </p>
+          <button
+            onClick={() => { setSearchTerm(""); setActiveCategory("All"); }}
+            className="labs-cat-pill"
+          >
+            Clear Filters
+          </button>
+        </div>
+      )}
     </div>
   );
 }
